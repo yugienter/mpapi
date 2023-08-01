@@ -13,15 +13,11 @@ export class ForgotService {
   ) {}
 
   async findOne(options: FindOptions<Forgot>): Promise<NullableType<Forgot>> {
-    return this.forgotRepository.findOne({
-      where: options.where,
-    });
+    return this.forgotRepository.findOne({ where: options.where });
   }
 
   async findMany(options: FindOptions<Forgot>): Promise<Forgot[]> {
-    return this.forgotRepository.find({
-      where: options.where,
-    });
+    return this.forgotRepository.find({ where: options.where });
   }
 
   async create(data: DeepPartial<Forgot>): Promise<Forgot> {

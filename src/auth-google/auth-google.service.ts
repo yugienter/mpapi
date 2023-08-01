@@ -16,14 +16,10 @@ export class AuthGoogleService {
     );
   }
 
-  async getProfileByToken(
-    loginDto: AuthGoogleLoginDto,
-  ): Promise<SocialInterface> {
+  async getProfileByToken(loginDto: AuthGoogleLoginDto): Promise<SocialInterface> {
     const ticket = await this.google.verifyIdToken({
       idToken: loginDto.idToken,
-      audience: [
-        this.configService.getOrThrow('google.clientId', { infer: true }),
-      ],
+      audience: [this.configService.getOrThrow('google.clientId', { infer: true })],
     });
 
     const data = ticket.getPayload();
@@ -32,9 +28,7 @@ export class AuthGoogleService {
       throw new HttpException(
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            user: 'wrongToken',
-          },
+          errors: { user: 'wrongToken' },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
       );

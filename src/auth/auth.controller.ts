@@ -26,32 +26,21 @@ import { NullableType } from '../utils/types/nullable.type';
 import { AuthCompanyRegisterDto } from './dto/auth-company-register.dto';
 
 @ApiTags('Auth')
-@Controller({
-  path: 'auth',
-  version: '1',
-})
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(private readonly service: AuthService) {}
 
-  @SerializeOptions({
-    groups: ['me'],
-  })
+  @SerializeOptions({ groups: ['me'] })
   @Post('email/login')
   @HttpCode(HttpStatus.OK)
-  public login(
-    @Body() loginDto: AuthEmailLoginDto,
-  ): Promise<LoginResponseType> {
+  public login(@Body() loginDto: AuthEmailLoginDto): Promise<LoginResponseType> {
     return this.service.validateLogin(loginDto, false);
   }
 
-  @SerializeOptions({
-    groups: ['me'],
-  })
+  @SerializeOptions({ groups: ['me'] })
   @Post('admin/email/login')
   @HttpCode(HttpStatus.OK)
-  public adminLogin(
-    @Body() loginDTO: AuthEmailLoginDto,
-  ): Promise<LoginResponseType> {
+  public adminLogin(@Body() loginDTO: AuthEmailLoginDto): Promise<LoginResponseType> {
     return this.service.validateLogin(loginDTO, true);
   }
 
@@ -63,41 +52,30 @@ export class AuthController {
 
   @Post('company/register')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async companyRegister(
-    @Body() createUserCompanyDto: AuthCompanyRegisterDto,
-  ): Promise<void> {
+  async companyRegister(@Body() createUserCompanyDto: AuthCompanyRegisterDto): Promise<void> {
     return this.service.companyRegister(createUserCompanyDto);
   }
 
   @Post('email/confirm')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async confirmEmail(
-    @Body() confirmEmailDto: AuthConfirmEmailDto,
-  ): Promise<void> {
+  async confirmEmail(@Body() confirmEmailDto: AuthConfirmEmailDto): Promise<void> {
     return this.service.confirmEmail(confirmEmailDto.hash);
   }
 
   @Post('forgot/password')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async forgotPassword(
-    @Body() forgotPasswordDto: AuthForgotPasswordDto,
-  ): Promise<void> {
+  async forgotPassword(@Body() forgotPasswordDto: AuthForgotPasswordDto): Promise<void> {
     return this.service.forgotPassword(forgotPasswordDto.email);
   }
 
   @Post('reset/password')
   @HttpCode(HttpStatus.NO_CONTENT)
   resetPassword(@Body() resetPasswordDto: AuthResetPasswordDto): Promise<void> {
-    return this.service.resetPassword(
-      resetPasswordDto.hash,
-      resetPasswordDto.password,
-    );
+    return this.service.resetPassword(resetPasswordDto.hash, resetPasswordDto.password);
   }
 
   @ApiBearerAuth()
-  @SerializeOptions({
-    groups: ['me'],
-  })
+  @SerializeOptions({ groups: ['me'] })
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
@@ -106,9 +84,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
-  @SerializeOptions({
-    groups: ['me'],
-  })
+  @SerializeOptions({ groups: ['me'] })
   @Post('refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
   @HttpCode(HttpStatus.OK)
@@ -127,16 +103,11 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
-  @SerializeOptions({
-    groups: ['me'],
-  })
+  @SerializeOptions({ groups: ['me'] })
   @Patch('me')
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
-  public update(
-    @Request() request,
-    @Body() userDto: AuthUpdateDto,
-  ): Promise<NullableType<User>> {
+  public update(@Request() request, @Body() userDto: AuthUpdateDto): Promise<NullableType<User>> {
     return this.service.update(request.user, userDto);
   }
 

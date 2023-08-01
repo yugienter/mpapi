@@ -23,44 +23,25 @@ import { AllConfigType } from 'src/config/config.type';
             diskStorage({
               destination: './files',
               filename: (request, file, callback) => {
-                callback(
-                  null,
-                  `${randomStringGenerator()}.${file.originalname
-                    .split('.')
-                    .pop()
-                    ?.toLowerCase()}`,
-                );
+                callback(null, `${randomStringGenerator()}.${file.originalname.split('.').pop()?.toLowerCase()}`);
               },
             }),
           s3: () => {
             const s3 = new S3Client({
               region: configService.get('file.awsS3Region', { infer: true }),
               credentials: {
-                accessKeyId: configService.getOrThrow('file.accessKeyId', {
-                  infer: true,
-                }),
-                secretAccessKey: configService.getOrThrow(
-                  'file.secretAccessKey',
-                  { infer: true },
-                ),
+                accessKeyId: configService.getOrThrow('file.accessKeyId', { infer: true }),
+                secretAccessKey: configService.getOrThrow('file.secretAccessKey', { infer: true }),
               },
             });
 
             return multerS3({
               s3: s3,
-              bucket: configService.getOrThrow('file.awsDefaultS3Bucket', {
-                infer: true,
-              }),
+              bucket: configService.getOrThrow('file.awsDefaultS3Bucket', { infer: true }),
               acl: 'public-read',
               contentType: multerS3.AUTO_CONTENT_TYPE,
               key: (request, file, callback) => {
-                callback(
-                  null,
-                  `${randomStringGenerator()}.${file.originalname
-                    .split('.')
-                    .pop()
-                    ?.toLowerCase()}`,
-                );
+                callback(null, `${randomStringGenerator()}.${file.originalname.split('.').pop()?.toLowerCase()}`);
               },
             });
           },
@@ -73,9 +54,7 @@ import { AllConfigType } from 'src/config/config.type';
                 new HttpException(
                   {
                     status: HttpStatus.UNPROCESSABLE_ENTITY,
-                    errors: {
-                      file: `cantUploadFileType`,
-                    },
+                    errors: { file: `cantUploadFileType` },
                   },
                   HttpStatus.UNPROCESSABLE_ENTITY,
                 ),
@@ -85,13 +64,8 @@ import { AllConfigType } from 'src/config/config.type';
 
             callback(null, true);
           },
-          storage:
-            storages[
-              configService.getOrThrow('file.driver', { infer: true })
-            ](),
-          limits: {
-            fileSize: configService.get('file.maxFileSize', { infer: true }),
-          },
+          storage: storages[configService.getOrThrow('file.driver', { infer: true })](),
+          limits: { fileSize: configService.get('file.maxFileSize', { infer: true }) },
         };
       },
     }),

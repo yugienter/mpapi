@@ -22,20 +22,13 @@ export class AuthFacebookService {
     });
   }
 
-  async getProfileByToken(
-    loginDto: AuthFacebookLoginDto,
-  ): Promise<SocialInterface> {
+  async getProfileByToken(loginDto: AuthFacebookLoginDto): Promise<SocialInterface> {
     this.fb.setAccessToken(loginDto.accessToken);
 
     const data: FacebookInterface = await new Promise((resolve) => {
-      this.fb.api(
-        '/me',
-        'get',
-        { fields: 'id,last_name,email,first_name' },
-        (response) => {
-          resolve(response);
-        },
-      );
+      this.fb.api('/me', 'get', { fields: 'id,last_name,email,first_name' }, (response) => {
+        resolve(response);
+      });
     });
 
     return {

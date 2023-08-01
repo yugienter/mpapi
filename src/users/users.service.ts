@@ -15,14 +15,10 @@ export class UsersService {
   ) {}
 
   create(createProfileDto: CreateUserDto): Promise<User> {
-    return this.usersRepository.save(
-      this.usersRepository.create(createProfileDto),
-    );
+    return this.usersRepository.save(this.usersRepository.create(createProfileDto));
   }
 
-  findManyWithPagination(
-    paginationOptions: IPaginationOptions,
-  ): Promise<User[]> {
+  findManyWithPagination(paginationOptions: IPaginationOptions): Promise<User[]> {
     return this.usersRepository.find({
       skip: (paginationOptions.page - 1) * paginationOptions.limit,
       take: paginationOptions.limit,
@@ -30,18 +26,11 @@ export class UsersService {
   }
 
   findOne(fields: EntityCondition<User>): Promise<NullableType<User>> {
-    return this.usersRepository.findOne({
-      where: fields,
-    });
+    return this.usersRepository.findOne({ where: fields });
   }
 
   update(id: User['id'], payload: DeepPartial<User>): Promise<User> {
-    return this.usersRepository.save(
-      this.usersRepository.create({
-        id,
-        ...payload,
-      }),
-    );
+    return this.usersRepository.save(this.usersRepository.create({ id, ...payload }));
   }
 
   async softDelete(id: User['id']): Promise<void> {

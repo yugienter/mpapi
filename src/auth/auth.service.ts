@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import ms from 'ms';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entities/user.entity';
@@ -47,27 +42,17 @@ export class AuthService {
     private configService: ConfigService<AllConfigType>,
   ) {}
 
-  async validateLogin(
-    loginDto: AuthEmailLoginDto,
-    onlyAdmin: boolean,
-  ): Promise<LoginResponseType> {
-    const user = await this.usersService.findOne({
-      email: loginDto.email,
-    });
+  async validateLogin(loginDto: AuthEmailLoginDto, onlyAdmin: boolean): Promise<LoginResponseType> {
+    const user = await this.usersService.findOne({ email: loginDto.email });
 
     if (
       !user ||
-      (user?.role &&
-        !(
-          onlyAdmin ? [RoleEnum.admin] : [RoleEnum.company, RoleEnum.investor]
-        ).includes(user.role.id))
+      (user?.role && !(onlyAdmin ? [RoleEnum.admin] : [RoleEnum.company, RoleEnum.investor]).includes(user.role.id))
     ) {
       throw new HttpException(
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            email: 'notFound',
-          },
+          errors: { email: 'notFound' },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
@@ -77,34 +62,25 @@ export class AuthService {
       throw new HttpException(
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            email: `needLoginViaProvider:${user.provider}`,
-          },
+          errors: { email: `needLoginViaProvider:${user.provider}` },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
-    const isValidPassword = await bcrypt.compare(
-      loginDto.password,
-      user.password,
-    );
+    const isValidPassword = await bcrypt.compare(loginDto.password, user.password);
 
     if (!isValidPassword) {
       throw new HttpException(
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            password: 'incorrectPassword',
-          },
+          errors: { password: 'incorrectPassword' },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
-    const session = await this.sessionService.create({
-      user,
-    });
+    const session = await this.sessionService.create({ user });
 
     const { token, refreshToken, tokenExpires } = await this.getTokensData({
       id: user.id,
@@ -120,21 +96,13 @@ export class AuthService {
     };
   }
 
-  async validateSocialLogin(
-    authProvider: string,
-    socialData: SocialInterface,
-  ): Promise<LoginResponseType> {
+  async validateSocialLogin(authProvider: string, socialData: SocialInterface): Promise<LoginResponseType> {
     let user: NullableType<User>;
     const socialEmail = socialData.email?.toLowerCase();
 
-    const userByEmail = await this.usersService.findOne({
-      email: socialEmail,
-    });
+    const userByEmail = await this.usersService.findOne({ email: socialEmail });
 
-    user = await this.usersService.findOne({
-      socialId: socialData.id,
-      provider: authProvider,
-    });
+    user = await this.usersService.findOne({ socialId: socialData.id, provider: authProvider });
 
     if (user) {
       if (socialEmail && !userByEmail) {
@@ -145,12 +113,8 @@ export class AuthService {
       user = userByEmail;
     } else {
       /** TODO -  ROLE INVESTOR : Validate role investor  */
-      const role = plainToClass(Role, {
-        id: RoleEnum.company,
-      });
-      const status = plainToClass(Status, {
-        id: StatusEnum.active,
-      });
+      const role = plainToClass(Role, { id: RoleEnum.company });
+      const status = plainToClass(Status, { id: StatusEnum.active });
 
       user = await this.usersService.create({
         email: socialEmail ?? null,
@@ -162,26 +126,20 @@ export class AuthService {
         status,
       });
 
-      user = await this.usersService.findOne({
-        id: user.id,
-      });
+      user = await this.usersService.findOne({ id: user.id });
     }
 
     if (!user) {
       throw new HttpException(
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            user: 'userNotFound',
-          },
+          errors: { user: 'userNotFound' },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
-    const session = await this.sessionService.create({
-      user,
-    });
+    const session = await this.sessionService.create({ user });
 
     const {
       token: jwtToken,
@@ -211,60 +169,36 @@ export class AuthService {
     const userData = await this.usersService.create({
       ...user,
       email: user.email,
-      role: {
-        id: RoleEnum.company,
-      } as Role,
-      status: {
-        id: StatusEnum.inactive,
-      } as Status,
+      role: { id: RoleEnum.company } as Role,
+      status: { id: StatusEnum.inactive } as Status,
     });
 
     let company = new CreateCompanyDto();
-    company = {
-      ...dto.company,
-      user: userData as User,
-    };
+    company = { ...dto.company, user: userData as User };
 
     await this.companiesService.create(company);
 
-    await this.mailService.userCompanyRegister({
-      to: dto.user.email,
-      data: null,
-    });
+    await this.mailService.userCompanyRegister({ to: dto.user.email, data: null });
   }
 
   async register(dto: AuthRegisterLoginDto): Promise<void> {
-    const hash = crypto
-      .createHash('sha256')
-      .update(randomStringGenerator())
-      .digest('hex');
+    const hash = crypto.createHash('sha256').update(randomStringGenerator()).digest('hex');
 
     /** TODO -  ROLE INVESTOR : register role investor  */
 
     await this.usersService.create({
       ...dto,
       email: dto.email,
-      role: {
-        id: RoleEnum.company,
-      } as Role,
-      status: {
-        id: StatusEnum.inactive,
-      } as Status,
+      role: { id: RoleEnum.company } as Role,
+      status: { id: StatusEnum.inactive } as Status,
       hash,
     });
 
-    await this.mailService.userSignUp({
-      to: dto.email,
-      data: {
-        hash,
-      },
-    });
+    await this.mailService.userSignUp({ to: dto.email, data: { hash } });
   }
 
   async confirmEmail(hash: string): Promise<void> {
-    const user = await this.usersService.findOne({
-      hash,
-    });
+    const user = await this.usersService.findOne({ hash });
 
     if (!user) {
       throw new HttpException(
@@ -277,60 +211,37 @@ export class AuthService {
     }
 
     user.hash = null;
-    user.status = plainToClass(Status, {
-      id: StatusEnum.active,
-    });
+    user.status = plainToClass(Status, { id: StatusEnum.active });
     await user.save();
   }
 
   async forgotPassword(email: string): Promise<void> {
-    const user = await this.usersService.findOne({
-      email,
-    });
+    const user = await this.usersService.findOne({ email });
 
     if (!user) {
       throw new HttpException(
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            email: 'emailNotExists',
-          },
+          errors: { email: 'emailNotExists' },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
-    const hash = crypto
-      .createHash('sha256')
-      .update(randomStringGenerator())
-      .digest('hex');
-    await this.forgotService.create({
-      hash,
-      user,
-    });
+    const hash = crypto.createHash('sha256').update(randomStringGenerator()).digest('hex');
+    await this.forgotService.create({ hash, user });
 
-    await this.mailService.forgotPassword({
-      to: email,
-      data: {
-        hash,
-      },
-    });
+    await this.mailService.forgotPassword({ to: email, data: { hash } });
   }
 
   async resetPassword(hash: string, password: string): Promise<void> {
-    const forgot = await this.forgotService.findOne({
-      where: {
-        hash,
-      },
-    });
+    const forgot = await this.forgotService.findOne({ where: { hash } });
 
     if (!forgot) {
       throw new HttpException(
         {
           status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            hash: `notFound`,
-          },
+          errors: { hash: `notFound` },
         },
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
@@ -339,63 +250,43 @@ export class AuthService {
     const user = forgot.user;
     user.password = password;
 
-    await this.sessionService.softDelete({
-      user: {
-        id: user.id,
-      },
-    });
+    await this.sessionService.softDelete({ user: { id: user.id } });
     await user.save();
     await this.forgotService.softDelete(forgot.id);
   }
 
   async me(userJwtPayload: JwtPayloadType): Promise<NullableType<User>> {
-    return this.usersService.findOne({
-      id: userJwtPayload.id,
-    });
+    return this.usersService.findOne({ id: userJwtPayload.id });
   }
 
-  async update(
-    userJwtPayload: JwtPayloadType,
-    userDto: AuthUpdateDto,
-  ): Promise<NullableType<User>> {
+  async update(userJwtPayload: JwtPayloadType, userDto: AuthUpdateDto): Promise<NullableType<User>> {
     if (userDto.password) {
       if (userDto.oldPassword) {
-        const currentUser = await this.usersService.findOne({
-          id: userJwtPayload.id,
-        });
+        const currentUser = await this.usersService.findOne({ id: userJwtPayload.id });
 
         if (!currentUser) {
           throw new HttpException(
             {
               status: HttpStatus.UNPROCESSABLE_ENTITY,
-              errors: {
-                user: 'userNotFound',
-              },
+              errors: { user: 'userNotFound' },
             },
             HttpStatus.UNPROCESSABLE_ENTITY,
           );
         }
 
-        const isValidOldPassword = await bcrypt.compare(
-          userDto.oldPassword,
-          currentUser.password,
-        );
+        const isValidOldPassword = await bcrypt.compare(userDto.oldPassword, currentUser.password);
 
         if (!isValidOldPassword) {
           throw new HttpException(
             {
               status: HttpStatus.UNPROCESSABLE_ENTITY,
-              errors: {
-                oldPassword: 'incorrectOldPassword',
-              },
+              errors: { oldPassword: 'incorrectOldPassword' },
             },
             HttpStatus.UNPROCESSABLE_ENTITY,
           );
         } else {
           await this.sessionService.softDelete({
-            user: {
-              id: currentUser.id,
-            },
+            user: { id: currentUser.id },
             excludeId: userJwtPayload.sessionId,
           });
         }
@@ -403,9 +294,7 @@ export class AuthService {
         throw new HttpException(
           {
             status: HttpStatus.UNPROCESSABLE_ENTITY,
-            errors: {
-              oldPassword: 'missingOldPassword',
-            },
+            errors: { oldPassword: 'missingOldPassword' },
           },
           HttpStatus.UNPROCESSABLE_ENTITY,
         );
@@ -414,19 +303,11 @@ export class AuthService {
 
     await this.usersService.update(userJwtPayload.id, userDto);
 
-    return this.usersService.findOne({
-      id: userJwtPayload.id,
-    });
+    return this.usersService.findOne({ id: userJwtPayload.id });
   }
 
-  async refreshToken(
-    data: Pick<JwtRefreshPayloadType, 'sessionId'>,
-  ): Promise<Omit<LoginResponseType, 'user'>> {
-    const session = await this.sessionService.findOne({
-      where: {
-        id: data.sessionId,
-      },
-    });
+  async refreshToken(data: Pick<JwtRefreshPayloadType, 'sessionId'>): Promise<Omit<LoginResponseType, 'user'>> {
+    const session = await this.sessionService.findOne({ where: { id: data.sessionId } });
 
     if (!session) {
       throw new UnauthorizedException();
@@ -450,45 +331,24 @@ export class AuthService {
   }
 
   async logout(data: Pick<JwtRefreshPayloadType, 'sessionId'>) {
-    return this.sessionService.softDelete({
-      id: data.sessionId,
-    });
+    return this.sessionService.softDelete({ id: data.sessionId });
   }
 
-  private async getTokensData(data: {
-    id: User['id'];
-    role: User['role'];
-    sessionId: Session['id'];
-  }) {
-    const tokenExpiresIn = this.configService.getOrThrow('auth.expires', {
-      infer: true,
-    });
+  private async getTokensData(data: { id: User['id']; role: User['role']; sessionId: Session['id'] }) {
+    const tokenExpiresIn = this.configService.getOrThrow('auth.expires', { infer: true });
 
     const tokenExpires = Date.now() + ms(tokenExpiresIn);
 
     const [token, refreshToken] = await Promise.all([
       await this.jwtService.signAsync(
-        {
-          id: data.id,
-          role: data.role,
-          sessionId: data.sessionId,
-        },
-        {
-          secret: this.configService.getOrThrow('auth.secret', { infer: true }),
-          expiresIn: tokenExpiresIn,
-        },
+        { id: data.id, role: data.role, sessionId: data.sessionId },
+        { secret: this.configService.getOrThrow('auth.secret', { infer: true }), expiresIn: tokenExpiresIn },
       ),
       await this.jwtService.signAsync(
+        { sessionId: data.sessionId },
         {
-          sessionId: data.sessionId,
-        },
-        {
-          secret: this.configService.getOrThrow('auth.refreshSecret', {
-            infer: true,
-          }),
-          expiresIn: this.configService.getOrThrow('auth.refreshExpires', {
-            infer: true,
-          }),
+          secret: this.configService.getOrThrow('auth.refreshSecret', { infer: true }),
+          expiresIn: this.configService.getOrThrow('auth.refreshExpires', { infer: true }),
         },
       ),
     ]);

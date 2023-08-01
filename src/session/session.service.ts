@@ -14,15 +14,11 @@ export class SessionService {
   ) {}
 
   async findOne(options: FindOptions<Session>): Promise<NullableType<Session>> {
-    return this.sessionRepository.findOne({
-      where: options.where,
-    });
+    return this.sessionRepository.findOne({ where: options.where });
   }
 
   async findMany(options: FindOptions<Session>): Promise<Session[]> {
-    return this.sessionRepository.find({
-      where: options.where,
-    });
+    return this.sessionRepository.find({ where: options.where });
   }
 
   async create(data: DeepPartial<Session>): Promise<Session> {

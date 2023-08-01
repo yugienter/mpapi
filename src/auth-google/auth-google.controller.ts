@@ -18,9 +18,7 @@ export class AuthGoogleController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Body() loginDto: AuthGoogleLoginDto,
-  ): Promise<LoginResponseType> {
+  async login(@Body() loginDto: AuthGoogleLoginDto): Promise<LoginResponseType> {
     const socialData = await this.authGoogleService.getProfileByToken(loginDto);
 
     return this.authService.validateSocialLogin('google', socialData);

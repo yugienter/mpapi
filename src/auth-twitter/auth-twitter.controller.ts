@@ -18,12 +18,8 @@ export class AuthTwitterController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Body() loginDto: AuthTwitterLoginDto,
-  ): Promise<LoginResponseType> {
-    const socialData = await this.authTwitterService.getProfileByToken(
-      loginDto,
-    );
+  async login(@Body() loginDto: AuthTwitterLoginDto): Promise<LoginResponseType> {
+    const socialData = await this.authTwitterService.getProfileByToken(loginDto);
 
     return this.authService.validateSocialLogin('twitter', socialData);
   }

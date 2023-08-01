@@ -21,8 +21,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       }),
       dropSchema: false,
       keepConnectionAlive: true,
-      logging:
-        this.configService.get('app.nodeEnv', { infer: true }) !== 'production',
+      logging: this.configService.get('app.nodeEnv', { infer: true }) !== 'production',
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
       cli: {
@@ -35,21 +34,13 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         max: this.configService.get('database.maxConnections', { infer: true }),
         ssl: this.configService.get('database.sslEnabled', { infer: true })
           ? {
-              rejectUnauthorized: this.configService.get(
-                'database.rejectUnauthorized',
-                { infer: true },
-              ),
-              ca:
-                this.configService.get('database.ca', { infer: true }) ??
-                undefined,
-              key:
-                this.configService.get('database.key', { infer: true }) ??
-                undefined,
-              cert:
-                this.configService.get('database.cert', { infer: true }) ??
-                undefined,
+              rejectUnauthorized: this.configService.get('database.rejectUnauthorized', { infer: true }),
+              ca: this.configService.get('database.ca', { infer: true }) ?? undefined,
+              key: this.configService.get('database.key', { infer: true }) ?? undefined,
+              cert: this.configService.get('database.cert', { infer: true }) ?? undefined,
             }
           : undefined,
+        charset: 'utf8',
       },
     } as TypeOrmModuleOptions;
   }

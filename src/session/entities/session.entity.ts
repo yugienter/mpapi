@@ -1,11 +1,4 @@
-import {
-  CreateDateColumn,
-  Entity,
-  Index,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  DeleteDateColumn,
-} from 'typeorm';
+import { CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, DeleteDateColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { EntityHelper } from 'src/utils/entity-helper';
 
@@ -14,9 +7,7 @@ export class Session extends EntityHelper {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, {
-    eager: true,
-  })
+  @ManyToOne(() => User, { eager: true })
   @Index()
   user: User;
 

@@ -54,20 +54,14 @@ import { CompaniesModule } from './companies/companies.module';
     }),
     I18nModule.forRootAsync({
       useFactory: (configService: ConfigService<AllConfigType>) => ({
-        fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', {
-          infer: true,
-        }),
+        fallbackLanguage: configService.getOrThrow('app.fallbackLanguage', { infer: true }),
         loaderOptions: { path: path.join(__dirname, '/i18n/'), watch: true },
       }),
       resolvers: [
         {
           use: HeaderResolver,
           useFactory: (configService: ConfigService<AllConfigType>) => {
-            return [
-              configService.get('app.headerLanguage', {
-                infer: true,
-              }),
-            ];
+            return [configService.get('app.headerLanguage', { infer: true })];
           },
           inject: [ConfigService],
         },

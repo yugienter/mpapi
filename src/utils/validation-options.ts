@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  ValidationError,
-  ValidationPipeOptions,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, ValidationError, ValidationPipeOptions } from '@nestjs/common';
 
 const validationOptions: ValidationPipeOptions = {
   transform: true,
@@ -16,9 +11,7 @@ const validationOptions: ValidationPipeOptions = {
         errors: errors.reduce(
           (accumulator, currentValue) => ({
             ...accumulator,
-            [currentValue.property]: Object.values(
-              currentValue.constraints ?? {},
-            ).join(', '),
+            [currentValue.property]: Object.values(currentValue.constraints ?? {}).join(', '),
           }),
           {},
         ),

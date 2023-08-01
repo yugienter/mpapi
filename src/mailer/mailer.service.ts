@@ -26,10 +26,7 @@ export class MailerService {
     templatePath,
     context,
     ...mailOptions
-  }: nodemailer.SendMailOptions & {
-    templatePath: string;
-    context: Record<string, unknown>;
-  }): Promise<void> {
+  }: nodemailer.SendMailOptions & { templatePath: string; context: Record<string, unknown> }): Promise<void> {
     let html: string | undefined;
     if (templatePath) {
       const template = await fs.readFile(templatePath, 'utf-8');

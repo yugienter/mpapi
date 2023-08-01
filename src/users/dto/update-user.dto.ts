@@ -15,9 +15,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ example: 'test1@example.com' })
   @Transform(lowerCaseTransformer)
   @IsOptional()
-  @Validate(IsNotExist, ['User'], {
-    message: 'emailAlreadyExists',
-  })
+  @Validate(IsNotExist, ['User'], { message: 'emailAlreadyExists' })
   @IsEmail()
   email?: string | null;
 
@@ -40,9 +38,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({ type: () => FileEntity })
   @IsOptional()
-  @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
-  })
+  @Validate(IsExist, ['FileEntity', 'id'], { message: 'imageNotExists' })
   photo?: FileEntity | null;
 
   @ApiProperty({ type: Role })
@@ -54,9 +50,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({ type: Status })
   @IsOptional()
-  @Validate(IsExist, ['Status', 'id'], {
-    message: 'statusNotExists',
-  })
+  @Validate(IsExist, ['Status', 'id'], { message: 'statusNotExists' })
   status?: Status;
 
   hash?: string | null;

@@ -14,11 +14,7 @@ import { UserSeedModule } from './user/user-seed.module';
     RoleSeedModule,
     StatusSeedModule,
     UserSeedModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [databaseConfig, appConfig],
-      envFilePath: ['.env'],
-    }),
+    ConfigModule.forRoot({ isGlobal: true, load: [databaseConfig, appConfig], envFilePath: ['.env'] }),
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
       dataSourceFactory: async (options: DataSourceOptions) => {

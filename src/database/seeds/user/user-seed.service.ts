@@ -13,13 +13,7 @@ export class UserSeedService {
   ) {}
 
   async run() {
-    const countAdmin = await this.repository.count({
-      where: {
-        role: {
-          id: RoleEnum.admin,
-        },
-      },
-    });
+    const countAdmin = await this.repository.count({ where: { role: { id: RoleEnum.admin } } });
 
     if (!countAdmin) {
       await this.repository.save(
@@ -28,25 +22,13 @@ export class UserSeedService {
           lastName: 'Admin',
           email: 'admin@example.com',
           password: 'secret',
-          role: {
-            id: RoleEnum.admin,
-            name: 'Admin',
-          },
-          status: {
-            id: StatusEnum.active,
-            name: 'Active',
-          },
+          role: { id: RoleEnum.admin, name: 'Admin' },
+          status: { id: StatusEnum.active, name: 'Active' },
         }),
       );
     }
 
-    const countUser = await this.repository.count({
-      where: {
-        role: {
-          id: RoleEnum.company,
-        },
-      },
-    });
+    const countUser = await this.repository.count({ where: { role: { id: RoleEnum.company } } });
 
     if (!countUser) {
       await this.repository.save(
@@ -55,14 +37,8 @@ export class UserSeedService {
           lastName: 'Doe',
           email: 'my.name@example.com',
           password: 'secret',
-          role: {
-            id: RoleEnum.company,
-            name: 'Company',
-          },
-          status: {
-            id: StatusEnum.active,
-            name: 'Active',
-          },
+          role: { id: RoleEnum.company, name: 'Company' },
+          status: { id: StatusEnum.active, name: 'Active' },
         }),
       );
     }

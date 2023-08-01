@@ -29,7 +29,7 @@ export class Company extends EntityHelper {
   @Expose({ name: 'describe' })
   description_1: string;
 
-  @Column()
+  @Column({ type: 'text' })
   @Expose({ name: 'introduction' })
   description_2: string;
 
@@ -88,7 +88,8 @@ export class Company extends EntityHelper {
   @Column('boolean', { default: false })
   businessCollaboration: boolean = false;
 
-  @Column({ type: String, nullable: true })
+  // @Column({ type: String, nullable: true })
+  @Column({ type: 'text', nullable: true })
   collaborationDetail: string | null;
 
   @OneToOne(() => User)

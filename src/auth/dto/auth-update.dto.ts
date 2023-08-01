@@ -6,9 +6,7 @@ import { FileEntity } from '../../files/entities/file.entity';
 export class AuthUpdateDto {
   @ApiProperty({ type: () => FileEntity })
   @IsOptional()
-  @Validate(IsExist, ['FileEntity', 'id'], {
-    message: 'imageNotExists',
-  })
+  @Validate(IsExist, ['FileEntity', 'id'], { message: 'imageNotExists' })
   photo?: FileEntity;
 
   @ApiProperty({ example: 'John' })

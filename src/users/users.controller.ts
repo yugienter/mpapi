@@ -38,18 +38,14 @@ import { NullableType } from '../utils/types/nullable.type';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @SerializeOptions({
-    groups: ['admin'],
-  })
+  @SerializeOptions({ groups: ['admin'] })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createProfileDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createProfileDto);
   }
 
-  @SerializeOptions({
-    groups: ['admin'],
-  })
+  @SerializeOptions({ groups: ['admin'] })
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll(
@@ -60,33 +56,20 @@ export class UsersController {
       limit = 50;
     }
 
-    return infinityPagination(
-      await this.usersService.findManyWithPagination({
-        page,
-        limit,
-      }),
-      { page, limit },
-    );
+    return infinityPagination(await this.usersService.findManyWithPagination({ page, limit }), { page, limit });
   }
 
-  @SerializeOptions({
-    groups: ['admin'],
-  })
+  @SerializeOptions({ groups: ['admin'] })
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id') id: string): Promise<NullableType<User>> {
     return this.usersService.findOne({ id: +id });
   }
 
-  @SerializeOptions({
-    groups: ['admin'],
-  })
+  @SerializeOptions({ groups: ['admin'] })
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  update(
-    @Param('id') id: number,
-    @Body() updateProfileDto: UpdateUserDto,
-  ): Promise<User> {
+  update(@Param('id') id: number, @Body() updateProfileDto: UpdateUserDto): Promise<User> {
     return this.usersService.update(id, updateProfileDto);
   }
 
