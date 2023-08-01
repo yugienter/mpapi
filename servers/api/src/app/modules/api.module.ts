@@ -23,7 +23,7 @@ import { EmailProvider } from '@/app/providers/email.provider'
 import { I18nProvider } from '@/app/providers/i18n.provider'
 import { SlackProvider } from '@/app/providers/slack.provider'
 import { StorageProvider } from '@/app/providers/storage.provider'
-import { authorizedControllers, jpccxPersistences, jpccxServices } from '@/app/utils/decorators'
+import { authorizedControllers, mpplatformPersistences, mpplatformServices } from '@/app/utils/decorators'
 
 // ここの並び順はSwagger的に若干重要
 const allControllers = [
@@ -51,8 +51,8 @@ const providers = [
 
 // ここに関してはproviders以外はcontrollerがimportされるとdocorator経由で入ってくる
 const services = [
-  ...jpccxServices,
-  ...jpccxPersistences,
+  ...mpplatformServices,
+  ...mpplatformPersistences,
   ...providers,
 ]
 

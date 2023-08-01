@@ -52,14 +52,14 @@ export const Authorized: () => ClassDecorator = () => {
  * DecorateされたServiceの一覧
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const jpccxServices: any[] = []
+export const mpplatformServices: any[] = []
 
 /**
  * サービス層のクラス一般に付ける
  */
 export const Service: () => ClassDecorator = () => {
   return (constructor) => {
-    jpccxServices.push(constructor)
+    mpplatformServices.push(constructor)
   }
 }
 
@@ -67,13 +67,13 @@ export const Service: () => ClassDecorator = () => {
  * DecorateされたPersistenceの一覧
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const jpccxPersistences: any[] = []
+export const mpplatformPersistences: any[] = []
 
 /**
  * 永続化層のクラス一般に付ける
  */
 export const Persistence: () => ClassDecorator = () => {
   return (constructor) => {
-    jpccxPersistences.push(constructor)
+    mpplatformPersistences.push(constructor)
   }
 }
