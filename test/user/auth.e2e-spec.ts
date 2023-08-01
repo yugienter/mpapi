@@ -1,11 +1,5 @@
 import request from 'supertest';
-import {
-  APP_URL,
-  TESTER_EMAIL,
-  TESTER_PASSWORD,
-  MAIL_HOST,
-  MAIL_PORT,
-} from '../utils/constants';
+import { APP_URL, TESTER_EMAIL, TESTER_PASSWORD, MAIL_HOST, MAIL_PORT } from '../utils/constants';
 
 describe('Auth user (e2e)', () => {
   const app = APP_URL;
@@ -90,8 +84,7 @@ describe('Auth user (e2e)', () => {
           body
             .find(
               (letter) =>
-                letter.to[0].address.toLowerCase() ===
-                  newUserEmail.toLowerCase() &&
+                letter.to[0].address.toLowerCase() === newUserEmail.toLowerCase() &&
                 /.*confirm\-email\/(\w+).*/g.test(letter.text),
             )
             ?.text.replace(/.*confirm\-email\/(\w+).*/g, '$1'),
@@ -113,8 +106,7 @@ describe('Auth user (e2e)', () => {
           body
             .find(
               (letter) =>
-                letter.to[0].address.toLowerCase() ===
-                  newUserEmail.toLowerCase() &&
+                letter.to[0].address.toLowerCase() === newUserEmail.toLowerCase() &&
                 /.*confirm\-email\/(\w+).*/g.test(letter.text),
             )
             ?.text.replace(/.*confirm\-email\/(\w+).*/g, '$1'),
@@ -274,9 +266,6 @@ describe('Auth user (e2e)', () => {
         collaborationDetail: 'string',
       },
     };
-    return request(app)
-      .post(`/api/v1/auth/company/register`)
-      .send(seed)
-      .expect(204);
+    return request(app).post(`/api/v1/auth/company/register`).send(seed).expect(204);
   });
 });
