@@ -1,0 +1,7 @@
+{
+  "TEST": "テスト",
+  "email_verification": "メールアドレスの確認",
+  "password_reset": "パスワードリセット",
+  "email_change_verification": "メールアドレスの変更",
+  "pug_comment": "pugでコンパイルするものについてはprefixに「|」をつける"
+}

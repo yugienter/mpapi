@@ -1,0 +1,6 @@
+{
+  "TEST": "test",
+  "email_verification": "Email address verification",
+  "password_reset": "Password reset",
+  "email_change_verification": "Email address change verification"
+}

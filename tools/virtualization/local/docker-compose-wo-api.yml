@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  firebase-emulator:
+    command: /usr/local/src/docker-run.sh local
+    image: ma-platform-firebase-emulator
+    build:
+      context: ../
+      dockerfile: ./local/firebase/Dockerfile
+      target: local
+    working_dir: /opt/modules/firebase-emulator
+    platform: "${BUILD_PLATFORM}"
+    environment:
+      - NODE_PROJECT_ROOT=/opt/modules/firebase-emulator
+      - APP_ENV=local
+    ports:
+      - "4000:4000"
+      - "8080:8080"
+      - "9099:9099"
+      - "9199:9199"
+    volumes:
+      - ../../../servers/firebase:/opt/modules/firebase-emulator
+      - ../default/firebase/docker-run.sh:/usr/local/src/docker-run.sh
+    networks:
+      - base-network
+  db:
+    image: mysql:8.0.28
+    command: mysqld
+    volumes:
+      - ./mysql/mysql_data/mpplatform:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    platform: "${BUILD_PLATFORM}"
+    environment:
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=mpplatform
+      - MYSQL_DATABASE=ma-platform-db
+    expose:
+      - '3306'
+    ports:
+      - '3206:3306'
+    networks:
+      - base-network
+networks:
+  base-network:

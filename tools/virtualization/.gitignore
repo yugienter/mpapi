@@ -1,0 +1,4 @@
+service-account.json
+/local/firebase/firestore
+cred/
+mysql_data/

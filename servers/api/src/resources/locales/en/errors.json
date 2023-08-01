@@ -1,0 +1,39 @@
+{
+    "server_error": "Connection error",
+    "invalid_arguments": "Invalid values",
+
+    "#__": "",
+    "##_": "",
+    "###": "",
+
+    "#E-CSM": "SamplesController",
+    "E-CSM-HTST": "This is a test message",
+
+    "#E-CAT": "AuthController",
+    "E-CAT-IVEP": "Invalid email or password",
+    "E-CAT-ENV": "The email is not verified",
+
+    "#E-MAT": "AuthMiddleware",
+    "E-MAT-NT": "This function needs authentication information",
+    "E-MAT-IVT": "Invalid authentication information",
+    "E-MAT-EXT": "The given authentication information is expired",
+
+    "#E-CUS": "UsersController",
+    "E-CUS-IR": "Invalid role for this user",
+
+    "#E-SUS": "UsersService",
+    "E-SUS-IID": "Invalid user ID",
+    "E-SUS-IEML": "Invalid email",
+    "E-SUS-IVC": "Invalid auth code",
+    "E-SUS-IVEP": "Invalid email or password",
+    "E-SUS-ITK": "Invalid activation token",
+    "E-SUS-AIU": "The email address is already in use",
+    "E-SUS-FCA": "Failed to create user",
+    "E-SUS-AIRC": "The user is already in recess",
+
+    "#E-PVST": "StorageProvider",
+    "E-PVST-FUPF": "Failed to upload file",
+
+    "#E-SAPP": "ApplicationsService",
+    "E-SAPP-NRF": "No released apps are found for this device"
+}
