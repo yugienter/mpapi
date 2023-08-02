@@ -471,7 +471,7 @@ Request/Response に日付情報を含める際には、[ISO8601(RFC3339)](https
 
 ##### タグ名の命名規則
 
-Swaggerで表示されるタグ名の命名は[webAPI仕様書](https://docs.google.com/spreadsheets/d/1DOWRVwLHg2xw_I5I3uvHWpdhmEQNVAtR/edit#gid=1261803390)に準拠する。Swagger画面上でのAPIの検索性向上のためにタグをつけているという事情を鑑み、タグ名の命名規則は以下のとおりとする。
+Swaggerで表示されるタグ名の命名は[webAPI仕様書]に準拠する。Swagger画面上でのAPIの検索性向上のためにタグをつけているという事情を鑑み、タグ名の命名規則は以下のとおりとする。
 
 - 全てのタグは単数系で表す。
 - ユーザー自身の情報を扱うものは `user`タグを用いる
