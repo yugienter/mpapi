@@ -1,25 +1,24 @@
 /**
  * アプリのコアの部分。主要なモジュールのimportインポートを行う。
  */
-import { HttpModule } from '@nestjs/axios'
-import { Module } from '@nestjs/common'
-import { ConfigModule } from '@nestjs/config'
-import { RouterModule } from '@nestjs/core'
-import { TypeOrmModule } from '@nestjs/typeorm'
-import { MailerModule } from '@nestjs-modules/mailer'
-import AWS from 'aws-sdk'
-import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter'
-import path from 'path'
+import { HttpModule } from '@nestjs/axios';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { RouterModule } from '@nestjs/core';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import AWS from 'aws-sdk';
+import path from 'path';
 
-import { ALL_MODELS } from '@/app/models/index'
-import { ApiModule } from '@/app/modules/api.module'
-import { ApiBaseModule } from '@/app/modules/api-base.module'
-import { ConfigProviderModule } from '@/app/modules/config.provider.module'
-import { FirebaseModule } from '@/app/modules/firebase.module'
-import { LoggerModule } from '@/app/modules/logger.module'
-import { AuthProvider } from '@/app/providers/auth.provider'
-import { ConfigProvider } from '@/app/providers/config.provider'
-
+import { ALL_MODELS } from '@/app/models/index';
+import { ApiModule } from '@/app/modules/api.module';
+import { ApiBaseModule } from '@/app/modules/api-base.module';
+import { ConfigProviderModule } from '@/app/modules/config.provider.module';
+import { FirebaseModule } from '@/app/modules/firebase.module';
+import { LoggerModule } from '@/app/modules/logger.module';
+import { AuthProvider } from '@/app/providers/auth.provider';
+import { ConfigProvider } from '@/app/providers/config.provider';
 
 @Module({
   imports: [
@@ -47,7 +46,7 @@ import { ConfigProvider } from '@/app/providers/config.provider'
       imports: [ConfigProviderModule],
       inject: [ConfigProvider],
       useFactory: (configProvider: ConfigProvider) => {
-        const conf = configProvider.config
+        const conf = configProvider.config;
         return {
           transport: {
             SES: new AWS.SES({
@@ -75,14 +74,14 @@ import { ConfigProvider } from '@/app/providers/config.provider'
               strict: true,
             },
           },
-        }
+        };
       },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigProviderModule],
       inject: [ConfigProvider],
       useFactory: (configProvider: ConfigProvider) => {
-        const conf = configProvider.config
+        const conf = configProvider.config;
         return {
           type: 'mysql',
           timezone: '+00:00',
@@ -93,15 +92,12 @@ import { ConfigProvider } from '@/app/providers/config.provider'
           database: conf.dbDatabase,
           entities: ALL_MODELS,
           synchronize: false,
-        }
-      }
+        };
+      },
     }),
   ],
   controllers: [],
-  providers: [
-    AuthProvider,
-    ConfigProvider,
-  ],
-  exports: []
+  providers: [AuthProvider, ConfigProvider],
+  exports: [],
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,41 +1,36 @@
-import { Body, Controller, Get, Logger, Param, Post, Req } from '@nestjs/common'
-import { ApiOperation, ApiProperty } from '@nestjs/swagger'
+import { Body, Controller, Get, Logger, Param, Post, Req } from '@nestjs/common';
+import { ApiOperation, ApiProperty } from '@nestjs/swagger';
 
-import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception'
-import { ErrorInfo } from '@/app/exceptions/errors/error-info'
-import { ConfigProvider } from '@/app/providers/config.provider'
-import { SampleService } from '@/app/services/samples.service'
-import { Coded } from '@/app/utils/coded'
-import { MpplatformApiDefault } from '@/app/utils/decorators'
-import { ValidationUtil } from '@/app/utils/validation.util'
-
+import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
+import { ErrorInfo } from '@/app/exceptions/errors/error-info';
+import { ConfigProvider } from '@/app/providers/config.provider';
+import { SampleService } from '@/app/services/samples.service';
+import { Coded } from '@/app/utils/coded';
+import { MpplatformApiDefault } from '@/app/utils/decorators';
+import { ValidationUtil } from '@/app/utils/validation.util';
 
 class ValidationTestFooDto {
-  @ApiProperty() a: number
+  @ApiProperty() a: number;
 }
 
 class ValidationTestDto {
-  @ApiProperty() age: number
-  @ApiProperty() name: string
-  @ApiProperty() email: string
-  @ApiProperty() foo: ValidationTestFooDto
+  @ApiProperty() age: number;
+  @ApiProperty() name: string;
+  @ApiProperty() email: string;
+  @ApiProperty() foo: ValidationTestFooDto;
 }
-
 
 @MpplatformApiDefault()
 @Controller('samples')
 export class SamplesController implements Coded {
-  private readonly logger = new Logger(SamplesController.name)
+  private readonly logger = new Logger(SamplesController.name);
 
-  constructor(
-    private readonly sampleService: SampleService,
-    private readonly configProvider: ConfigProvider
-  ) {
+  constructor(private readonly sampleService: SampleService, private readonly configProvider: ConfigProvider) {
     // nothing to do
   }
 
   get code(): string {
-    return 'CSM'
+    return 'CSM';
   }
 
   @ApiOperation({
@@ -45,12 +40,12 @@ export class SamplesController implements Coded {
   })
   @Get('hello')
   async getHello() {
-    const message = this.sampleService.getHello()
+    const message = this.sampleService.getHello();
 
     return {
       message: `${message}`,
       pjt: this.configProvider.config.firebaseProjectId,
-    }
+    };
   }
 
   @ApiOperation({
@@ -61,16 +56,15 @@ export class SamplesController implements Coded {
   @Get('foo/:id')
   async getFirestoreTest(@Param('id') id: string) {
     if (this.configProvider.config.isEmulatorMode) {
-      this.logger.debug('+++ Emulator mode +++')
+      this.logger.debug('+++ Emulator mode +++');
     }
-    const result = await this.sampleService.getFoo(id)
-    return result
+    const result = await this.sampleService.getFoo(id);
+    return result;
   }
 
   @ApiOperation({
     summary: '***テスト用API***',
-    description: '422エラー(validation)<br />'
-      + 'validationSchemaの条件にマッチしない場合に例外発生',
+    description: '422エラー(validation)<br />' + 'validationSchemaの条件にマッチしない場合に例外発生',
     tags: ['_sample'],
   })
   @Post('validation-test')
@@ -79,23 +73,24 @@ export class SamplesController implements Coded {
       type: 'object',
       properties: {
         age: { type: 'integer' },
-        name: { type: 'string',  maxLength: 20, nullable: true },
-        email: { type: 'string',  maxLength: 60, format: 'email', nullable: true },
+        name: { type: 'string', maxLength: 20, nullable: true },
+        email: { type: 'string', maxLength: 60, format: 'email', nullable: true },
         foo: {
           type: 'object',
           properties: {
             a: {
-              type: 'integer', nullable: true
-            }
-          }
+              type: 'integer',
+              nullable: true,
+            },
+          },
         },
       },
       required: ['name'],
-      additionalProperties: true
-    })
+      additionalProperties: true,
+    });
     return {
-      message: 'ok'
-    }
+      message: 'ok',
+    };
   }
 
   /**
@@ -108,7 +103,7 @@ export class SamplesController implements Coded {
   })
   @Get('handler-test')
   async handlerTest() {
-    throw new CodedInvalidArgumentException(this.code, new ErrorInfo('invalid_arguments', 'HTST', 'HT-001'))
+    throw new CodedInvalidArgumentException(this.code, new ErrorInfo('invalid_arguments', 'HTST', 'HT-001'));
   }
 
   @ApiOperation({
@@ -118,6 +113,6 @@ export class SamplesController implements Coded {
   })
   @Get('error')
   async getError() {
-    throw new Error('Something is going wrong')
+    throw new Error('Something is going wrong');
   }
 }

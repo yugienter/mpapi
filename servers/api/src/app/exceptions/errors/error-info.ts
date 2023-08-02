@@ -4,6 +4,6 @@ export class ErrorInfo {
   }
 
   static getBuilder(typeCode: string, message = '') {
-    return (posCode: string) => new ErrorInfo(message, typeCode, posCode)
+    return (posCode: string) => new ErrorInfo(message, typeCode, posCode);
   }
 }

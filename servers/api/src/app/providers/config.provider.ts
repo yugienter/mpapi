@@ -1,115 +1,111 @@
-import { Injectable, Logger, LogLevel } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import _ from 'lodash'
+import { Injectable, Logger, LogLevel } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import _ from 'lodash';
 // import _ from 'lodash'
-import moment from 'moment'
-
+import moment from 'moment';
 
 export declare class Config {
   /** Environment variable: APP_ENV */
-  readonly appEnv: string
+  readonly appEnv: string;
   /** Environment variable: APP_SECRET_KEY */
-  readonly appSecretKey: string
+  readonly appSecretKey: string;
   /** Environment variable: SERVER_PORT */
-  readonly serverPort: string
+  readonly serverPort: string;
   /** Environment variable: APP_BASE_URL */
-  readonly appBaseUrl: string
+  readonly appBaseUrl: string;
   /** Environment variable: EXCHANGE_BASE_URL */
-  readonly exchangeBaseUrl: string
+  readonly exchangeBaseUrl: string;
 
   /** Environment variable: LOG_LEVEL */
-  readonly logLevel: LogLevel
+  readonly logLevel: LogLevel;
   /** Environment variable: LOG_FILE */
-  readonly logFile: string
+  readonly logFile: string;
 
   /** Environment variable: AWS_ACCESS_KEY */
-  readonly awsAccessKey: string
+  readonly awsAccessKey: string;
   /** Environment variable: AWS_SECRET_KEY */
-  readonly awsSecretKey: string
+  readonly awsSecretKey: string;
   /** Environment variable: AWS_REGION */
-  readonly awsRegion: string
+  readonly awsRegion: string;
 
   /** Environment variable: EMAIL_USER */
-  readonly emailUser: string
+  readonly emailUser: string;
   /** Environment variable: BCC_EMAIL_USER */
-  readonly bccEmailUser: string
+  readonly bccEmailUser: string;
   /** Environment variable: AWS_EMAIL_USER */
-  readonly awsEmailUser: string
+  readonly awsEmailUser: string;
   /** Environment variable: EMAIL_PASSWORD */
-  readonly emailPassword: string
+  readonly emailPassword: string;
   /** Environment variable: EMAIL_HOST */
-  readonly emailHost: string
+  readonly emailHost: string;
   /** Environment variable: EMAIL_PORT */
-  readonly emailPort: string
+  readonly emailPort: string;
   /** Environment variable: EMAIL_DEBUG_PREVIEW */
-  readonly emailDebugPreview: boolean
+  readonly emailDebugPreview: boolean;
 
-  readonly slackApiHost: string
+  readonly slackApiHost: string;
   /**
    * https://api.slack.com/apps/
    */
-  readonly slackAuthToken: string
+  readonly slackAuthToken: string;
 
-  readonly dbHost: string
-  readonly dbPort: number
-  readonly dbDatabase: string
-  readonly dbUsername: string
-  readonly dbPassword: string
+  readonly dbHost: string;
+  readonly dbPort: number;
+  readonly dbDatabase: string;
+  readonly dbUsername: string;
+  readonly dbPassword: string;
 
-  readonly cookieAccessTokenName: string
-  readonly cookieRefreshTokenName: string
+  readonly cookieAccessTokenName: string;
+  readonly cookieRefreshTokenName: string;
 
   /** Environment variable: IS_EMULATOR_MODE */
-  readonly isEmulatorMode: boolean
+  readonly isEmulatorMode: boolean;
   /** Environment variable: IS_RESTRICTED_SERVER */
-  readonly isRestrictedServer: boolean
+  readonly isRestrictedServer: boolean;
 
   /**
    * Environment variable: FIREBASE_AUTH_EMULATOR_HOST
    * - Link: https://firebase.google.com/docs/emulator-suite/connect_auth#admin_sdks
    */
-  readonly firebaseAuthEmulatorHost: string
+  readonly firebaseAuthEmulatorHost: string;
   /**
    * Environment variable: FIRESTORE_EMULATOR_HOST
    * - Link: https://firebase.google.com/docs/emulator-suite/connect_firestore#admin_sdks
    */
-  readonly firestoreEmulatorHost: string
+  readonly firestoreEmulatorHost: string;
   /**
    * Environment variable: FIREBASE_STORAGE_EMULATOR_HOST
    * - Link: https://firebase.google.com/docs/emulator-suite/connect_storage#admin_sdks
    */
-  readonly firebaseStorageEmulatorHost: string
+  readonly firebaseStorageEmulatorHost: string;
 
   /** Environment variable: FIREBASE_PROJECT_ID */
-  readonly firebaseProjectId: string
+  readonly firebaseProjectId: string;
   /** Environment variable: FIREBASE_DATABASE */
-  readonly firebaseDatabase: string
+  readonly firebaseDatabase: string;
   /** Environment variable: FIREBASE_WEB_API_KEY */
-  readonly firebaseWebApiKey: string
+  readonly firebaseWebApiKey: string;
 
   /** Environment variable: SETCOOKIE_DOMAIN */
-  readonly setCookieDomain: string
+  readonly setCookieDomain: string;
 
   /** Environment variable: SERVER_COMMUNICATION_SALT */
-  readonly serverCommunicationSalt: string
+  readonly serverCommunicationSalt: string;
 
   /** Environment variable: APP_LAST_UPDATE_DATETIME */
-  readonly appLastUpdateDatetime: Date
+  readonly appLastUpdateDatetime: Date;
 
-  readonly hashIdsSalt: string
-
+  readonly hashIdsSalt: string;
 }
 
 @Injectable()
 export class ConfigProvider {
-  private readonly logger = new Logger(ConfigProvider.name)
+  private readonly logger = new Logger(ConfigProvider.name);
 
-  private _config: Config = null
+  private _config: Config = null;
 
-  constructor(
-    private readonly configService: ConfigService
-  ) {
-    const dt = this.configService.get<string>('APP_LAST_UPDATE_DATETIME')
+  constructor(private readonly configService: ConfigService) {
+    const dt = this.configService.get<string>('APP_LAST_UPDATE_DATETIME');
     this._config = {
       appEnv: this.getOrShowError<string>('APP_ENV'),
       appSecretKey: this.getOrShowError<string>('APP_SECRET_KEY'),
@@ -162,25 +158,24 @@ export class ConfigProvider {
       appLastUpdateDatetime: dt ? moment(dt).toDate() : new Date(),
 
       hashIdsSalt: this.getOrShowError<string>('HASH_IDS_SALT'),
-
-    }
+    };
   }
 
   get config() {
-    return this._config
+    return this._config;
   }
 
   private getOrShowError<T>(key, defaultValue = undefined, castFunction: (v: T) => T = null) {
-    const val = this.configService.get<T>(key)
+    const val = this.configService.get<T>(key);
     if (val) {
       if (castFunction) {
-        return castFunction(val)
+        return castFunction(val);
       }
-      return val
+      return val;
     } else if (defaultValue !== undefined) {
-      return defaultValue
+      return defaultValue;
     }
-    this.logger.error(`Insufficient environment value for key: ${key}. Check your .env`)
-    return null
+    this.logger.error(`Insufficient environment value for key: ${key}. Check your .env`);
+    return null;
   }
 }

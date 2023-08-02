@@ -1,8 +1,7 @@
-import dotenv from 'dotenv'
-import { DataSource } from 'typeorm'
+import dotenv from 'dotenv';
+import { DataSource } from 'typeorm';
 
-
-dotenv.config()
+dotenv.config();
 
 export const AppDataSource = new DataSource({
   type: 'mysql',
@@ -12,7 +11,8 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  entities: [],
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  // entities: [],
   migrations: ['./src/database/migrations/*.ts'],
   subscribers: [],
-})
+});

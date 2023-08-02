@@ -1,3 +1,3 @@
 export interface Coded {
-  get code(): string
+  get code(): string;
 }
