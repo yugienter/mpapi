@@ -1,17 +1,17 @@
 {
-    "messages": {
-        "_default": "Invalid value",
-        "bmiRange": "Make sure your BMI value is %(min)s~%(max)s",
-        "datetimeComparison": "Please set the correct date",
-        "timeComparison": "Please set the correct term",
-        "timeRangeComparison": "Ensure that the duration value is within %(timeRange)s years. Also, set the start date and time and end date and time correctly",
-        "required": "%(_)s is mandatory",
-        "minLength": "%(_)s must not be less than %(limit)s",
-        "maxLength": "%(_)s must not be more than %(limit)s",
-        "pattern": "%(_)s must match $(pattern)s",
-        "type": "%(_)s must be %(type)s",
-        "format": "%(_)s must be %(format)s format",
-        "minimum": "%(_)s must not be less than %(limit)s",
-        "maximum": "%(_)s must not be more than %(limit)s"
-    }
+  "messages": {
+    "_default": "Invalid value",
+    "bmiRange": "Make sure your BMI value is %(min)s~%(max)s",
+    "datetimeComparison": "Please set the correct date",
+    "timeComparison": "Please set the correct term",
+    "timeRangeComparison": "Ensure that the duration value is within %(timeRange)s years. Also, set the start date and time and end date and time correctly",
+    "required": "%(_)s is mandatory",
+    "minLength": "%(_)s must not be less than %(limit)s",
+    "maxLength": "%(_)s must not be more than %(limit)s",
+    "pattern": "%(_)s must match $(pattern)s",
+    "type": "%(_)s must be %(type)s",
+    "format": "%(_)s must be %(format)s format",
+    "minimum": "%(_)s must not be less than %(limit)s",
+    "maximum": "%(_)s must not be more than %(limit)s"
+  }
 }

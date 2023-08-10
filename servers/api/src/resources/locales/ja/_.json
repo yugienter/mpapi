@@ -1,5 +1,7 @@
 {
   "TEST": "テスト",
+  "email_register_company_for_user": "会社情報の登録が完了しました",
+  "email_register_company_for_admin": "新規会社登録",
   "email_verification": "メールアドレスの確認",
   "password_reset": "パスワードリセット",
   "email_change_verification": "メールアドレスの変更",

@@ -1,38 +1,38 @@
 {
-    "server_error": "通信エラーが発生しました",
-    "invalid_arguments": "不正な値です",
+  "server_error": "通信エラーが発生しました",
+  "invalid_arguments": "不正な値です",
 
-    "#__": "E - クラス(サービスやコントローラの略称) - 種別(同一エラー種別) - 関数名(エラー箇所識別) - 番号(関数内箇所識別)",
-    "##_": "validationのメッセージとしては識別コードまでで判定する",
-    "###": "なお、#で始まったキーは単なるコメント",
+  "#__": "E - クラス(サービスやコントローラの略称) - 種別(同一エラー種別) - 関数名(エラー箇所識別) - 番号(関数内箇所識別)",
+  "##_": "validationのメッセージとしては識別コードまでで判定する",
+  "###": "なお、#で始まったキーは単なるコメント",
 
-    "#E-CSM": "SamplesController",
-    "E-CSM-HTST": "テストメッセージ",
+  "#E-CSM": "SamplesController",
+  "E-CSM-HTST": "テストメッセージ",
 
-    "#E-CAT": "AuthController",
-    "E-CAT-IVEP": "メールアドレスかパスワードが間違っています",
-    "E-CAT-ENV": "メールアドレスが確認されていません。アカウント登録時の確認メールを今一度お確かめください。",
+  "#E-CAT": "AuthController",
+  "E-CAT-IVEP": "メールアドレスかパスワードが間違っています",
+  "E-CAT-ENV": "メールアドレスが確認されていません。アカウント登録時の確認メールを今一度お確かめください。",
 
-    "#E-MAT": "AuthMiddleware",
-    "E-MAT-NT": "認証が必要です",
-    "E-MAT-IVT": "不正な認証情報です",
-    "E-MAT-EXT": "認証情報の期限が切れています",
+  "#E-MAT": "AuthMiddleware",
+  "E-MAT-NT": "認証が必要です",
+  "E-MAT-IVT": "不正な認証情報です",
+  "E-MAT-EXT": "認証情報の期限が切れています",
 
-    "#E-CUS": "UsersController",
-    "E-CUS-IR": "権限がありません",
+  "#E-CUS": "UsersController",
+  "E-CUS-IR": "権限がありません",
 
-    "#E-SUS": "UsersService",
-    "E-SUS-IID": "不正なユーザIDです",
-    "E-SUS-IEML": "無効なメールアドレスです",
-    "E-SUS-IVC": "不正な認証情報です",
-    "E-SUS-IVEP": "メールアドレスかパスワードが間違っています",
-    "E-SUS-ITK": "不正なアクティベーショントークンです",
-    "E-SUS-AIU": "すでに使われているメールアドレスです",
-    "E-SUS-FCA": "ユーザアカウントの作成に失敗しました",
+  "#E-SUS": "UsersService",
+  "E-SUS-IID": "不正なユーザIDです",
+  "E-SUS-IEML": "無効なメールアドレスです",
+  "E-SUS-IVC": "不正な認証情報です",
+  "E-SUS-IVEP": "メールアドレスかパスワードが間違っています",
+  "E-SUS-ITK": "不正なアクティベーショントークンです",
+  "E-SUS-AIU": "すでに使われているメールアドレスです",
+  "E-SUS-FCA": "ユーザアカウントの作成に失敗しました",
 
-    "#E-PVST": "StorageProvider",
-    "E-PVST-FUPF": "ファイルのアップロードに失敗しました",
+  "#E-PVST": "StorageProvider",
+  "E-PVST-FUPF": "ファイルのアップロードに失敗しました",
 
-    "#E-SAPP": "ApplicationsService",
-    "E-SAPP-NRF": "この端末向けのアプリが見つかりません"
+  "#E-SAPP": "ApplicationsService",
+  "E-SAPP-NRF": "この端末向けのアプリが見つかりません"
 }
