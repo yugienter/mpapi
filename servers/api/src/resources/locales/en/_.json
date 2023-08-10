@@ -1,5 +1,7 @@
 {
   "TEST": "test",
+  "email_register_company_for_user": "Company information registration is successful",
+  "email_register_company_for_admin": "New company registered",
   "email_verification": "Email address verification",
   "password_reset": "Password reset",
   "email_change_verification": "Email address change verification"

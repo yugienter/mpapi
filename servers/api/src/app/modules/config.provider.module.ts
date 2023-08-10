@@ -1,14 +1,13 @@
-import { DynamicModule, Module } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import { DynamicModule, Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
-import { ConfigProvider } from '@/app/providers/config.provider'
-
+import { ConfigProvider } from '@/app/providers/config.provider';
 
 /**
  * MailerModuleでのInjectionの解決ができるようにglobalにする必要があるため、ConfigProviderだけはModuleベースで扱う。
  */
 @Module({
-  providers: [ConfigService]
+  providers: [ConfigService],
 })
 export class ConfigProviderModule {
   static forRoot(): DynamicModule {
@@ -16,16 +15,16 @@ export class ConfigProviderModule {
     const confProvider = {
       provide: ConfigProvider,
       useFactory: (configService: ConfigService) => {
-        return new ConfigProvider(configService)
+        return new ConfigProvider(configService);
       },
       inject: [ConfigService],
-    }
+    };
     return {
       global: true,
       module: ConfigProviderModule,
       imports: [],
-      providers: [confProvider, ],
-      exports: [confProvider, ],
-    }
+      providers: [confProvider],
+      exports: [confProvider],
+    };
   }
 }

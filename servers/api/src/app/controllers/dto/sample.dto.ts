@@ -1,12 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger'
-
+import { ApiProperty } from '@nestjs/swagger';
 
 export class Baz {
-  @ApiProperty() aaa: string
+  @ApiProperty() aaa: string;
 }
 
 export class TestRequest {
-  @ApiProperty() foo: string
-  @ApiProperty() bar: number
-  @ApiProperty() baz: Baz
+  @ApiProperty() foo: string;
+  @ApiProperty() bar: number;
+  @ApiProperty() baz: Baz;
 }

@@ -1,18 +1,19 @@
 /**
  */
-import { HttpModule } from '@nestjs/axios'
-import { Module } from '@nestjs/common'
-import { APP_FILTER } from '@nestjs/core'
+import { HttpModule } from '@nestjs/axios';
+import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 
-import { BaseUrlController } from '@/app/controllers/base-url.controller'
-import { CodedExceptionHandler } from '@/app/exceptions/handlers/coded.handlers'
-import { ExceptionHandler } from '@/app/exceptions/handlers/handler'
-import { ValidationExceptionHandler } from '@/app/exceptions/handlers/validation.exception.handler'
-import { ConfigProvider } from '@/app/providers/config.provider'
-import { I18nProvider } from '@/app/providers/i18n.provider'
+import { BaseUrlController } from '@/app/controllers/base-url.controller';
+import { CodedExceptionHandler } from '@/app/exceptions/handlers/coded.handlers';
+import { ExceptionHandler } from '@/app/exceptions/handlers/handler';
+import { ValidationExceptionHandler } from '@/app/exceptions/handlers/validation.exception.handler';
+import { ConfigProvider } from '@/app/providers/config.provider';
+import { I18nProvider } from '@/app/providers/i18n.provider';
 
 @Module({
-  controllers: [ // ここの並び順はSwaggerにも影響する
+  controllers: [
+    // ここの並び順はSwaggerにも影響する
     BaseUrlController,
   ],
   imports: [HttpModule],
@@ -33,4 +34,4 @@ import { I18nProvider } from '@/app/providers/i18n.provider'
     I18nProvider,
   ],
 })
-export class ApiBaseModule { }
+export class ApiBaseModule {}

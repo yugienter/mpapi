@@ -1,19 +1,24 @@
-import { Controller, Get, Logger, Query, } from '@nestjs/common'
-import { ApiOperation } from '@nestjs/swagger'
-import moment from 'moment'
+import {
+  Controller,
+  Get,
+  Logger,
+  // Query
+} from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
+import moment from 'moment';
 
-import { ConfigProvider } from '@/app/providers/config.provider'
-import { ApplicationsService } from '@/app/services/applications.service'
-import { Coded } from '@/app/utils/coded'
-import { MpplatformApiDefault } from '@/app/utils/decorators'
-import { ValidationUtil } from '@/app/utils/validation.util'
+import { ConfigProvider } from '@/app/providers/config.provider';
+import { ApplicationsService } from '@/app/services/applications.service';
+import { Coded } from '@/app/utils/coded';
+import { MpplatformApiDefault } from '@/app/utils/decorators';
+// import { ValidationUtil } from '@/app/utils/validation.util';
 
 /**
  */
 @MpplatformApiDefault()
 @Controller('')
 export class PublicController implements Coded {
-  private readonly logger = new Logger(PublicController.name)
+  private readonly logger = new Logger(PublicController.name);
 
   constructor(
     private readonly configProvider: ConfigProvider,
@@ -23,7 +28,7 @@ export class PublicController implements Coded {
   }
 
   get code(): string {
-    return 'CABS'
+    return 'CABS';
   }
 
   @ApiOperation({
@@ -34,6 +39,6 @@ export class PublicController implements Coded {
   async getCurrentServerUpdatedDate() {
     return {
       updated_at: moment(this.configProvider.config.appLastUpdateDatetime).toISOString(),
-    }
+    };
   }
 }
