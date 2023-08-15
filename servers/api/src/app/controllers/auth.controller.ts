@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Post, Put, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Logger, Post, Put, Query, Req, Res } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { FastifyReply } from 'fastify';
 import { getAuth as getAuthClient, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
@@ -21,6 +21,7 @@ import { User } from '../models/user';
 import { CompaniesService } from '../services/companies/companies.service';
 import { RolesEnum } from '../utils/enum-utils';
 import { CreateCompanyDto } from './dto/company.dto';
+import { CodedInvalidArgumentException } from '../exceptions/errors/coded-invalid-argument.exception';
 
 /**
  * signinなど、入るときには無認証であるが、認証に関する制御を行う
@@ -45,6 +46,7 @@ export class AuthController implements Coded {
   }
 
   static ERROR_CODES = {
+    EMAIL_ALREADY_EXIST: ErrorInfo.getBuilder('EAE', 'email_already_exist'),
     INVALID_EMAIL_OR_PASSWORD: ErrorInfo.getBuilder('IVEP', 'invalid_email_or_password'),
     EMAIL_NOT_VERIFIED: ErrorInfo.getBuilder('ENV', 'email_not_verified'),
     RESTRICTED_MP_PLATFORM: ErrorInfo.getBuilder('RSTJCX', 'restricted_for_only_ma_platform_account'),
@@ -191,6 +193,12 @@ export class AuthController implements Coded {
       required: ['email', 'name'],
       additionalProperties: true,
     });
+
+    const emailExist = await this.usersService.checkEmailExists(dto.user.email, RolesEnum.company);
+    if (emailExist) {
+      // throw new HttpException({ message: 'Email is already exists' }, HttpStatus.CONFLICT);
+      throw new CodedInvalidArgumentException(this.code, this.errorCodes.EMAIL_ALREADY_EXIST(null));
+    }
 
     await ValidationUtil.validate(dto.company, {
       type: 'object',

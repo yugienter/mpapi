@@ -156,6 +156,12 @@ export class UsersService implements Coded {
     return userRec;
   }
 
+  async checkEmailExists(email: string, roles: RolesEnum): Promise<boolean> {
+    return await this.dataSource.manager.transaction(async (transaction) => {
+      return await transaction.getRepository(User).exist({ where: { role: In([roles]), email: email } });
+    });
+  }
+
   async createUserWithoutPassword(data: { email: string; name: string }) {
     return await this.dataSource.manager.transaction(async (t) => {
       const now = new Date();
@@ -431,8 +437,8 @@ export class UsersService implements Coded {
       collaborationDetail: company.collaboration_detail,
     };
 
-    const subjectAdmin = await this.i18n.t('_.email_register_company_for_admin');
-    const subjectUser = await this.i18n.t('_.email_register_company_for_user');
+    const subjectAdmin = await this.i18n.t('_.email_register_company_for_admin', { lang: 'en' });
+    const subjectUser = await this.i18n.t('_.email_register_company_for_user', { lang: 'en' });
 
     try {
       await this.emailProvider.sendNotificationRegisterCompanyEmail(subjectUser, userEmail, params);

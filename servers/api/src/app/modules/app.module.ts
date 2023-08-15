@@ -64,7 +64,7 @@ import { ConfigProvider } from '@/app/providers/config.provider';
             },
           },
           defaults: {
-            from: `"日本カーボンクレジット取引所" <${conf.emailUser}>`,
+            from: `"M&P Asia platform" <${conf.emailUser}>`,
           },
           preview: conf.emailDebugPreview,
           template: {
