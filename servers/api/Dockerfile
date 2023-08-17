@@ -13,8 +13,8 @@ WORKDIR /user/src/app
 ENV NODE_ENV staging
 
 # Create non-root user for Docker
-RUN addgroup --system --gid 1001 node
-RUN adduser --system --uid 1001 node
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
 
 # Copy source code into app folder
 COPY --chown=node:node . .
@@ -22,9 +22,11 @@ COPY --chown=node:node . .
 # Install dependencies
 RUN npm install
 
+RUN cp .env.staging.local .env
+
 RUN npm run build
 
 # Set Docker as a non-root user
-USER node
+USER nodejs
 
 CMD ["npm", "run", "start:prod"]
