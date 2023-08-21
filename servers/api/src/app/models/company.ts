@@ -8,9 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { User } from './user';
 import { CompaniesUsers } from './companies-users';
-
 
 export enum TypeOfBusinessEnum {
   MANUFACTURE = 'manufacture',

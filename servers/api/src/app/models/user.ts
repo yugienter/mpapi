@@ -100,5 +100,3 @@ export const safeColumnsOfUserProfile = [
   'created_at',
   'updated_at',
 ];
-
-
