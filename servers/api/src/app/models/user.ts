@@ -21,11 +21,6 @@ export enum StatusEnum {
   'inActive' = 'inActive',
 }
 
-export enum TypeOfBusinessEnum {
-  MANUFACTURE = 'manufacture',
-  DISTRIBUTION = 'distribution',
-}
-
 export enum RolesEnum {
   admin = 'admin',
   company = 'company',

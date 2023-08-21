@@ -11,6 +11,12 @@ import {
 import { User } from './user';
 import { CompaniesUsers } from './companies-users';
 
+
+export enum TypeOfBusinessEnum {
+  MANUFACTURE = 'manufacture',
+  DISTRIBUTION = 'distribution',
+}
+
 @Entity('companies')
 export class Company {
   @PrimaryGeneratedColumn('uuid')
@@ -36,7 +42,7 @@ export class Company {
   area_other: boolean;
 
   @Column()
-  type_of_business: string;
+  type_of_business: TypeOfBusinessEnum;
 
   @Column()
   commodity: string;
