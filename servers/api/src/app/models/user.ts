@@ -14,8 +14,23 @@ import {
 
 import { UserProfile } from '@/app/models/user-profile';
 
-import { RolesEnum, StatusEnum } from '../utils/enum-utils';
 import { CompaniesUsers } from './companies-users';
+
+export enum StatusEnum {
+  'active' = 'active',
+  'inActive' = 'inActive',
+}
+
+export enum TypeOfBusinessEnum {
+  MANUFACTURE = 'manufacture',
+  DISTRIBUTION = 'distribution',
+}
+
+export enum RolesEnum {
+  admin = 'admin',
+  company = 'company',
+  investor = 'investor',
+}
 
 @Entity({ name: 'users' })
 @Index(['email', 'role'], { unique: true })
@@ -91,14 +106,4 @@ export const safeColumnsOfUserProfile = [
   'updated_at',
 ];
 
-// export const safeColumnsOfUserWallet = [
-//   'wallet_id',
-//   'name_sei',
-//   'name_mei',
-//   'kana_name_sei',
-//   'kana_name_mei',
-//   'gender_type',
-//   'birthday',
-//   'created_at',
-//   'updated_at',
-// ];
+

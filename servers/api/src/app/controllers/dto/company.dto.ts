@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
-import { User } from '@/app/models/user';
-import { TypeOfBusinessEnum } from '@/app/utils/enum-utils';
+import { User, TypeOfBusinessEnum } from '@/app/models/user';
 
 export class CreateCompanyDto {
   @ApiProperty({ example: 'Company Ltd' })

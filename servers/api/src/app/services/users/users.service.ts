@@ -11,7 +11,7 @@ import { CodedException } from '@/app/exceptions/errors/coded-exception';
 import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
-import { ModifiedUser, User } from '@/app/models/user';
+import { ModifiedUser, User, RolesEnum, StatusEnum, TypeOfBusinessEnum } from '@/app/models/user';
 import { UserProfile } from '@/app/models/user-profile';
 import { FirebaseInfo } from '@/app/modules/firebase.module';
 import { UsersPersistence } from '@/app/persistence/users.persistence';
@@ -22,7 +22,6 @@ import { SlackProvider } from '@/app/providers/slack.provider';
 import { StorageProvider } from '@/app/providers/storage.provider';
 import { Coded } from '@/app/utils/coded';
 import { Service } from '@/app/utils/decorators';
-import { RolesEnum, StatusEnum, TypeOfBusinessEnum } from '@/app/utils/enum-utils';
 import { CONSTANTS } from '@/config/constants';
 
 @Service()

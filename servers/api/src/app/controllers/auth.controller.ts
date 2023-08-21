@@ -17,9 +17,8 @@ import { Coded } from '@/app/utils/coded';
 import { MpplatformApiDefault } from '@/app/utils/decorators';
 import { ValidationUtil } from '@/app/utils/validation.util';
 
-import { User } from '../models/user';
+import { User, RolesEnum } from '../models/user';
 import { CompaniesService } from '../services/companies/companies.service';
-import { RolesEnum } from '../utils/enum-utils';
 import { CreateCompanyDto } from './dto/company.dto';
 import { CodedInvalidArgumentException } from '../exceptions/errors/coded-invalid-argument.exception';
 
