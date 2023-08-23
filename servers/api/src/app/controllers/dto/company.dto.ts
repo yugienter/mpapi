@@ -4,7 +4,7 @@ import { IsBoolean, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString } from 'cla
 import { TypeOfBusinessEnum } from '@/app/models/company';
 import { User } from '@/app/models/user';
 
-export class CreateCompanyDto {
+export class CreateCompanyRequest {
   @ApiProperty({ example: 'Company Ltd' })
   @IsString()
   @IsNotEmpty()
@@ -42,9 +42,9 @@ export class CreateCompanyDto {
 
   @ApiProperty()
   @IsString()
-  @IsIn([TypeOfBusinessEnum.MANUFACTURE, TypeOfBusinessEnum.DISTRIBUTION])
+  @IsIn([Object.values(TypeOfBusinessEnum)])
   @IsNotEmpty()
-  type_of_business: string;
+  type_of_business: TypeOfBusinessEnum;
 
   @ApiProperty()
   @IsString()

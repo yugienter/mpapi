@@ -8,8 +8,6 @@ import { AuthProvider } from '@/app/providers/auth.provider';
 import { ConfigProvider } from '@/app/providers/config.provider';
 import { Coded } from '@/app/utils/coded';
 
-import { UserAndCompanyRegisterDto } from '../controllers/dto/auth.dto';
-
 @Injectable()
 export class EmailProvider implements Coded {
   private readonly logger = new Logger(EmailProvider.name);
@@ -40,7 +38,7 @@ export class EmailProvider implements Coded {
     },
   ) {
     const conf = this.configProvider.config;
-    const redirectLink = new URL(`signup/email-verified`, conf.exchangeBaseUrl).toString();
+    const redirectLink = new URL(`sign-up/email-verified`, conf.exchangeBaseUrl).toString();
     const link = await this.firebase.auth.generateEmailVerificationLink(sendTo, { url: redirectLink });
     if (!this.needsSendingEmail()) {
       this.logger.log(`Verification link: ${link}`);

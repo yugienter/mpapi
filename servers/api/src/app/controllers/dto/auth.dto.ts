@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateCompanyUserDto } from './user.dto';
-import { CreateCompanyDto } from './company.dto';
+
+import { CreateCompanyRequest } from './company.dto';
 
 export class SignInRequest {
   @ApiProperty() email: string;
@@ -8,12 +8,17 @@ export class SignInRequest {
 }
 
 export class SignupRequest {
-  @ApiProperty() email: string;
+  @ApiProperty({ example: 'test1@example.com' }) email: string;
   @ApiProperty() password: string;
   @ApiProperty() password_confirmation: string;
 }
 
-export class UserAndCompanyRegisterDto {
-  @ApiProperty() user: CreateCompanyUserDto;
-  @ApiProperty() company: CreateCompanyDto;
+class CompanyUserRequest extends SignupRequest {
+  @ApiProperty({ example: 'John' })
+  name: string;
+}
+
+export class UserAndCompanyRegisterRequest {
+  @ApiProperty() user: CompanyUserRequest;
+  @ApiProperty() company: CreateCompanyRequest;
 }

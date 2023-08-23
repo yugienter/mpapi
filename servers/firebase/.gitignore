@@ -1,6 +1,7 @@
 /firebase-export-*
 
 firebase.json
+serviceAccountKey.json
 
 # Logs
 logs

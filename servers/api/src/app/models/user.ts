@@ -7,6 +7,7 @@ import {
   JoinColumn,
   OneToMany,
   OneToOne,
+  PrimaryColumn,
   // PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -30,8 +31,7 @@ export enum RolesEnum {
 @Entity({ name: 'users' })
 @Index(['email', 'role'], { unique: true })
 export class User {
-  // @PrimaryColumn({ primary: true })
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn({ primary: true })
   id: string;
 
   @Column({ nullable: false })

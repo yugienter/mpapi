@@ -6,7 +6,7 @@ import moment from 'moment';
 import { Brackets, DataSource, EntityManager, In } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { UserAndCompanyRegisterDto } from '@/app/controllers/dto/auth.dto';
+import { UserAndCompanyRegisterRequest } from '@/app/controllers/dto/auth.dto';
 import { CodedException } from '@/app/exceptions/errors/coded-exception';
 import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
@@ -162,7 +162,7 @@ export class UsersService implements Coded {
     });
   }
 
-  async createUserWithoutPassword(data: { email: string; name: string }) {
+  async createUserWithoutPassword(data: { email: string; name: string }): Promise<User> {
     return await this.dataSource.manager.transaction(async (t) => {
       const now = new Date();
       const userData = {
@@ -196,10 +196,15 @@ export class UsersService implements Coded {
       return user;
     });
   }
-
   /**
    */
-  async createNewUser(data: { email: string; password: string; user_id?: string | null }) {
+  async createNewUser(data: {
+    email: string;
+    password: string;
+    role: RolesEnum;
+    user_id?: string | null;
+    name?: string;
+  }) {
     const tranResult = await this.dataSource.manager.transaction(async (t) => {
       const userRec = await this.createOrUpdateFirebaseUser(t, data.email, data.password, {
         setEmailVerified: false,
@@ -212,6 +217,9 @@ export class UsersService implements Coded {
       const userData = {
         id: uid,
         email: data.email ?? null,
+        name: data.name,
+        role: data.role,
+        status: StatusEnum.inActive,
         created_at: now,
         updated_at: now,
       };
@@ -401,12 +409,24 @@ export class UsersService implements Coded {
     return {};
   }
 
-  async sendEmailNotificationForRegisterCompany(dataRegister: UserAndCompanyRegisterDto) {
+  async sendEmailNotificationForRegisterCompany(dataRegister: UserAndCompanyRegisterRequest) {
     const admins = await this.getUserByRoles([RolesEnum.admin]);
     const adminEmails = _.map(admins, (admin) => admin.email);
     const user = dataRegister.user;
     const company = dataRegister.company;
     const userEmail = user.email;
+    let willingToText = '';
+    let willingTo = '';
+
+    if (company.type_of_business === TypeOfBusinessEnum.MANUFACTURING) {
+      willingToText = 'Are you willing to manufacture products requested by foreign investor/company on a OEM basis?';
+    }
+    if (company.type_of_business === TypeOfBusinessEnum.DISTRIBUTION) {
+      willingToText = 'Are you willing to distribute products from foreign investor/company as a local distributor?';
+    }
+    if ([TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(company.type_of_business)) {
+      willingTo = company.willing_to ? 'Yes' : 'No';
+    }
     const params = {
       userName: user.name,
       email: user.email,
@@ -418,11 +438,8 @@ export class UsersService implements Coded {
       area: company.area,
       typeOfBusiness: company.type_of_business,
       commodity: company.commodity,
-      willingTo: company.willing_to ? 'Yes' : 'No',
-      willingToText:
-        company.type_of_business === TypeOfBusinessEnum.MANUFACTURE
-          ? 'Are you willing to manufacture products requested by foreign investor/company on a OEM basis?'
-          : 'Are you willing to distribute products from foreign investor/company as a local distributor?',
+      willingTo,
+      willingToText,
       dateOfEstablishment: company.date_of_establishment,
       annualRevenue: company.annual_revenue,
       annualProfit: company.annual_profit,

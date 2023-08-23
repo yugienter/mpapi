@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateCompanyDto } from '@/app/controllers/dto/company.dto';
+import { CreateCompanyRequest } from '@/app/controllers/dto/company.dto';
 import { CompaniesUsers } from '@/app/models/companies-users';
 import { Company } from '@/app/models/company';
 import { User } from '@/app/models/user';
@@ -18,7 +18,7 @@ export class CompaniesService {
     @InjectRepository(CompaniesUsers) private companiesUserRepository: Repository<CompaniesUsers>,
   ) {}
 
-  create(createCompany: CreateCompanyDto): Promise<Company> {
+  create(createCompany: CreateCompanyRequest): Promise<Company> {
     return this.companiesRepository.save(this.companiesRepository.create(createCompany));
   }
 

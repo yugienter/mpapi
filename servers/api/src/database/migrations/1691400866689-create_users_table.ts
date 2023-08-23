@@ -14,7 +14,7 @@ export class CreateUsersTable1691400866689 implements MigrationInterface {
             name: 'id',
             type: 'varchar',
             isPrimary: true,
-            generationStrategy: 'uuid',
+            length: '28',
           },
           {
             name: 'name',
@@ -55,16 +55,6 @@ export class CreateUsersTable1691400866689 implements MigrationInterface {
     for (const targetColumns of [['name'], ['email']]) {
       await queryRunner.createIndex(this.tableName, new TableIndex({ columnNames: targetColumns }));
     }
-
-    await queryRunner.query(
-      `CREATE TRIGGER ${this.tableName}_before_insert
-      BEFORE INSERT ON ${this.tableName} FOR EACH ROW 
-      BEGIN
-        IF new.id IS NULL THEN
-          SET new.id = uuid();
-        END IF;
-      END;;`,
-    );
 
     // MySql does not support unique constraints. Use unique index instead.
     await queryRunner.query(`ALTER TABLE ${this.tableName} ADD UNIQUE ${this.UNIQUE_NAME_KEY}(email, role)`);

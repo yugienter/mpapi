@@ -18,11 +18,3 @@ export class PasswordChangingRequest {
   @ApiProperty() password: string;
   @ApiProperty() password_confirmation: string;
 }
-
-export class CreateCompanyUserDto {
-  @ApiProperty({ example: 'test1@example.com' })
-  email: string;
-
-  @ApiProperty({ example: 'John' })
-  name: string;
-}

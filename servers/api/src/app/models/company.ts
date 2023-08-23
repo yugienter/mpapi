@@ -10,9 +10,26 @@ import {
 
 import { CompaniesUsers } from './companies-users';
 
+/*************************************************************************************
+ * CAUTION: This enum is the same from CLIENT SIDE.                                  *
+ * IF EDIT AND COMMIT THIS ENUM - PLEASE CLONE AND UPDATE THAT TO API WITH THE SAME  *
+ *************************************************************************************/
 export enum TypeOfBusinessEnum {
-  MANUFACTURE = 'manufacture',
-  DISTRIBUTION = 'distribution',
+  MANUFACTURING = 'Manufacturing',
+  DISTRIBUTION = 'Distribution',
+  RETAIL = 'Retail',
+  RESTAURANT = 'Restaurant',
+  MEDICAL_SERVICE_AND_HEALTH_CARE = 'Medical Service, health care',
+  CONSTRUCTION = 'Construction',
+  EDUCATION = 'Education',
+  REAL_PROPERTY = 'Real property',
+  E_COMMERCE = 'E-commerce',
+  IT_SOFTWARE_ENGINEERING = 'IT, software, engineering',
+  TRAVE_SIGHTSEEING = 'Trave, sightseeing',
+  ADVERTISEMENT_ENTERTAINMENT_PUBLISHING = 'Advertisement, entertainment, publishing',
+  ENVIRONMENT_ESG_SOLUTION = 'Environment, ESG solution',
+  ENERGY_MINERAL_RESOURCES = 'Energy, mineral resources',
+  LOGISTICS = 'logistics',
 }
 
 @Entity('companies')
