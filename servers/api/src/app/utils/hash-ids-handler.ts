@@ -1,29 +1,26 @@
-import Hashids from 'hashids'
-import _ from 'lodash'
-
+import Hashids from 'hashids';
+import _ from 'lodash';
 
 /**
  * Hashids (https://github.com/niieani/hashids.js) に関する処理を取り扱う。
  * 一部のAPIにおいては（メールにリンクを載せるなど）直接の数値のIDを用いたくなく、表示をユーザにわからない形に変換して用いる。
  */
 export class HashIdsHandler {
-  constructor(
-    private readonly hashIds: Hashids
-  ) {
+  constructor(private readonly hashIds: Hashids) {
     //
   }
   encodeAshashIds(value: string): string {
-    return this.hashIds.encode(value)
+    return this.hashIds.encode(value);
   }
 
   decodeFromhashIds(value: string): string | null {
     try {
-      const v = _.first(this.hashIds.decode(value))
-      return v ? `${v}` : null
+      const v = _.first(this.hashIds.decode(value));
+      return v ? `${v}` : null;
     } catch (e) {
       // nothing to do
     }
-    return null
+    return null;
   }
 
   /**
@@ -33,11 +30,11 @@ export class HashIdsHandler {
    */
   decodeFromhashIdsOrOriginal(value: string): string | null {
     try {
-      const v = _.first(this.hashIds.decode(value)) ?? value
-      return `${v}`
+      const v = _.first(this.hashIds.decode(value)) ?? value;
+      return `${v}`;
     } catch (e) {
       // nothing to do
     }
-    return null
+    return null;
   }
 }

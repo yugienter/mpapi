@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  api:
+    container_name: nodejs
+    build: './api'
+    ports:
+      - 3000:3000
+
+  nginx:
+    container_name: nginx_service
+    build: './nginx-conf/'
+    ports:
+      - 80:80
+    restart: always

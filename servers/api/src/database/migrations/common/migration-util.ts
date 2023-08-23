@@ -4,13 +4,21 @@ export const TIME_STAMPS_AND_ITS_USERS = [
     type: 'timestamp',
     isNullable: false,
     default: 'CURRENT_TIMESTAMP',
-    comment: '作成日'
   },
   {
     name: 'updated_at',
     type: 'timestamp',
     isNullable: false,
     default: 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
-    comment: '更新日'
   },
-]
+];
+
+export const TIME_STAMPS_WITH_SOFT_DELETE = [
+  ...TIME_STAMPS_AND_ITS_USERS,
+  {
+    name: 'deleted_at',
+    type: 'timestamp',
+    isNullable: true,
+    default: null,
+  },
+];

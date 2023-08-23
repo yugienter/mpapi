@@ -1,25 +1,20 @@
 module.exports = {
   root: true,
-  plugins: [
-    'simple-import-sort',
-    '@typescript-eslint',
-  ],
+  plugins: ['simple-import-sort', '@typescript-eslint'],
   env: {
     browser: true,
     es2021: true,
     node: true,
   },
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended'
-  ],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 12,
     sourceType: 'module',
   },
   rules: {
-    semi: ['error', 'never'],
+    // semi: ['error', 'never'],
+    semi: [2, 'always'],
     curly: 'error',
     'no-unused-labels': 'warn',
     'no-unused-vars': 'off',
@@ -39,21 +34,16 @@ module.exports = {
           ['^'],
           // デフォルト: 相対インポート
           ['^\\.'],
-        ]
-      }
-    ],
-    indent: [
-      'warn',
-      2,
-      {
-        ignoredNodes: [
-          'TemplateLiteral',
-          'ConditionalExpression',
-          'SwitchCase',
-          'MemberExpression',
         ],
       },
     ],
+    // indent: [
+    //   'warn',
+    //   2,
+    //   {
+    //     ignoredNodes: ['TemplateLiteral', 'ConditionalExpression', 'SwitchCase', 'MemberExpression'],
+    //   },
+    // ],
     'no-template-curly-in-string': 'warn',
     'no-var': 'error',
     'prefer-const': 'warn',
@@ -69,4 +59,4 @@ module.exports = {
   },
   ignorePatterns: ['node_modules/', 'dist/'],
   settings: {},
-}
+};
