@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
 import { TIME_STAMPS_AND_ITS_USERS } from './common/migration-util';
 
@@ -11,9 +11,11 @@ export class CreateCompaniesUsersTable1691488611876 implements MigrationInterfac
         columns: [
           {
             name: 'id',
-            type: 'varchar',
+            type: 'bigint',
+            unsigned: true,
             isPrimary: true,
-            generationStrategy: 'uuid',
+            isGenerated: true,
+            generationStrategy: 'increment',
           },
           {
             name: 'position_of_user',
@@ -55,15 +57,16 @@ export class CreateCompaniesUsersTable1691488611876 implements MigrationInterfac
       }),
     );
 
-    await queryRunner.query(
-      `CREATE TRIGGER ${this.tableName}_before_insert
-          BEFORE INSERT ON ${this.tableName} FOR EACH ROW 
-          BEGIN
-            IF new.id IS NULL THEN
-              SET new.id = uuid();
-            END IF;
-          END;;`,
-    );
+    for (const targetColumns of [['user_id'], ['company_id'], ['position_of_user']]) {
+      await queryRunner.createIndex(
+        new Table({
+          name: this.tableName,
+        }),
+        new TableIndex({
+          columnNames: targetColumns,
+        }),
+      );
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

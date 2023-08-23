@@ -35,12 +35,12 @@ export class CreateCompanyRequest {
   @IsNotEmpty()
   area: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: false })
   @IsBoolean()
   @IsNotEmpty()
   area_other: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'Manufacturing' })
   @IsString()
   @IsIn([Object.values(TypeOfBusinessEnum)])
   @IsNotEmpty()
@@ -51,7 +51,7 @@ export class CreateCompanyRequest {
   @IsNotEmpty()
   commodity: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: true })
   @IsBoolean()
   @IsNotEmpty()
   willing_to: boolean;

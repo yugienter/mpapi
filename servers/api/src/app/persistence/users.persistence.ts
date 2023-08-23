@@ -5,12 +5,9 @@ import _ from 'lodash';
 import { Brackets, EntityManager } from 'typeorm';
 
 import { ModifiedUser, safeColumnsOfUserProfile, User } from '@/app/models/user';
-import { UserProfile } from '@/app/models/user-profile';
 import { FirebaseInfo } from '@/app/modules/firebase.module';
 import { Coded } from '@/app/utils/coded';
 import { Persistence } from '@/app/utils/decorators';
-import { UserUtil } from '@/app/utils/user.util';
-import { CONSTANTS } from '@/config/constants';
 
 /***
  * ユーザデータ周辺情報に関する同一トランザクション内アクセスの共通機能をまとめたもの。

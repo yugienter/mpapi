@@ -10,12 +10,6 @@ export class createUserProfilesTable1691477906095 implements MigrationInterface 
         name: this.tableName,
         columns: [
           {
-            name: 'id',
-            type: 'varchar',
-            isPrimary: true,
-            generationStrategy: 'uuid',
-          },
-          {
             name: 'user_id',
             type: 'varchar',
             isPrimary: true,
@@ -69,16 +63,6 @@ export class createUserProfilesTable1691477906095 implements MigrationInterface 
         referencedTableName: 'users',
         referencedColumnNames: ['id'],
       }),
-    );
-
-    await queryRunner.query(
-      `CREATE TRIGGER ${this.tableName}_before_insert
-      BEFORE INSERT ON ${this.tableName} FOR EACH ROW 
-      BEGIN
-        IF new.id IS NULL THEN
-          SET new.id = uuid();
-        END IF;
-      END;;`,
     );
   }
 

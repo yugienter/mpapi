@@ -8,8 +8,6 @@ import {
   OneToMany,
   OneToOne,
   PrimaryColumn,
-  // PrimaryColumn,
-  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
