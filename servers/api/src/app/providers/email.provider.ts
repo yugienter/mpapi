@@ -38,7 +38,7 @@ export class EmailProvider implements Coded {
     },
   ) {
     const conf = this.configProvider.config;
-    const redirectLink = new URL(`sign-up/email-verified`, conf.exchangeBaseUrl).toString();
+    const redirectLink = new URL(`authenticator/email-verified`, conf.exchangeBaseUrl).toString();
     const link = await this.firebase.auth.generateEmailVerificationLink(sendTo, { url: redirectLink });
     if (!this.needsSendingEmail()) {
       this.logger.log(`Verification link: ${link}`);
