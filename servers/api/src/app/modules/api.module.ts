@@ -25,8 +25,17 @@ import { SlackProvider } from '@/app/providers/slack.provider';
 import { StorageProvider } from '@/app/providers/storage.provider';
 import { authorizedControllers, mpplatformPersistences, mpplatformServices } from '@/app/utils/decorators';
 
+import { CompaniesController } from '../controllers/companies/companies.controller';
+
 // ここの並び順はSwagger的に若干重要
-const allControllers = [SamplesController, PublicController, AuthController, UsersController, MastersController];
+const allControllers = [
+  SamplesController,
+  PublicController,
+  AuthController,
+  UsersController,
+  CompaniesController,
+  MastersController,
+];
 
 const publicControllers = [AuthController, SamplesController, PublicController];
 

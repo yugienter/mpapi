@@ -26,4 +26,49 @@ export class CompaniesService {
     const companiesUsers = new CompaniesUsers(positionOfUser, user, company);
     this.companiesUserRepository.save(companiesUsers);
   }
+
+  async getCompaniesOfUser(userId: string) {
+    return this.companiesRepository
+      .createQueryBuilder('c')
+      .select(['c.name', 'c.updated_at', 'c.id'])
+      .innerJoin('c.companiesUsers', 'cu')
+      .where('cu.user_id = :userId', { userId })
+      .getMany();
+  }
+
+  // async getCompanyDetail(companyId: string, userId: string) {
+  //   const query = this.companiesRepository
+  //     .createQueryBuilder('c')
+  //     .select(['c.*', 'cu.position_of_user'])
+  //     .innerJoin('c.companiesUsers', 'cu')
+  //     .where('cu.user_id = :userId', { userId })
+  //     .andWhere('c.id = :companyId', { companyId });
+
+  //   const sql = query.getSql();
+
+  //   console.log('companyId:', companyId);
+  //   console.log('userId:', userId);
+  //   console.log('Generated SQL:', sql);
+
+  //   return query.getOne();
+
+  // }
+
+  async getCompanyDetail(companyId: string, userId: string) {
+    const userCompanyRelation = await this.companiesUserRepository.findOne({
+      where: {
+        user_id: userId,
+        company_id: companyId,
+      },
+    });
+
+    if (!userCompanyRelation) {
+      return null;
+    }
+
+    return await this.companiesRepository.findOne({
+      where: { id: companyId },
+      relations: ['companiesUsers'],
+    });
+  }
 }
