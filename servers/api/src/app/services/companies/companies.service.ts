@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateCompanyRequest } from '@/app/controllers/dto/company.dto';
+import { CreateCompanyRequest, UpdateCompanyInfoDto } from '@/app/controllers/dto/company.dto';
 import { CompaniesUsers } from '@/app/models/companies-users';
 import { Company } from '@/app/models/company';
 import { User } from '@/app/models/user';
@@ -66,9 +66,46 @@ export class CompaniesService {
       return null;
     }
 
-    return await this.companiesRepository.findOne({
+    const company = await this.companiesRepository.findOne({
       where: { id: companyId },
-      relations: ['companiesUsers'],
+      relations: ['companiesUsers', 'companiesUsers.user'],
+    });
+
+    if (!company) {
+      return null;
+    }
+
+    const result = {
+      ...company,
+      position_of_user: userCompanyRelation.position_of_user,
+    };
+
+    return result;
+  }
+
+  async updateCompany(companyId: string, updateCompanyDto: UpdateCompanyInfoDto): Promise<Company> {
+    return await this.companiesRepository.manager.transaction(async (manager) => {
+      const company = await manager.findOne(Company, { where: { id: companyId } });
+
+      if (!company) {
+        throw new NotFoundException('Company not found');
+      }
+
+      // Update company fields
+      Object.assign(company, updateCompanyDto);
+      await manager.save(Company, company);
+
+      // Update position_of_user in companies_users table
+      const companyUserRelation = await manager.findOne(CompaniesUsers, {
+        where: { company_id: companyId },
+      });
+
+      if (companyUserRelation) {
+        companyUserRelation.position_of_user = updateCompanyDto.position_of_user;
+        await manager.save(CompaniesUsers, companyUserRelation);
+      }
+
+      return company;
     });
   }
 }
