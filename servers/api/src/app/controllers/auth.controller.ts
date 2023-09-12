@@ -158,8 +158,6 @@ export class AuthController implements Coded {
       throw new CodedInvalidArgumentException(this.code, this.errorCodes.EMAIL_ALREADY_EXIST(null));
     }
 
-    console.log(dto);
-
     await ValidationUtil.validate(dto.company, {
       type: 'object',
       properties: {
@@ -197,8 +195,6 @@ export class AuthController implements Coded {
       ],
       additionalProperties: true,
     });
-
-    console.log(2);
 
     const createUser: { user: ModifiedUser } = await this.usersService.createNewUser({
       ...dto.user,
