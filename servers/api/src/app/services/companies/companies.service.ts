@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 import { CreateCompanyRequest, UpdateCompanyInfoDto } from '@/app/controllers/dto/company.dto';
 import { CompaniesUsers } from '@/app/models/companies-users';
@@ -16,6 +16,7 @@ export class CompaniesService {
   constructor(
     @InjectRepository(Company) private companiesRepository: Repository<Company>,
     @InjectRepository(CompaniesUsers) private companiesUserRepository: Repository<CompaniesUsers>,
+    @InjectEntityManager() private readonly _entityManager: EntityManager,
   ) {}
 
   create(createCompany: CreateCompanyRequest): Promise<Company> {
@@ -25,6 +26,29 @@ export class CompaniesService {
   manyToManyCreateCompanyUser(positionOfUser: string, company: Company, user: User) {
     const companiesUsers = new CompaniesUsers(positionOfUser, user, company);
     this.companiesUserRepository.save(companiesUsers);
+  }
+
+  async createCompanyAndLinkUser(
+    createCompanyDto: CreateCompanyRequest,
+    userId: string,
+  ): Promise<{ company: Company; user: User }> {
+    return await this._entityManager.transaction(async (transactionalEntityManager) => {
+      const company = new Company();
+      Object.assign(company, createCompanyDto);
+      const savedCompany = await transactionalEntityManager.save(Company, company);
+
+      const user = await transactionalEntityManager.findOne(User, { where: { id: userId } });
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const positionOfUser = createCompanyDto.position_of_user;
+      const companiesUsers = new CompaniesUsers(positionOfUser, user, savedCompany);
+      await transactionalEntityManager.save(CompaniesUsers, companiesUsers);
+
+      return { company: savedCompany, user: user };
+    });
   }
 
   async getCompaniesOfUser(userId: string) {

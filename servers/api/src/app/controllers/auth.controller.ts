@@ -158,6 +158,8 @@ export class AuthController implements Coded {
       throw new CodedInvalidArgumentException(this.code, this.errorCodes.EMAIL_ALREADY_EXIST(null));
     }
 
+    console.log(dto);
+
     await ValidationUtil.validate(dto.company, {
       type: 'object',
       properties: {
@@ -166,10 +168,10 @@ export class AuthController implements Coded {
         description_1: { type: 'string' },
         description_2: { type: 'string' },
         country: { type: 'string', maxLength: 50 },
-        // area: { type: 'string', maxLength: 50 },
-        // area_other: { type: 'boolean' },
+        area: { type: 'string', maxLength: 50 },
+        area_other: { type: 'boolean' },
         type_of_business: { type: 'string' },
-        // commodity: { type: 'string' },
+        commodity: { type: 'string' },
         willing_to: { type: 'boolean' },
         date_of_establishment: { type: 'string' },
         annual_revenue: { type: 'number', nullable: true },
@@ -191,11 +193,12 @@ export class AuthController implements Coded {
         'description_2',
         'country',
         'type_of_business',
-        'willing_to',
         'date_of_establishment',
       ],
       additionalProperties: true,
     });
+
+    console.log(2);
 
     const createUser: { user: ModifiedUser } = await this.usersService.createNewUser({
       ...dto.user,

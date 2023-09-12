@@ -406,7 +406,7 @@ export class UsersService implements Coded {
     return {};
   }
 
-  async sendEmailNotificationForRegisterCompany(dataRegister: UserAndCompanyRegisterRequest) {
+  async sendEmailNotificationForRegisterCompany(dataRegister: Partial<UserAndCompanyRegisterRequest>) {
     const admins = await this.getUserByRoles([RolesEnum.admin]);
     const adminEmails = _.map(admins, (admin) => admin.email);
     const user = dataRegister.user;
