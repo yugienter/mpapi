@@ -240,9 +240,15 @@ export class UsersService implements Coded {
 
       this.logger.debug('Sending email...');
 
-      await this.emailProvider.sendSignupEmail(await this.i18n.t('_.email_verification'), data.email, {
-        app: 'MPPLATFORM',
-      });
+      try {
+        await this.emailProvider.sendSignupEmail(await this.i18n.t('_.email_verification'), data.email, {
+          app: 'MPPLATFORM',
+        });
+        this.logger.log(`Send signup email-verified for user: ${data.email}`);
+      } catch (error) {
+        this.logger.error(error);
+        this.logger.log(`[sendEmailVerified] Fail to send email for user ${data.email}`);
+      }
 
       return _.first(await this.usersPersistence.getUsers(t, [uid]));
     });

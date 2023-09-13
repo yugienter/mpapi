@@ -136,7 +136,7 @@ export class AuthController implements Coded {
     tags: ['auth'],
   })
   @Post('company/signup')
-  async createUserAndCompanyWithoutPassword(@Body() dto: UserAndCompanyRegisterRequest) {
+  async createUserAndCompany(@Body() dto: UserAndCompanyRegisterRequest) {
     await ValidationUtil.validate(dto.user, {
       type: 'object',
       properties: {
