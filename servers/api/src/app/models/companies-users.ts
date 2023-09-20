@@ -22,16 +22,6 @@ export class CompaniesUsers {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ nullable: false })
-  @ManyToOne(() => User, (x) => x.id)
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-  user_id: string;
-
-  @Column({ nullable: false })
-  @ManyToOne(() => Company, (x) => x.id)
-  @JoinColumn({ name: 'company_id', referencedColumnName: 'id' })
-  company_id: string;
-
   @Column()
   position_of_user: string;
 

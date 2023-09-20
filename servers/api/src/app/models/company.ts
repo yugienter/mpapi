@@ -122,12 +122,4 @@ export class Company {
 
   @OneToMany(() => CompaniesUsers, (companiesUsers) => companiesUsers.company)
   public companiesUsers: CompaniesUsers[];
-
-  @ManyToMany(() => User, (x) => x.id)
-  @JoinTable({
-    name: 'companies_users',
-    joinColumn: { name: 'company_id' },
-    inverseJoinColumn: { name: 'user_id' },
-  })
-  users: User[];
 }
