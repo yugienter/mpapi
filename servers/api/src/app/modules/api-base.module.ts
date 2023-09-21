@@ -7,7 +7,8 @@ import { APP_FILTER } from '@nestjs/core';
 import { BaseUrlController } from '@/app/controllers/base-url.controller';
 import { CodedExceptionHandler } from '@/app/exceptions/handlers/coded.handlers';
 import { ExceptionHandler } from '@/app/exceptions/handlers/handler';
-import { ValidationExceptionHandler } from '@/app/exceptions/handlers/validation.exception.handler';
+import { ValidationExceptionFilter } from '@/app/exceptions/handlers/validation.filter';
+// import { ValidationExceptionHandler } from '@/app/exceptions/handlers/validation.exception.handler';
 import { ConfigProvider } from '@/app/providers/config.provider';
 import { I18nProvider } from '@/app/providers/i18n.provider';
 
@@ -28,8 +29,13 @@ import { I18nProvider } from '@/app/providers/i18n.provider';
     },
     {
       provide: APP_FILTER,
-      useClass: ValidationExceptionHandler,
+      useClass: ValidationExceptionFilter,
     },
+    // change the validation filter from ajv to class-validator
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: ValidationExceptionHandler,
+    // },
     ConfigProvider,
     I18nProvider,
   ],

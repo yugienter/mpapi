@@ -14,6 +14,7 @@ import {
 import { UserProfile } from '@/app/models/user-profile';
 
 import { CompaniesUsers } from './companies-users';
+import { EmailVerificationToken } from './email_verification_tokens';
 
 export enum StatusEnum {
   'active' = 'active',
@@ -72,6 +73,9 @@ export class User {
 
   @OneToMany(() => CompaniesUsers, (companiesUsers) => companiesUsers.user)
   public companiesUsers: CompaniesUsers[];
+
+  @OneToMany(() => EmailVerificationToken, (emailVerificationToken) => emailVerificationToken.user)
+  emailVerificationTokens: EmailVerificationToken[];
 }
 
 export class ModifiedUser {

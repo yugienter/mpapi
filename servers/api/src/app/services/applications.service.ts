@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
-import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
 import { Coded } from '@/app/utils/coded';
 import { Service } from '@/app/utils/decorators';

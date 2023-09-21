@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { getAuth as getAuthClient, signInWithEmailAndPassword } from 'firebase/auth';
 import { UserRecord } from 'firebase-admin/auth';
+import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { DataSource, EntityManager, In } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,6 +11,7 @@ import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-inv
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
 import { TypeOfBusinessEnum } from '@/app/models/company';
+import { EmailVerificationToken } from '@/app/models/email_verification_tokens';
 import { RolesEnum, StatusEnum, User } from '@/app/models/user';
 import { UserProfile } from '@/app/models/user-profile';
 import { FirebaseInfo } from '@/app/modules/firebase.module';
@@ -77,6 +79,11 @@ export class UsersService implements Coded {
       // 存在していれば権限あり
       return true;
     });
+  }
+
+  async generateEmailVerificationToken(userId: string): Promise<string> {
+    const payload = { userId, action: 'email-verification' };
+    return jwt.sign(payload, this.configProvider.config.appSecretKey, { expiresIn: '1d' });
   }
 
   private async createOrUpdateFirebaseUser(
@@ -159,42 +166,6 @@ export class UsersService implements Coded {
     });
   }
 
-  async createUserWithoutPassword(data: { email: string; name: string }): Promise<User> {
-    return await this.dataSource.manager.transaction(async (t) => {
-      const now = new Date();
-      const userData = {
-        email: data.email,
-        name: data.name,
-        role: RolesEnum.company,
-        status: StatusEnum.inActive,
-        created_at: now,
-        updated_at: now,
-      };
-      let user = await t
-        .getRepository(User)
-        .findOneBy({ email: data.email, role: RolesEnum.company, is_deleted: false });
-      if (user) {
-        await t.update(User, { email: data.email, role: RolesEnum.company }, userData);
-      } else {
-        user = await t.save(User, userData);
-      }
-      const profileData = {
-        user_id: user.id,
-        created_at: now,
-        updated_at: now,
-      };
-      const userProfile = await t.getRepository(UserProfile).findOneBy({ user_id: user.id });
-      if (userProfile) {
-        await t.update(UserProfile, { user_id: user.id }, profileData);
-      } else {
-        await t.save(UserProfile, profileData);
-      }
-
-      return user;
-    });
-  }
-  /**
-   */
   async createNewUser(data: {
     email: string;
     password: string;
@@ -245,9 +216,30 @@ export class UsersService implements Coded {
           app: 'MPPLATFORM',
         });
         this.logger.log(`Send signup email-verified for user: ${data.email}`);
+
+        // const emailVerificationToken = await this.generateEmailVerificationToken(userData.id);
+
+        // const userEntity = new User();
+        // Object.assign(userEntity, userData);
+
+        // const expiresAt = new Date();
+        // expiresAt.setDate(expiresAt.getDate() + 1);
+
+        // const emailToken = new EmailVerificationToken();
+        // emailToken.token = emailVerificationToken;
+        // emailToken.expires_at = expiresAt;
+        // emailToken.user = userEntity;
+
+        // await t.getRepository(EmailVerificationToken).save(emailToken);
+
+        // await this.emailProvider.sendCustomEmailVerification(await this.i18n.t('_.email_verification'), data.email, {
+        //   app: 'MPPLATFORM',
+        // });
+
+        // this.logger.log(`Send custom email verification for user: ${data.email}`);
       } catch (error) {
         this.logger.error(error);
-        this.logger.log(`[sendEmailVerified] Fail to send email for user ${data.email}`);
+        this.logger.log(`[sendCustomEmailVerification] Fail to send email for user ${data.email}`);
       }
 
       return _.first(await this.usersPersistence.getUsers(t, [uid]));

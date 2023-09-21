@@ -1,11 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsNumber, IsObject, IsString, ValidateNested } from 'class-validator';
 
 export class Baz {
-  @ApiProperty() aaa: string;
+  @ApiProperty()
+  @IsString()
+  aaa: string;
 }
 
 export class TestRequest {
-  @ApiProperty() foo: string;
-  @ApiProperty() bar: number;
-  @ApiProperty() baz: Baz;
+  @ApiProperty()
+  @IsString()
+  foo: string;
+
+  @ApiProperty()
+  @IsNumber()
+  bar: number;
+
+  @ApiProperty()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => Baz)
+  baz: Baz;
 }

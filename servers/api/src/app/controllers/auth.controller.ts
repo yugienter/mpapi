@@ -1,30 +1,23 @@
-import { Body, Controller, Get, Logger, Post, Put, Query, Req, Res } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { Body, Controller, Logger, Post, Res } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
 import { FastifyReply } from 'fastify';
 import { getAuth as getAuthClient, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
 
-import { SignInRequest, SignupRequest, UserAndCompanyRegisterRequest } from '@/app/controllers/dto/auth.dto';
-import { TestRequest } from '@/app/controllers/dto/sample.dto';
-import { EmailRequest } from '@/app/controllers/dto/user.dto';
+import { SignInRequest, UserAndCompanyRegisterRequest } from '@/app/controllers/dto/auth.dto';
+import { CreateCompanyRequest } from '@/app/controllers/dto/company.dto';
+import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
+import { Company } from '@/app/models/company';
+import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { FirebaseInfo } from '@/app/modules/firebase.module';
 import { AuthProvider } from '@/app/providers/auth.provider';
 import { ConfigProvider } from '@/app/providers/config.provider';
+import { CompaniesService } from '@/app/services/companies/companies.service';
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { MpplatformApiDefault } from '@/app/utils/decorators';
-import { ValidationUtil } from '@/app/utils/validation.util';
 
-import { CodedInvalidArgumentException } from '../exceptions/errors/coded-invalid-argument.exception';
-import { Company } from '../models/company';
-import { ModifiedUser, RolesEnum, User } from '../models/user';
-import { CompaniesService } from '../services/companies/companies.service';
-import { CreateCompanyRequest } from './dto/company.dto';
-
-/**
- * signinなど、入るときには無認証であるが、認証に関する制御を行う
- */
 @MpplatformApiDefault()
 @Controller('auth')
 export class AuthController implements Coded {
@@ -55,30 +48,13 @@ export class AuthController implements Coded {
     return AuthController.ERROR_CODES;
   }
 
-  /**
-   * ログイン
-   * Cookie処理の都合上、Responseオブジェクトに{passthrough: true}を渡す必要あり。
-   */
   @ApiOperation({
-    summary: 'WEB用ログイン(Secure Cookie利用)',
-    description:
-      '通常ログイン(http-only-cookie利用)<br />' +
-      'ブラウザで認証が必要な場合にのみ用いる（Swaggerで実行する際やブラウザ上でFirebase-SDKが必要ない場合のみ）。<br />' +
-      '（その場合はSDKのsignInWithEmailAndPasswordを用いる）',
+    summary: 'Sign In',
+    description: 'Sign In with Email and Password',
     tags: ['auth'],
   })
   @Post('signin')
-  async signin(@Res({ passthrough: true }) response: FastifyReply, @Body() dto: SignInRequest) {
-    await ValidationUtil.validate(dto, {
-      type: 'object',
-      properties: {
-        email: { type: 'string', maxLength: 200, format: 'email' },
-        password: { type: 'string', minLength: 8, maxLength: 64 },
-      },
-      required: ['email', 'password'],
-      additionalProperties: true,
-    });
-
+  async signIn(@Res({ passthrough: true }) response: FastifyReply, @Body() dto: SignInRequest) {
     const auth = getAuthClient(this.firebase.firebaseAppClient);
     let cred: UserCredential;
     try {
@@ -100,36 +76,6 @@ export class AuthController implements Coded {
     };
   }
 
-  /**
-   * サインアップ
-   */
-  @ApiOperation({
-    summary: '新規ユーザ作成',
-    tags: ['auth'],
-  })
-  @Post('investor/signup')
-  async signup(@Body() dto: SignupRequest) {
-    await ValidationUtil.validate(dto, {
-      type: 'object',
-      properties: {
-        email: { type: 'string', maxLength: 255, format: 'email' },
-        password: { type: 'string', minLength: 8, maxLength: 64 },
-        password_confirmation: { const: { $data: '1/password' } },
-      },
-      required: ['email', 'password', 'password_confirmation'],
-      additionalProperties: true,
-    });
-
-    if (this.configProvider.config.isRestrictedServer && !dto.email.match(/@mp-asia\.com$/)) {
-      throw new CodedUnauthorizedException(this.code, this.errorCodes.RESTRICTED_MP_PLATFORM('SG-001'));
-    }
-
-    const result = await this.usersService.createNewUser({ ...dto, role: RolesEnum.investor });
-    return {
-      user: result.user,
-    };
-  }
-
   @ApiOperation({
     summary: 'Company User register',
     description: 'For case user register the company info to platform',
@@ -137,18 +83,6 @@ export class AuthController implements Coded {
   })
   @Post('company/signup')
   async createUserAndCompany(@Body() dto: UserAndCompanyRegisterRequest) {
-    await ValidationUtil.validate(dto.user, {
-      type: 'object',
-      properties: {
-        name: { type: 'string', maxLength: 50 },
-        email: { type: 'string', maxLength: 255, format: 'email' },
-        password: { type: 'string', minLength: 8, maxLength: 64 },
-        password_confirmation: { const: { $data: '1/password' } },
-      },
-      required: ['email', 'name', 'password', 'password_confirmation'],
-      additionalProperties: true,
-    });
-
     if (this.configProvider.config.isRestrictedServer && !dto.user.email.match(/@mp-asia\.com$/)) {
       throw new CodedUnauthorizedException(this.code, this.errorCodes.RESTRICTED_MP_PLATFORM('SG-001'));
     }
@@ -157,44 +91,6 @@ export class AuthController implements Coded {
     if (emailExist) {
       throw new CodedInvalidArgumentException(this.code, this.errorCodes.EMAIL_ALREADY_EXIST(null));
     }
-
-    await ValidationUtil.validate(dto.company, {
-      type: 'object',
-      properties: {
-        name: { type: 'string', maxLength: 195 },
-        position_of_user: { type: 'string', maxLength: 50 },
-        description_1: { type: 'string' },
-        description_2: { type: 'string' },
-        country: { type: 'string', maxLength: 50 },
-        area: { type: 'string', maxLength: 50 },
-        area_other: { type: 'boolean' },
-        type_of_business: { type: 'string' },
-        commodity: { type: 'string' },
-        willing_to: { type: 'boolean' },
-        date_of_establishment: { type: 'string' },
-        annual_revenue: { type: 'number', nullable: true },
-        annual_profit: { type: 'number', nullable: true },
-        number_of_employees: { type: 'number', nullable: true },
-        sell_of_shares: { type: 'number', nullable: true },
-        expected_price_of_shares: { type: 'number', nullable: true },
-        expected_price_of_shares_percent: { type: 'number', nullable: true },
-        issuance_raise_money: { type: 'number', nullable: true },
-        issuance_price_of_shares: { type: 'number', nullable: true },
-        issuance_price_of_shares_percent: { type: 'number', nullable: true },
-        business_collaboration: { type: 'boolean' },
-        collaboration_detail: { type: 'string', nullable: true },
-      },
-      required: [
-        'name',
-        'position_of_user',
-        'description_1',
-        'description_2',
-        'country',
-        'type_of_business',
-        'date_of_establishment',
-      ],
-      additionalProperties: true,
-    });
 
     const createUser: { user: ModifiedUser } = await this.usersService.createNewUser({
       ...dto.user,
@@ -213,72 +109,38 @@ export class AuthController implements Coded {
     return true;
   }
 
-  /**
-   * ログアウト
-   * Cookie処理の都合上、Responseオブジェクトに{passthrough: true}を渡す必要あり。
-   */
+  // @ApiOperation({
+  //   summary: 'Verify Email thought token',
+  //   tags: ['auth'],
+  // })
+  // @Post('verify-email')
+  // async verifyEmail(@Body('token') token: string, @Body('userId') userId: string, @Res() res: Response) {
+  //   try {
+  //     const isVerified = await this.authService.verifyEmailToken(token, userId);
+
+  //     if (isVerified) {
+  //       return res.status(HttpStatus.OK).json({
+  //         message: 'Email verified successfully',
+  //       });
+  //     } else {
+  //       return res.status(HttpStatus.UNAUTHORIZED).json({
+  //         message: 'Invalid token or user ID',
+  //       });
+  //     }
+  //   } catch (error) {
+  //     return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+  //       message: 'An error occurred while verifying the email',
+  //     });
+  //   }
+  // }
+
   @ApiOperation({
-    summary: 'WEB用ログアウト',
+    summary: 'Log Out',
     tags: ['auth'],
   })
   @Post('signout')
-  async signout(@Res({ passthrough: true }) response: FastifyReply) {
+  async signOut(@Res({ passthrough: true }) response: FastifyReply) {
     await this.authProvider.setTokenToCookie(response, null, null);
     return {};
-  }
-
-  @ApiOperation({
-    summary: '『パスワードを忘れた場合はこちら』',
-    description: 'パスワードを忘れた場合のメールアドレスによるリセット',
-    tags: ['auth'],
-  })
-  @Put('reset-password')
-  async updatePasswordWithEmail(@Req() request, @Body() dto: EmailRequest) {
-    await ValidationUtil.validate(dto, {
-      type: 'object',
-      properties: {
-        email: { type: 'string', maxLength: 200, format: 'email' },
-      },
-      required: ['email'],
-      additionalProperties: true,
-    });
-    // await this.usersService.sendPasswordResetEmail(dto.email)
-    return {};
-  }
-
-  @ApiOperation({
-    summary: '内部API',
-    description: 'メールアドレス変更',
-    tags: ['others'],
-  })
-  @Get('verification/update-email')
-  // @Render('update-email')
-  async getUpdateEmailVerificationPage(@Query('uid') id, @Query('email') email, @Query('v') verificationCode) {
-    // await this.usersService.updateEmail(id, email, verificationCode)
-    // TODO
-    return 'メールアドレスの変更に成功しました。';
-  }
-
-  /**
-   * ペイロードのハッシュ化でのAPI連携テスト用。本番環境では動作しない。
-   * 検証がうまくいったかどうかを返す。
-   */
-  @ApiOperation({
-    summary: '開発環境テスト用',
-    tags: ['_sample'],
-  })
-  @Post('test-communication')
-  @ApiBearerAuth('external-comm')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async test(@Req() request, @Body() dto: TestRequest) {
-    if (this.configProvider.config.appEnv == 'production') {
-      return null;
-    }
-    return {
-      ...(await this.authProvider.checkServerAuthToken(
-        (request.headers.authorization?.trim() ?? '(empty)').replace(/^Bearer\s+/, ''),
-        request.rawBody.toString(),
-      )),
-    };
   }
 }

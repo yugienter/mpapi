@@ -7,6 +7,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthController } from '@/app/controllers/auth.controller';
+import { CompaniesController } from '@/app/controllers/companies/companies.controller';
 import { MastersController } from '@/app/controllers/masters.controller';
 import { PublicController } from '@/app/controllers/public.controller';
 import { SamplesController } from '@/app/controllers/samples.controller';
@@ -14,6 +15,7 @@ import { UsersController } from '@/app/controllers/users/users.controller';
 import { CodedExceptionHandler } from '@/app/exceptions/handlers/coded.handlers';
 import { ExceptionHandler } from '@/app/exceptions/handlers/handler';
 import { ValidationExceptionHandler } from '@/app/exceptions/handlers/validation.exception.handler';
+import { ValidationExceptionFilter } from '@/app/exceptions/handlers/validation.filter';
 import { AuthMiddleware } from '@/app/middlewares/auth.middleware';
 import { CorsMiddleware } from '@/app/middlewares/cors.middleware';
 import { ALL_MODELS } from '@/app/models/index';
@@ -24,8 +26,6 @@ import { I18nProvider } from '@/app/providers/i18n.provider';
 import { SlackProvider } from '@/app/providers/slack.provider';
 import { StorageProvider } from '@/app/providers/storage.provider';
 import { authorizedControllers, mpplatformPersistences, mpplatformServices } from '@/app/utils/decorators';
-
-import { CompaniesController } from '../controllers/companies/companies.controller';
 
 // ここの並び順はSwagger的に若干重要
 const allControllers = [
@@ -58,8 +58,13 @@ const services = [...mpplatformServices, ...mpplatformPersistences, ...providers
     },
     {
       provide: APP_FILTER,
-      useClass: ValidationExceptionHandler,
+      useClass: ValidationExceptionFilter,
     },
+    // change the validation filter from ajv to class-validator
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: ValidationExceptionHandler,
+    // },
     ...services,
   ],
 })

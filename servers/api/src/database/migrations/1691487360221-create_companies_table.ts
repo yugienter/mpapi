@@ -74,12 +74,12 @@ export class CreateCompaniesTable1691487360221 implements MigrationInterface {
           },
           {
             name: 'annual_revenue',
-            type: 'decimal(10,2)',
+            type: 'bigint',
             isNullable: true,
           },
           {
             name: 'annual_profit',
-            type: 'decimal(10,2)',
+            type: 'bigint',
             isNullable: true,
           },
           {
@@ -89,12 +89,12 @@ export class CreateCompaniesTable1691487360221 implements MigrationInterface {
           },
           {
             name: 'sell_of_shares',
-            type: 'int',
+            type: 'bigint',
             isNullable: true,
           },
           {
             name: 'expected_price_of_shares',
-            type: 'int',
+            type: 'bigint',
             isNullable: true,
           },
           {
@@ -104,12 +104,12 @@ export class CreateCompaniesTable1691487360221 implements MigrationInterface {
           },
           {
             name: 'issuance_raise_money',
-            type: 'int',
+            type: 'bigint',
             isNullable: true,
           },
           {
             name: 'issuance_price_of_shares',
-            type: 'int',
+            type: 'bigint',
             isNullable: true,
           },
           {

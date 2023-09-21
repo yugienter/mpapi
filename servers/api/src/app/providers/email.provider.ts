@@ -4,9 +4,12 @@ import path from 'path';
 import pug from 'pug';
 
 import { FirebaseInfo } from '@/app/modules/firebase.module';
-import { AuthProvider } from '@/app/providers/auth.provider';
 import { ConfigProvider } from '@/app/providers/config.provider';
 import { Coded } from '@/app/utils/coded';
+
+interface EmailContext {
+  [key: string]: string | number | undefined;
+}
 
 @Injectable()
 export class EmailProvider implements Coded {
@@ -14,7 +17,6 @@ export class EmailProvider implements Coded {
 
   constructor(
     private readonly firebase: FirebaseInfo,
-    private readonly authProvider: AuthProvider,
     private readonly configProvider: ConfigProvider,
     private readonly mailerService: MailerService,
   ) {
@@ -25,33 +27,36 @@ export class EmailProvider implements Coded {
     return 'PVEM';
   }
 
+  private async sendEmail(subject: string, sendTo: string, template: string, context: EmailContext) {
+    if (this.needsSendingEmail()) {
+      await this.mailerService.sendMail({
+        to: sendTo,
+        subject,
+        template,
+        context,
+      });
+    } else {
+      this.logger.log(`Verification link: ${context.actionLink}`);
+    }
+  }
+
   needsSendingEmail() {
     const conf = this.configProvider.config;
     return (conf.emailHost && conf.emailHost != 'localhost') || conf.emailDebugPreview;
   }
 
-  async sendSignupEmail(
-    subject: string,
-    sendTo: string,
-    params: {
-      app: string;
-    },
-  ) {
-    const conf = this.configProvider.config;
-    const redirectLink = new URL(`authenticator/email-verified`, conf.exchangeBaseUrl).toString();
+  async sendSignupEmail(subject: string, sendTo: string, params: { app: string }) {
+    const redirectLink = new URL(`authenticator/email-verified`, this.configProvider.config.exchangeBaseUrl).toString();
     const link = await this.firebase.auth.generateEmailVerificationLink(sendTo, { url: redirectLink });
-    if (!this.needsSendingEmail()) {
-      this.logger.log(`Verification link: ${link}`);
-      return;
-    }
+    await this.sendEmail(subject, sendTo, 'signup-verification', { ...params, actionLink: link });
+  }
+
+  async sendCustomEmailVerification(subject: string, sendTo: string, params: EmailContext) {
     await this.mailerService.sendMail({
       to: sendTo,
       subject,
       template: 'signup-verification',
-      context: {
-        ...params,
-        actionLink: link,
-      },
+      context: params,
     });
   }
 

@@ -5,9 +5,6 @@ import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-inv
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
 import { I18nProvider } from '@/app/providers/i18n.provider';
 
-/***
- * https://docs.nestjs.com/exception-filters
- */
 @Catch(CodedInvalidArgumentException, CodedUnauthorizedException)
 export class CodedExceptionHandler implements ExceptionFilter {
   private readonly logger = new Logger(CodedExceptionHandler.name);
@@ -16,13 +13,6 @@ export class CodedExceptionHandler implements ExceptionFilter {
     // nothing to do
   }
 
-  // catch(exception: CodedInvalidArgumentException, host: ArgumentsHost) {
-  //   this._catch(exception, host)
-  // }
-
-  /**
-   * Decolatorの @Catch で指定された例外に対して処理を行う。
-   */
   catch(exception: CodedInvalidArgumentException | CodedUnauthorizedException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();

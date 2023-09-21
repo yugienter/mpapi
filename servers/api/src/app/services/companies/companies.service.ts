@@ -60,29 +60,11 @@ export class CompaniesService {
       .getMany();
   }
 
-  // async getCompanyDetail(companyId: string, userId: string) {
-  //   const query = this.companiesRepository
-  //     .createQueryBuilder('c')
-  //     .select(['c.*', 'cu.position_of_user'])
-  //     .innerJoin('c.companiesUsers', 'cu')
-  //     .where('cu.user_id = :userId', { userId })
-  //     .andWhere('c.id = :companyId', { companyId });
-
-  //   const sql = query.getSql();
-
-  //   console.log('companyId:', companyId);
-  //   console.log('userId:', userId);
-  //   console.log('Generated SQL:', sql);
-
-  //   return query.getOne();
-
-  // }
-
   async getCompanyDetail(companyId: string, userId: string) {
     const userCompanyRelation = await this.companiesUserRepository.findOne({
       where: {
-        user_id: userId,
-        company_id: companyId,
+        user: { id: userId },
+        company: { id: companyId },
       },
     });
 
@@ -121,7 +103,7 @@ export class CompaniesService {
 
       // Update position_of_user in companies_users table
       const companyUserRelation = await manager.findOne(CompaniesUsers, {
-        where: { company_id: companyId },
+        where: { company: { id: companyId } },
       });
 
       if (companyUserRelation) {

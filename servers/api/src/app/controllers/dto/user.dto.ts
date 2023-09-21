@@ -1,20 +1,33 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsString, Length } from 'class-validator';
 
 export class UserUpdateRequest {
-  @ApiProperty() name_sei: string;
-  @ApiProperty() name_mei: string;
-  @ApiProperty() kana_name_sei: string;
-  @ApiProperty() kana_name_mei: string;
-  @ApiProperty() birthday: string;
-  @ApiProperty() gender: 'M' | 'F' | null;
-}
+  @ApiProperty()
+  @IsString()
+  @Length(1, 50)
+  name_sei: string;
 
-export class EmailRequest {
-  @ApiProperty() email: string;
-}
+  @ApiProperty()
+  @IsString()
+  @Length(1, 50)
+  name_mei: string;
 
-export class PasswordChangingRequest {
-  @ApiProperty() current_password: string;
-  @ApiProperty() password: string;
-  @ApiProperty() password_confirmation: string;
+  @ApiProperty()
+  @IsString()
+  @Length(1, 50)
+  kana_name_sei: string;
+
+  @ApiProperty()
+  @IsString()
+  @Length(1, 50)
+  kana_name_mei: string;
+
+  @ApiProperty()
+  @IsString()
+  @Length(8, 10) // Assuming YYYY-MM-DD format
+  birthday: string;
+
+  @ApiProperty()
+  @IsEnum(['M', 'F'])
+  gender: 'M' | 'F' | null;
 }

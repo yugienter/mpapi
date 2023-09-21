@@ -74,10 +74,12 @@ export class Company {
   /**
    * store currency amounts with precision of 10 and upto 2 decimal places.
    */
-  @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
+  // @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
+  @Column({ type: Number, nullable: true })
   annual_revenue: number;
 
-  @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
+  // @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
+  @Column({ type: Number, nullable: true })
   annual_profit: number;
 
   @Column({ type: Number, nullable: true })

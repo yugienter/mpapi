@@ -16,9 +16,6 @@ const errorCodesToIgnore = _.chain([
   .mapValues(() => true)
   .value();
 
-/***
- * https://docs.nestjs.com/exception-filters
- */
 @Catch(Error, TypeORMError)
 export class ExceptionHandler implements ExceptionFilter {
   private readonly logger = new Logger(ExceptionHandler.name);
@@ -30,17 +27,7 @@ export class ExceptionHandler implements ExceptionFilter {
   ) {
     // nothing to do
   }
-
-  // catch(exception: Error, host: ArgumentsHost) {
-  //   this._catch(exception, host)
-  // }
-
-  /**
-   * 一般の500エラーの処理を行う。
-   */
   catch(exception: Error, host: ArgumentsHost) {
-    // In certain situations `httpAdapter` might not be available in the
-    // constructor method, thus we should resolve it here.
     const { httpAdapter } = this.httpAdapterHost;
 
     const ctx = host.switchToHttp();
@@ -67,7 +54,6 @@ export class ExceptionHandler implements ExceptionFilter {
 
     const responseBody = {
       message: this.configProvider.config.appEnv == 'local' ? exception.message : 'server_error',
-      // https://nestjs-i18n.com/guides/exception-filters こちらを使った方がいいかも
       translated: this.i18n.translate('errors.server_error', { lang }),
       code: null,
       errors: null,

@@ -2,11 +2,13 @@ import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';
 import { fastifySwagger } from '@fastify/swagger';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 
+import { ValidationException } from '@/app/exceptions/errors/validation.exception';
 // import { FastifyInstance } from 'fastify'
 import { AppModule } from '@/app/modules/app.module';
 import { ConfigProvider } from '@/app/providers/config.provider';
@@ -24,6 +26,17 @@ async function bootstrap() {
       rawBody: true,
     },
   );
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      exceptionFactory: (errors) => {
+        return new ValidationException('Validation failed', errors);
+      },
+    }),
+  );
+
   await I18nProvider.loadResources();
   prepareApp(app);
 
@@ -63,14 +76,11 @@ export function prepareApp(app: NestFastifyApplication) {
     .setVersion('0.1')
     .addBearerAuth({ type: 'http', scheme: 'bearer' }, 'external-comm')
     .build();
-  /**
-   * https://github.com/nestjs/swagger
-   */
+
   if (configProvider.config.appEnv != 'production') {
     app.register(fastifySwagger);
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('specs', app, document, {
-      // https://github.com/nestjs/swagger/blob/master/lib/interfaces/swagger-custom-options.interface.ts
       swaggerOptions: {
         tagsSorter: 'alpha',
         operationsSorter: 'alpha',
