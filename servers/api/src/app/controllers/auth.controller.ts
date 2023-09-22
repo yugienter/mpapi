@@ -104,10 +104,61 @@ export class AuthController implements Coded {
 
     this.companiesService.manyToManyCreateCompanyUser(company.position_of_user, companyData, userData);
 
-    await this.usersService.sendEmailNotificationForRegisterCompany(dto);
+    // await this.usersService.sendEmailNotificationForRegisterCompany(dto);
 
     return true;
   }
+
+  @ApiOperation({
+    summary: 'Verify User through Token',
+    description: 'Verify the user using the token sent in the email',
+    tags: ['auth'],
+  })
+  @Post('verify-email')
+  async verifyUser(@Body() body: { token: string }) {
+    const user = await this.usersService.findByToken(body.token);
+
+    try {
+      await this.usersService.updateVerificationStatus(user.id, true);
+    } catch (error) {
+      this.logger.error('Failed to update verification status in database', error);
+      throw new CodedUnauthorizedException(this.code, this.errorCodes.EMAIL_NOT_VERIFIED('VFE-001'));
+    }
+
+    return { success: true, message: 'Success to verification' };
+  }
+
+  // @ApiOperation({
+  //   summary: '『パスワードを忘れた場合はこちら』',
+  //   description: 'パスワードを忘れた場合のメールアドレスによるリセット',
+  //   tags: ['auth'],
+  // })
+  // @Put('reset-password')
+  // async updatePasswordWithEmail(@Req() request, @Body() dto: EmailRequest) {
+  //   await ValidationUtil.validate(dto, {
+  //     type: 'object',
+  //     properties: {
+  //       email: { type: 'string', maxLength: 200, format: 'email' },
+  //     },
+  //     required: ['email'],
+  //     additionalProperties: true,
+  //   });
+  //   // await this.usersService.sendPasswordResetEmail(dto.email)
+  //   return {};
+  // }
+
+  // @ApiOperation({
+  //   summary: '内部API',
+  //   description: 'メールアドレス変更',
+  //   tags: ['others'],
+  // })
+  // @Get('verification/update-email')
+  // // @Render('update-email')
+  // async getUpdateEmailVerificationPage(@Query('uid') id, @Query('email') email, @Query('v') verificationCode) {
+  //   // await this.usersService.updateEmail(id, email, verificationCode)
+  //   // TODO
+  //   return 'メールアドレスの変更に成功しました。';
+  // }
 
   // @ApiOperation({
   //   summary: 'Verify Email thought token',

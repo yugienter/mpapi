@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import path from 'path';
-import pug from 'pug';
+import Bull from 'bull';
+import Queue from 'bull';
 
 import { FirebaseInfo } from '@/app/modules/firebase.module';
 import { ConfigProvider } from '@/app/providers/config.provider';
@@ -14,98 +14,59 @@ interface EmailContext {
 @Injectable()
 export class EmailProvider implements Coded {
   private readonly logger = new Logger(EmailProvider.name);
+  private readonly emailQueue: Bull.Queue;
 
   constructor(
     private readonly firebase: FirebaseInfo,
     private readonly configProvider: ConfigProvider,
     private readonly mailerService: MailerService,
   ) {
-    // nothing to do
+    this.emailQueue = new Queue('emails');
+    this.initializeEmailQueueProcessor();
   }
 
   get code(): string {
     return 'PVEM';
   }
 
-  private async sendEmail(subject: string, sendTo: string, template: string, context: EmailContext) {
-    if (this.needsSendingEmail()) {
-      await this.mailerService.sendMail({
-        to: sendTo,
-        subject,
-        template,
-        context,
-      });
-    } else {
-      this.logger.log(`Verification link: ${context.actionLink}`);
-    }
+  private initializeEmailQueueProcessor() {
+    this.emailQueue.process(async (job) => {
+      const { subject, sendTo, template, context } = job.data;
+      try {
+        await this.mailerService.sendMail({
+          to: sendTo,
+          subject,
+          template,
+          context,
+        });
+      } catch (error) {
+        this.logger.error('Error sending email:', error);
+        throw error; // Bull will automatically retry the job if there's an error
+      }
+    });
   }
 
-  needsSendingEmail() {
-    const conf = this.configProvider.config;
-    return (conf.emailHost && conf.emailHost != 'localhost') || conf.emailDebugPreview;
-  }
-
-  async sendSignupEmail(subject: string, sendTo: string, params: { app: string }) {
-    const redirectLink = new URL(`authenticator/email-verified`, this.configProvider.config.exchangeBaseUrl).toString();
-    const link = await this.firebase.auth.generateEmailVerificationLink(sendTo, { url: redirectLink });
-    await this.sendEmail(subject, sendTo, 'signup-verification', { ...params, actionLink: link });
+  private async queueEmail(subject: string, sendTo: string, template: string, context: EmailContext) {
+    await this.emailQueue.add(
+      { subject, sendTo, template, context },
+      {
+        attempts: 3, // Number to try again.
+        backoff: {
+          type: 'exponential', // Type of backoff. 'exponential' is a popular choice.
+          delay: 5000, // delay time between each.
+        },
+      },
+    );
   }
 
   async sendCustomEmailVerification(subject: string, sendTo: string, params: EmailContext) {
-    await this.mailerService.sendMail({
-      to: sendTo,
-      subject,
-      template: 'signup-verification',
-      context: params,
-    });
-  }
+    const verificationUrlObj = new URL(this.configProvider.config.exchangeBaseUrl);
+    verificationUrlObj.pathname = 'authenticator/email-verified';
+    verificationUrlObj.searchParams.set('token', String(params.emailVerificationToken));
 
-  async sendUpdateEmail(
-    subject: string,
-    sendTo: string,
-    params: {
-      id: string;
-      app: string;
-      name: string;
-      email: string;
-      verificationCode: string;
-    },
-  ) {
-    const conf = this.configProvider.config;
-    const link = new URL(
-      `api/auth/verification/update-email?uid=${params.id}&email=${params.email}&v=${params.verificationCode}`,
-      conf.appBaseUrl,
-    ).toString();
-    if (!this.needsSendingEmail()) {
-      this.logger.log(`Verification link: ${link}`);
-      return;
-    }
-    await this.mailerService.sendMail({
-      to: sendTo,
-      subject,
-      template: 'changing-email',
-      context: {
-        ...params,
-        actionLink: link,
-      },
-    });
-  }
+    const verificationUrl = verificationUrlObj.toString();
 
-  async sendPasswordResetEmail(subject: string, sendTo: string) {
-    const link = await this.firebase.auth.generatePasswordResetLink(sendTo);
-    if (!this.needsSendingEmail()) {
-      this.logger.log(`Verification link: ${link}`);
-      return;
-    }
-    await this.mailerService.sendMail({
-      to: sendTo,
-      subject,
-      template: 'changing-password',
-      context: {
-        email: sendTo,
-        actionLink: link,
-      },
-    });
+    await this.queueEmail(subject, sendTo, 'signup-verification', { ...params, actionLink: verificationUrl });
   }
 
   async sendNotificationRegisterCompanyEmail(
@@ -115,43 +76,6 @@ export class EmailProvider implements Coded {
       [key: string]: string | number;
     },
   ) {
-    await this.mailerService.sendMail({
-      to: sendTo,
-      subject,
-      template: 'company-register',
-      context: params,
-    });
-  }
-
-  async sendRegisterCompanyEmailForUser(
-    subject: string,
-    sendTo: string,
-    params: {
-      [key: string]: string | number;
-    },
-  ) {
-    await this.mailerService.sendMail({
-      to: sendTo,
-      subject,
-      template: 'company-register',
-      context: params,
-    });
-  }
-
-  async sendRegisterCompanyEmailForAdmin(
-    subject: string,
-    adminEmails: string[],
-    params: {
-      [key: string]: string | number;
-    },
-  ) {
-    for (const email of adminEmails) {
-      await this.mailerService.sendMail({
-        to: email,
-        subject,
-        template: 'company-register-admin',
-        context: params,
-      });
-    }
+    await this.queueEmail(subject, sendTo, 'company-register', params);
   }
 }

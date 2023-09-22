@@ -4,7 +4,6 @@ import { UserRecord } from 'firebase-admin/auth';
 import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { DataSource, EntityManager, In } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
 import { UserAndCompanyRegisterRequest } from '@/app/controllers/dto/auth.dto';
 import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
@@ -23,11 +22,27 @@ import { SlackProvider } from '@/app/providers/slack.provider';
 import { StorageProvider } from '@/app/providers/storage.provider';
 import { Coded } from '@/app/utils/coded';
 import { Service } from '@/app/utils/decorators';
+import { convertObjectToCamelCase } from '@/app/utils/utils';
 
-@Service()
+interface OTPs {
+  setEmailVerified: boolean;
+  userId: string | null;
+}
+
 @Injectable()
+@Service()
 export class UsersService implements Coded {
   private readonly logger = new Logger(UsersService.name);
+
+  static ERROR_CODES = {
+    INVALID_ID_USER: ErrorInfo.getBuilder('IID', 'invalid_user_id'),
+    INVALID_EMAIL: ErrorInfo.getBuilder('IEML', 'invalid_email'),
+    INVALID_VERIFICATION_CODE: ErrorInfo.getBuilder('IVC', 'invalid_verification_code'),
+    INVALID_EMAIL_OR_PASSWORD: ErrorInfo.getBuilder('IVEP', 'invalid_email_or_password'),
+    USER_ALREADY_IN_USE: ErrorInfo.getBuilder('AIU', 'already_in_use'),
+    FAILED_TO_CREATE_ACCOUNT: ErrorInfo.getBuilder('FCA', 'failed_to_create_account'),
+    USER_ALREADY_IN_RECESS: ErrorInfo.getBuilder('AIRC', 'the_user_is_already_in_recess'),
+  };
 
   constructor(
     private readonly firebase: FirebaseInfo,
@@ -44,90 +59,39 @@ export class UsersService implements Coded {
     return 'SUS'; // Service - USers
   }
 
-  static ERROR_CODES = {
-    /** user IDの検証エラー */
-    INVALID_ID_USER: ErrorInfo.getBuilder('IID', 'invalid_user_id'),
-    /** メールアドレスの形式に異常 */
-    INVALID_EMAIL: ErrorInfo.getBuilder('IEML', 'invalid_email'),
-    /** メールで送られた検証コードに異常 */
-    INVALID_VERIFICATION_CODE: ErrorInfo.getBuilder('IVC', 'invalid_verification_code'),
-    /** メールアドレスかパスワードが間違っている */
-    INVALID_EMAIL_OR_PASSWORD: ErrorInfo.getBuilder('IVEP', 'invalid_email_or_password'),
-    /** 既にアカウントが存在 */
-    USER_ALREADY_IN_USE: ErrorInfo.getBuilder('AIU', 'already_in_use'),
-    /** 不明な理由によりユーザが作れなかった場合 */
-    FAILED_TO_CREATE_ACCOUNT: ErrorInfo.getBuilder('FCA', 'failed_to_create_account'),
-
-    USER_ALREADY_IN_RECESS: ErrorInfo.getBuilder('AIRC', 'the_user_is_already_in_recess'),
-  };
-
   get errorCodes() {
     return UsersService.ERROR_CODES;
   }
 
-  /**
-   * Adminユーザかチェックする。
-   * @param userId
-   * @returns
-   */
-  async isAccessibleByAdmin(userId: string): Promise<boolean> {
-    return await this.dataSource.manager.transaction(async (t) => {
-      const user = await t.findOneBy(User, { id: userId, is_deleted: false, role: RolesEnum.admin });
-      if (!user) {
-        return false;
-      }
-      // 存在していれば権限あり
-      return true;
-    });
-  }
-
-  async generateEmailVerificationToken(userId: string): Promise<string> {
+  // Private utility methods
+  private async generateEmailVerificationToken(userId: string): Promise<string> {
     const payload = { userId, action: 'email-verification' };
     return jwt.sign(payload, this.configProvider.config.appSecretKey, { expiresIn: '1d' });
   }
 
-  private async createOrUpdateFirebaseUser(
-    t: EntityManager,
-    email: string,
-    password: string,
-    opts: {
-      setEmailVerified: boolean;
-      userId: string | null;
-    } = {
-      setEmailVerified: false,
-      userId: null,
-    },
-  ): Promise<UserRecord> {
-    let userRec: UserRecord | null = null;
-    // 対象の存在チェック
+  private async getUserFromFirebase(email: string): Promise<UserRecord | null> {
     try {
-      userRec = await this.firebase.auth.getUserByEmail(email);
+      return await this.firebase.auth.getUserByEmail(email);
     } catch (e) {
       const code: string = e.code;
-      if (code == 'auth/user-not-found') {
-        // do nothing
-      } else {
+      if (code !== 'auth/user-not-found') {
         this.logger.error(e);
       }
+      return null;
     }
+  }
 
-    if (userRec && !(await t.getRepository(User).findOneBy({ email }))) {
-      // firebase側で既に存在するのにも関わらず、レコードとしてユーザが存在しなかった場合
-      // この場合は明確な整合性エラーなため、元々のユーザを消す。
-      // （Google SignInの周りで勝手にアカウントを作られてしまった場合などにあり得る）
-      await this.firebase.auth.deleteUser(userRec.uid);
-      userRec = null;
-    }
+  private async deleteUserFromFirebase(uid: string) {
+    await this.firebase.auth.deleteUser(uid);
+  }
 
-    // すでに確認が取れている場合についてはアカウントの作成/更新を防止
-    if (userRec?.emailVerified) {
-      this.logger.log('Already verified');
-      throw new CodedUnauthorizedException(this.code, this.errorCodes.USER_ALREADY_IN_USE('CNU-003'));
-    }
-
+  private async createOrUpdateUserInFirebase(
+    userRec: UserRecord | null,
+    email: string,
+    password: string,
+    opts: OTPs,
+  ): Promise<UserRecord> {
     try {
-      // ユーザがあるものの確認が取れていない場合には別の人物が勝手に作った場合などを考慮し、
-      // それ以外の場合には作成する。
       if (userRec) {
         this.logger.log(`update: ${userRec.uid}`);
         await this.firebase.auth.updateUser(userRec.uid, {
@@ -147,8 +111,6 @@ export class UsersService implements Coded {
       // https://firebase.google.com/docs/auth/admin/errors
       const code: string = e.code;
       if (code == 'auth/email-already-exists') {
-        // メールの存在を相手に知られてしまうが、今回についてはそれよりはエラー対応を重視した方が良いと思われるため、
-        // ここで個別のコードを割り振っておく。
         throw new CodedUnauthorizedException(this.code, this.errorCodes.USER_ALREADY_IN_USE('CNU-001'));
       } else if (code == 'auth/invalid-email') {
         throw new CodedUnauthorizedException(this.code, this.errorCodes.INVALID_EMAIL('CNU-002'));
@@ -160,9 +122,107 @@ export class UsersService implements Coded {
     return userRec;
   }
 
-  async checkEmailExists(email: string, roles: RolesEnum): Promise<boolean> {
-    return await this.dataSource.manager.transaction(async (transaction) => {
-      return await transaction.getRepository(User).exist({ where: { role: In([roles]), email: email } });
+  private async createOrUpdateFirebaseUser(
+    t: EntityManager,
+    email: string,
+    password: string,
+    opts: OTPs = {
+      setEmailVerified: false,
+      userId: null,
+    },
+  ): Promise<UserRecord> {
+    let userRec = await this.getUserFromFirebase(email);
+
+    if (userRec && !(await t.getRepository(User).findOneBy({ email }))) {
+      await this.deleteUserFromFirebase(userRec.uid);
+      userRec = null;
+    } else if (userRec?.emailVerified) {
+      this.logger.log('Already verified');
+      throw new CodedUnauthorizedException(this.code, this.errorCodes.USER_ALREADY_IN_USE('CNU-003'));
+    }
+
+    return await this.createOrUpdateUserInFirebase(userRec, email, password, opts);
+  }
+
+  private async saveUserData(t: any, userData: any) {
+    const user = await t.getRepository(User).findOneBy({ id: userData.id, is_deleted: false });
+    if (user) {
+      await t.update(User, { id: userData.id }, userData);
+    } else {
+      await t.save(User, userData);
+    }
+  }
+
+  private async saveUserProfileData(t: any, profileData: any) {
+    const userProfile = await t.getRepository(UserProfile).findOneBy({ user_id: profileData.user_id });
+    if (userProfile) {
+      await t.update(UserProfile, { user_id: profileData.user_id }, profileData);
+    } else {
+      await t.save(UserProfile, profileData);
+    }
+  }
+
+  private async sendVerificationEmail(t: any, user: any, email: string) {
+    try {
+      const emailVerificationToken = await this.generateEmailVerificationToken(user.id);
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 1);
+
+      const emailToken = new EmailVerificationToken();
+      emailToken.token = emailVerificationToken;
+      emailToken.expires_at = expiresAt;
+      emailToken.user = user;
+
+      await t.getRepository(EmailVerificationToken).save(emailToken);
+
+      await this.emailProvider.sendCustomEmailVerification(
+        await this.i18n.t('_.email_verification', { lang: 'en' }),
+        email,
+        { emailVerificationToken },
+      );
+
+      this.logger.log(`Send custom email verification for user: ${email}`);
+    } catch (error) {
+      this.logger.error(error);
+      this.logger.log(`[sendCustomEmailVerification] Fail to send email for user ${email}`);
+    }
+  }
+
+  private getWillingToDetails(company) {
+    let willingToText = '';
+    let willingTo = '';
+
+    if (company.type_of_business === TypeOfBusinessEnum.MANUFACTURING) {
+      willingToText = 'Are you willing to manufacture products requested by foreign investor/company on a OEM basis?';
+    }
+    if (company.type_of_business === TypeOfBusinessEnum.DISTRIBUTION) {
+      willingToText = 'Are you willing to distribute products from foreign investor/company as a local distributor?';
+    }
+    if ([TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(company.type_of_business)) {
+      willingTo = company.willing_to ? 'Yes' : 'No';
+    }
+
+    return { willingTo, willingToText };
+  }
+
+  private async sendNotificationRegisterCompanyEmail(subject, email, params) {
+    try {
+      await this.emailProvider.sendNotificationRegisterCompanyEmail(subject, email, params);
+      this.logger.log(`Send register company email for: ${email}`);
+    } catch (error) {
+      this.logger.error(error);
+      this.logger.log(`[sendEmailNotificationForRegisterCompany] Fail to send email for ${email}`);
+    }
+  }
+
+  // Public methods
+  async isAccessibleByAdmin(userId: string): Promise<boolean> {
+    return await this.dataSource.manager.transaction(async (t) => {
+      const user = await t.findOneBy(User, { id: userId, is_deleted: false, role: RolesEnum.admin });
+      if (!user) {
+        return false;
+      }
+      return true;
     });
   }
 
@@ -191,62 +251,29 @@ export class UsersService implements Coded {
         created_at: now,
         updated_at: now,
       };
+      await this.saveUserData(t, userData);
+
       const profileData = {
         user_id: uid,
         created_at: now,
         updated_at: now,
       };
-      const user = await t.getRepository(User).findOneBy({ id: uid, is_deleted: false });
-      if (user) {
-        await t.update(User, { id: uid }, userData);
-      } else {
-        await t.save(User, userData);
-      }
-      const userProfile = await t.getRepository(UserProfile).findOneBy({ user_id: uid });
-      if (userProfile) {
-        await t.update(UserProfile, { user_id: uid }, profileData);
-      } else {
-        await t.save(UserProfile, profileData);
-      }
+      await this.saveUserProfileData(t, profileData);
 
       this.logger.debug('Sending email...');
-
-      try {
-        await this.emailProvider.sendSignupEmail(await this.i18n.t('_.email_verification'), data.email, {
-          app: 'MPPLATFORM',
-        });
-        this.logger.log(`Send signup email-verified for user: ${data.email}`);
-
-        // const emailVerificationToken = await this.generateEmailVerificationToken(userData.id);
-
-        // const userEntity = new User();
-        // Object.assign(userEntity, userData);
-
-        // const expiresAt = new Date();
-        // expiresAt.setDate(expiresAt.getDate() + 1);
-
-        // const emailToken = new EmailVerificationToken();
-        // emailToken.token = emailVerificationToken;
-        // emailToken.expires_at = expiresAt;
-        // emailToken.user = userEntity;
-
-        // await t.getRepository(EmailVerificationToken).save(emailToken);
-
-        // await this.emailProvider.sendCustomEmailVerification(await this.i18n.t('_.email_verification'), data.email, {
-        //   app: 'MPPLATFORM',
-        // });
-
-        // this.logger.log(`Send custom email verification for user: ${data.email}`);
-      } catch (error) {
-        this.logger.error(error);
-        this.logger.log(`[sendCustomEmailVerification] Fail to send email for user ${data.email}`);
-      }
+      await this.sendVerificationEmail(t, userData, data.email);
 
       return _.first(await this.usersPersistence.getUsers(t, [uid]));
     });
     return {
       user: tranResult,
     };
+  }
+
+  async checkEmailExists(email: string, roles: RolesEnum): Promise<boolean> {
+    return await this.dataSource.manager.transaction(async (transaction) => {
+      return await transaction.getRepository(User).exist({ where: { role: In([roles]), email: email } });
+    });
   }
 
   async getUser(id: string) {
@@ -267,76 +294,39 @@ export class UsersService implements Coded {
     });
   }
 
-  async updateUser(id: string, data) {
-    const tranResult = await this.dataSource.manager.transaction(async (t) => {
-      const user = await t.findOneBy(User, { id, is_deleted: false });
-      if (!user) {
-        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('UUSR-001'));
-      }
-
-      const userProfile = await t.findOneBy(UserProfile, { user_id: id });
-
-      const now = new Date();
-      const acceptableKeys = _.chain(['name_sei', 'name_mei', 'kana_name_sei', 'kana_name_mei', 'gender', 'birthday'])
-        .invert()
-        .mapValues(() => true)
-        .value();
-
-      const partialData = {
-        updated_at: now,
-      };
-      _.chain(data)
-        .keys()
-        .filter((x) => acceptableKeys[x])
-        .each((dataKey) => {
-          const dbKey = dataKey == 'gender' ? 'gender_type' : dataKey;
-          partialData[dbKey] = data[dataKey];
-        })
-        .commit();
-
-      if (userProfile) {
-        await t.update(UserProfile, { user_id: id }, partialData);
-      } else {
-        await t.save(UserProfile, {
-          user_id: id,
-          created_at: now,
-          ...partialData,
-        });
-      }
-      return _.first(await this.usersPersistence.getUsers(t, [id], {}));
+  async findByToken(token: string): Promise<User | null> {
+    const decodedToken = await this.verifyFirebaseUser(token);
+    const user = await this.dataSource.manager.transaction(async (t: EntityManager) => {
+      return t.findOne(User, { where: { id: decodedToken.uid } });
     });
-    return {
-      user: tranResult,
-    };
+    if (!user) {
+      throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('FBT-001'));
+    }
+    return user;
   }
 
-  async verifyToUpdateEmail(id: string, data: { email: string }) {
-    const tranResult = await this.dataSource.manager.transaction(async (t) => {
-      const user = await t.findOneBy(User, { id, is_deleted: false });
-      if (!user) {
-        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('VUE-001'));
-      }
-      const userProfile = await t.findOneBy(UserProfile, { user_id: user.id });
-
-      const vCode = uuidv4();
-
-      await this.firebase.auth.setCustomUserClaims(id, {
-        verification_code: vCode,
-      });
-
-      await this.emailProvider.sendUpdateEmail(await this.i18n.t('_.email_change_verification'), data.email, {
-        id,
-        app: 'MPPLATFORM',
-        name: userProfile.getDispNameForEmailOrNotification(user),
-        email: data.email,
-        verificationCode: vCode,
-      });
-
-      return _.first(await this.usersPersistence.getUsers(t, [id]));
+  async updateVerificationStatus(uid: string, status: boolean): Promise<void> {
+    const result = await this.dataSource.manager.transaction(async (t: EntityManager) => {
+      return t.update(User, { uid: uid }, { status: status ? StatusEnum.active : StatusEnum.inActive });
     });
-    return {
-      user: tranResult,
-    };
+    if (result.affected === 0) {
+      throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('UVS-002'));
+    }
+  }
+
+  async verifyFirebaseUser(token: string) {
+    try {
+      const decodedToken = await this.firebase.auth.verifyIdToken(token);
+      return decodedToken;
+    } catch (error) {
+      if (error.code === 'auth/id-token-expired') {
+        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_VERIFICATION_CODE('VFU-001'));
+      } else if (error.code === 'auth/invalid-id-token') {
+        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_VERIFICATION_CODE('VFU-002'));
+      } else {
+        throw new CodedUnauthorizedException(this.code, this.errorCodes.FAILED_TO_CREATE_ACCOUNT('VFU-003'));
+      }
+    }
   }
 
   async updateEmail(id: string, email: string, verificationCode: string) {
@@ -379,141 +369,112 @@ export class UsersService implements Coded {
     };
   }
 
-  async sendPasswordResetEmail(email: string) {
-    await this.dataSource.manager.transaction(async (t) => {
-      let fireUser = null;
-      try {
-        fireUser = await this.firebase.auth.getUserByEmail(email);
-      } catch (e) {
-        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_EMAIL('SPR-001'));
-      }
-
-      const user = await t.findOneBy(User, { id: fireUser.uid, is_deleted: false });
-      if (!user) {
-        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_EMAIL('SPR-002'));
-      }
-
-      const vCode = uuidv4();
-
-      await this.firebase.auth.setCustomUserClaims(fireUser.uid, {
-        verification_code: vCode,
-      });
-
-      await this.emailProvider.sendPasswordResetEmail(await this.i18n.t('_.password_reset'), email);
-    });
-    return {};
-  }
-
   async sendEmailNotificationForRegisterCompany(dataRegister: Partial<UserAndCompanyRegisterRequest>) {
     const admins = await this.getUserByRoles([RolesEnum.admin]);
     const adminEmails = _.map(admins, (admin) => admin.email);
     const user = dataRegister.user;
     const company = dataRegister.company;
     const userEmail = user.email;
-    let willingToText = '';
-    let willingTo = '';
 
-    if (company.type_of_business === TypeOfBusinessEnum.MANUFACTURING) {
-      willingToText = 'Are you willing to manufacture products requested by foreign investor/company on a OEM basis?';
-    }
-    if (company.type_of_business === TypeOfBusinessEnum.DISTRIBUTION) {
-      willingToText = 'Are you willing to distribute products from foreign investor/company as a local distributor?';
-    }
-    if ([TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(company.type_of_business)) {
-      willingTo = company.willing_to ? 'Yes' : 'No';
-    }
+    const { willingTo, willingToText } = this.getWillingToDetails(company);
+
+    const camelCaseCompany = convertObjectToCamelCase(company);
+
     const params = {
+      ...camelCaseCompany,
       userName: user.name,
       email: user.email,
-      companyName: company.name,
-      positionOfUser: company.position_of_user,
-      description1: company.description_1,
-      description2: company.description_2,
-      country: company.country,
-      area: company.area,
-      typeOfBusiness: company.type_of_business,
-      commodity: company.commodity,
       willingTo,
       willingToText,
-      dateOfEstablishment: company.date_of_establishment,
-      annualRevenue: company.annual_revenue,
-      annualProfit: company.annual_profit,
-      numberOfEmployees: company.number_of_employees,
-      sellOfShares: company.sell_of_shares,
-      expectedPriceOfShares: company.expected_price_of_shares,
-      expectedPriceOfSharesPercent: company.expected_price_of_shares_percent,
-      issuanceRaiseMoney: company.issuance_raise_money,
-      issuancePriceOfShares: company.issuance_price_of_shares,
-      issuancePriceOfSharesPercent: company.issuance_price_of_shares_percent,
       businessCollaboration: company.business_collaboration ? 'Yes' : 'No',
-      collaborationDetail: company.collaboration_detail,
     };
 
     const subjectAdmin = await this.i18n.t('_.email_register_company_for_admin', { lang: 'en' });
     const subjectUser = await this.i18n.t('_.email_register_company_for_user', { lang: 'en' });
 
-    try {
-      await this.emailProvider.sendNotificationRegisterCompanyEmail(subjectUser, userEmail, params);
-      this.logger.log(`Send register company email for user: ${userEmail}`);
-    } catch (error) {
-      this.logger.error(error);
-      this.logger.log(`[sendEmailNotificationForRegisterCompany] Fail to send email for user ${userEmail}`);
-    }
-
-    for (const email of adminEmails) {
-      try {
-        await this.emailProvider.sendNotificationRegisterCompanyEmail(subjectAdmin, email, params);
-        this.logger.log(`Send register company email for admins: ${email}`);
-      } catch (error) {
-        this.logger.error(error);
-        this.logger.log(
-          `[sendEmailNotificationForRegisterCompany] Fail to send email for admins: ${adminEmails.join(', ')}`,
-        );
-      }
-    }
-  }
-
-  /**
-   * 論理削除
-   */
-  async deleteUser(id: string) {
-    await this.dataSource.manager.transaction(async (t) => {
-      const user = await t.findOneBy(User, { id, is_deleted: false });
-      if (!user) {
-        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('DUS-001'));
-      }
-      user.is_deleted = true;
-      await t.save(user);
-    });
-  }
-
-  /***
-   * 一般でなく各種細かい情報の入った詳細取得。admin-console向け。
-   */
-  async getUserDetails(id: string, maxNumberOfSignInHistories = 10) {
-    const tranResult = await this.dataSource.manager.transaction(async (t) => {
-      const users = await this.usersPersistence.getUsers(t, [id], {
-        maxNumberOfSignInHistories: maxNumberOfSignInHistories,
-      });
-      const user = _.first(users);
-      if (!user) {
-        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('GUD-001'));
-      }
-      let fireUser = null;
-      try {
-        fireUser = await this.firebase.auth.getUser(id);
-      } catch (e) {
-        const code: string = e.code;
-        if (code == 'auth/user-not-found') {
-          throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('GUD-002'));
-        } else {
-          this.logger.error(e);
-        }
-      }
-      return user;
-    });
-    return {
-      user: tranResult,
-    };
+    this.sendNotificationRegisterCompanyEmail(subjectUser, userEmail, params);
+    adminEmails.forEach((email) => this.sendNotificationRegisterCompanyEmail(subjectAdmin, email, params));
   }
 }
+
+// async deleteUser(id: string) {
+//   await this.dataSource.manager.transaction(async (t) => {
+//     const user = await t.findOneBy(User, { id, is_deleted: false });
+//     if (!user) {
+//       throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('DUS-001'));
+//     }
+//     user.is_deleted = true;
+//     await t.save(user);
+//   });
+// }
+
+// async getUserDetails(id: string, maxNumberOfSignInHistories = 10) {
+//   const tranResult = await this.dataSource.manager.transaction(async (t) => {
+//     const users = await this.usersPersistence.getUsers(t, [id], {
+//       maxNumberOfSignInHistories: maxNumberOfSignInHistories,
+//     });
+//     const user = _.first(users);
+//     if (!user) {
+//       throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('GUD-001'));
+//     }
+//     let fireUser = null;
+//     try {
+//       fireUser = await this.firebase.auth.getUser(id);
+//     } catch (e) {
+//       const code: string = e.code;
+//       if (code == 'auth/user-not-found') {
+//         throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('GUD-002'));
+//       } else {
+//         this.logger.error(e);
+//       }
+//     }
+//     return user;
+//   });
+//   return {
+//     user: tranResult,
+//   };
+// }
+
+// async updateUser(id: string, data) {
+//   const tranResult = await this.dataSource.manager.transaction(async (t) => {
+//     const user = await t.findOneBy(User, { id, is_deleted: false });
+//     if (!user) {
+//       throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('UUSR-001'));
+//     }
+
+//     const userProfile = await t.findOneBy(UserProfile, { user_id: id });
+
+//     const now = new Date();
+//     const acceptableKeys = _.chain(['name_sei', 'name_mei', 'kana_name_sei', 'kana_name_mei', 'gender', 'birthday'])
+//       .invert()
+//       .mapValues(() => true)
+//       .value();
+
+//     const partialData = {
+//       updated_at: now,
+//     };
+//     _.chain(data)
+//       .keys()
+//       .filter((x) => acceptableKeys[x])
+//       .each((dataKey) => {
+//         const dbKey = dataKey == 'gender' ? 'gender_type' : dataKey;
+//         partialData[dbKey] = data[dataKey];
+//       })
+//       .commit();
+
+//     if (userProfile) {
+//       await t.update(UserProfile, { user_id: id }, partialData);
+//     } else {
+//       await t.save(UserProfile, {
+//         user_id: id,
+//         created_at: now,
+//         ...partialData,
+//       });
+//     }
+//     return _.first(await this.usersPersistence.getUsers(t, [id], {}));
+//   });
+//   return {
+//     user: tranResult,
+//   };
+// }
+// }
