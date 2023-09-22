@@ -66,12 +66,11 @@ export class CompaniesController implements Coded {
       throw new HttpException('Failed to create and link company', HttpStatus.BAD_REQUEST);
     }
 
-    const emailData = {
-      user: { email: newCompany.user.email, name: newCompany.user.name },
-      company: newCompany,
-    } as unknown as Partial<UserAndCompanyRegisterRequest>;
-
-    await this.usersService.sendEmailNotificationForRegisterCompany(emailData);
+    await this.usersService.sendEmailNotificationForRegisterCompany(
+      newCompany.user,
+      newCompany.company,
+      createCompanyDto.position_of_user,
+    );
 
     return {
       company: newCompany.company,
@@ -103,12 +102,11 @@ export class CompaniesController implements Coded {
 
     const updatedCompany = await this.companiesService.updateCompany(companyId, updateCompanyInfoDto);
 
-    const emailData = {
-      user: { email: userRelation.user.email, name: userRelation.user.name },
-      company: updatedCompany,
-    } as unknown as Partial<UserAndCompanyRegisterRequest>;
-
-    await this.usersService.sendEmailNotificationForRegisterCompany(emailData);
+    await this.usersService.sendEmailNotificationForRegisterCompany(
+      userRelation,
+      updatedCompany,
+      updateCompanyInfoDto.position_of_user,
+    );
 
     return {
       company: updatedCompany,

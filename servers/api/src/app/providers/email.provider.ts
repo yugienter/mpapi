@@ -3,7 +3,6 @@ import { MailerService } from '@nestjs-modules/mailer';
 import Bull from 'bull';
 import Queue from 'bull';
 
-import { FirebaseInfo } from '@/app/modules/firebase.module';
 import { ConfigProvider } from '@/app/providers/config.provider';
 import { Coded } from '@/app/utils/coded';
 
@@ -16,11 +15,7 @@ export class EmailProvider implements Coded {
   private readonly logger = new Logger(EmailProvider.name);
   private readonly emailQueue: Bull.Queue;
 
-  constructor(
-    private readonly firebase: FirebaseInfo,
-    private readonly configProvider: ConfigProvider,
-    private readonly mailerService: MailerService,
-  ) {
+  constructor(private readonly configProvider: ConfigProvider, private readonly mailerService: MailerService) {
     this.emailQueue = new Queue('emails');
     this.initializeEmailQueueProcessor();
   }
@@ -46,6 +41,7 @@ export class EmailProvider implements Coded {
     });
   }
 
+  // This queue request redis so for now this project not need to add redis.
   private async queueEmail(subject: string, sendTo: string, template: string, context: EmailContext) {
     await this.emailQueue.add(
       { subject, sendTo, template, context },
@@ -66,16 +62,22 @@ export class EmailProvider implements Coded {
 
     const verificationUrl = verificationUrlObj.toString();
 
-    await this.queueEmail(subject, sendTo, 'signup-verification', { ...params, actionLink: verificationUrl });
+    // await this.queueEmail(subject, sendTo, 'signup-verification', { ...params, actionLink: verificationUrl });
+    await this.mailerService.sendMail({
+      to: sendTo,
+      subject,
+      template: 'signup-verification',
+      context: { ...params, actionLink: verificationUrl },
+    });
   }
 
-  async sendNotificationRegisterCompanyEmail(
-    subject: string,
-    sendTo: string,
-    params: {
-      [key: string]: string | number;
-    },
-  ) {
-    await this.queueEmail(subject, sendTo, 'company-register', params);
+  async sendNotificationRegisterCompanyEmail(subject: string, sendTo: string, params: EmailContext) {
+    // await this.queueEmail(subject, sendTo, 'company-register', params);
+    await this.mailerService.sendMail({
+      to: sendTo,
+      subject,
+      template: 'company-register',
+      context: params,
+    });
   }
 }

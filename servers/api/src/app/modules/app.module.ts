@@ -92,6 +92,7 @@ import { ConfigProvider } from '@/app/providers/config.provider';
           database: conf.dbDatabase,
           entities: ALL_MODELS,
           synchronize: false,
+          // logging: true,
         };
       },
     }),

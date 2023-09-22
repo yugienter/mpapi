@@ -104,8 +104,6 @@ export class AuthController implements Coded {
 
     this.companiesService.manyToManyCreateCompanyUser(company.position_of_user, companyData, userData);
 
-    // await this.usersService.sendEmailNotificationForRegisterCompany(dto);
-
     return true;
   }
 
@@ -124,6 +122,16 @@ export class AuthController implements Coded {
       this.logger.error('Failed to update verification status in database', error);
       throw new CodedUnauthorizedException(this.code, this.errorCodes.EMAIL_NOT_VERIFIED('VFE-001'));
     }
+
+    await this.usersService.deleteEmailVerificationToken(body.token);
+
+    const companyDetails = await this.companiesService.getFirstCompanyFullDetailsOfUser(user.id);
+
+    await this.usersService.sendEmailNotificationForRegisterCompany(
+      user,
+      companyDetails.company,
+      companyDetails.positionOfUser,
+    );
 
     return { success: true, message: 'Success to verification' };
   }

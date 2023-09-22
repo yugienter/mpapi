@@ -89,6 +89,22 @@ export class CompaniesService {
     return result;
   }
 
+  async getFirstCompanyFullDetailsOfUser(userId: string): Promise<{ company: Company; positionOfUser: string } | null> {
+    const result = await this.companiesRepository
+      .createQueryBuilder('c')
+      .innerJoinAndSelect('c.companiesUsers', 'cu')
+      .where('cu.user_id = :userId', { userId })
+      .getOne();
+
+    if (result) {
+      return {
+        company: { ...result },
+        positionOfUser: result.companiesUsers[0].position_of_user,
+      };
+    }
+    return null;
+  }
+
   async updateCompany(companyId: string, updateCompanyDto: UpdateCompanyInfoDto): Promise<Company> {
     return await this.companiesRepository.manager.transaction(async (manager) => {
       const company = await manager.findOne(Company, { where: { id: companyId } });

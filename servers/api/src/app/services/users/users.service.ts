@@ -5,11 +5,10 @@ import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { DataSource, EntityManager, In } from 'typeorm';
 
-import { UserAndCompanyRegisterRequest } from '@/app/controllers/dto/auth.dto';
 import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
-import { TypeOfBusinessEnum } from '@/app/models/company';
+import { Company, TypeOfBusinessEnum } from '@/app/models/company';
 import { EmailVerificationToken } from '@/app/models/email_verification_tokens';
 import { RolesEnum, StatusEnum, User } from '@/app/models/user';
 import { UserProfile } from '@/app/models/user-profile';
@@ -42,6 +41,9 @@ export class UsersService implements Coded {
     USER_ALREADY_IN_USE: ErrorInfo.getBuilder('AIU', 'already_in_use'),
     FAILED_TO_CREATE_ACCOUNT: ErrorInfo.getBuilder('FCA', 'failed_to_create_account'),
     USER_ALREADY_IN_RECESS: ErrorInfo.getBuilder('AIRC', 'the_user_is_already_in_recess'),
+    TOKEN_EXPIRED: ErrorInfo.getBuilder('TE', 'token_expired'),
+    INVALID_TOKEN: ErrorInfo.getBuilder('IT', 'invalid_token'),
+    UNKNOWN_ERROR: ErrorInfo.getBuilder('UK', 'unknown_error'),
   };
 
   constructor(
@@ -64,9 +66,24 @@ export class UsersService implements Coded {
   }
 
   // Private utility methods
-  private async generateEmailVerificationToken(userId: string): Promise<string> {
+  private async generateEmailVerificationToken(userId: string, email: string): Promise<string> {
     const payload = { userId, action: 'email-verification' };
     return jwt.sign(payload, this.configProvider.config.appSecretKey, { expiresIn: '1d' });
+  }
+
+  private async verifyEmailToken(token: string): Promise<any> {
+    try {
+      const decoded = jwt.verify(token, this.configProvider.config.appSecretKey);
+      return decoded;
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        throw new CodedInvalidArgumentException(this.code, this.errorCodes.TOKEN_EXPIRED('VET-001'));
+      } else if (error instanceof jwt.JsonWebTokenError) {
+        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_TOKEN('VET-002'));
+      } else {
+        throw new CodedUnauthorizedException(this.code, this.errorCodes.UNKNOWN_ERROR('VET-003'));
+      }
+    }
   }
 
   private async getUserFromFirebase(email: string): Promise<UserRecord | null> {
@@ -164,7 +181,7 @@ export class UsersService implements Coded {
 
   private async sendVerificationEmail(t: any, user: any, email: string) {
     try {
-      const emailVerificationToken = await this.generateEmailVerificationToken(user.id);
+      const emailVerificationToken = await this.generateEmailVerificationToken(user.id, email);
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 1);
 
@@ -188,7 +205,7 @@ export class UsersService implements Coded {
     }
   }
 
-  private getWillingToDetails(company) {
+  private getWillingToDetails(company: Company) {
     let willingToText = '';
     let willingTo = '';
 
@@ -212,6 +229,16 @@ export class UsersService implements Coded {
     } catch (error) {
       this.logger.error(error);
       this.logger.log(`[sendEmailNotificationForRegisterCompany] Fail to send email for ${email}`);
+    }
+  }
+
+  private async autoVerifyEmail(uid: string): Promise<void> {
+    try {
+      await this.firebase.auth.updateUser(uid, {
+        emailVerified: true,
+      });
+    } catch (error) {
+      throw new Error(`Failed to auto verify email for user with UID: ${uid}. Error: ${error.message}`);
     }
   }
 
@@ -295,37 +322,38 @@ export class UsersService implements Coded {
   }
 
   async findByToken(token: string): Promise<User | null> {
-    const decodedToken = await this.verifyFirebaseUser(token);
-    const user = await this.dataSource.manager.transaction(async (t: EntityManager) => {
-      return t.findOne(User, { where: { id: decodedToken.uid } });
+    const emailToken = await this.dataSource.manager.transaction(async (t: EntityManager) => {
+      return t.findOne(EmailVerificationToken, { where: { token: token }, relations: ['user'] });
     });
-    if (!user) {
-      throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('FBT-001'));
+
+    if (!emailToken) {
+      throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_VERIFICATION_CODE('FBT-003'));
     }
-    return user;
+
+    const decodedToken = await this.verifyEmailToken(token);
+    const action = decodedToken.action;
+
+    if (action !== 'email-verification') {
+      throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_VERIFICATION_CODE('FBT-001'));
+    }
+
+    return emailToken.user;
+  }
+
+  async deleteEmailVerificationToken(token: string): Promise<void> {
+    await this.dataSource.manager.transaction(async (t: EntityManager) => {
+      await t.getRepository(EmailVerificationToken).delete({ token: token });
+    });
   }
 
   async updateVerificationStatus(uid: string, status: boolean): Promise<void> {
+    await this.autoVerifyEmail(uid);
+
     const result = await this.dataSource.manager.transaction(async (t: EntityManager) => {
-      return t.update(User, { uid: uid }, { status: status ? StatusEnum.active : StatusEnum.inActive });
+      return t.update(User, { id: uid }, { status: status ? StatusEnum.active : StatusEnum.inActive });
     });
     if (result.affected === 0) {
       throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('UVS-002'));
-    }
-  }
-
-  async verifyFirebaseUser(token: string) {
-    try {
-      const decodedToken = await this.firebase.auth.verifyIdToken(token);
-      return decodedToken;
-    } catch (error) {
-      if (error.code === 'auth/id-token-expired') {
-        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_VERIFICATION_CODE('VFU-001'));
-      } else if (error.code === 'auth/invalid-id-token') {
-        throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_VERIFICATION_CODE('VFU-002'));
-      } else {
-        throw new CodedUnauthorizedException(this.code, this.errorCodes.FAILED_TO_CREATE_ACCOUNT('VFU-003'));
-      }
     }
   }
 
@@ -369,25 +397,38 @@ export class UsersService implements Coded {
     };
   }
 
-  async sendEmailNotificationForRegisterCompany(dataRegister: Partial<UserAndCompanyRegisterRequest>) {
-    const admins = await this.getUserByRoles([RolesEnum.admin]);
-    const adminEmails = _.map(admins, (admin) => admin.email);
-    const user = dataRegister.user;
-    const company = dataRegister.company;
-    const userEmail = user.email;
-
+  async sendEmailNotificationForRegisterCompany(user: Partial<User>, company: Company, positionOfUser: string) {
     const { willingTo, willingToText } = this.getWillingToDetails(company);
-
-    const camelCaseCompany = convertObjectToCamelCase(company);
-
     const params = {
-      ...camelCaseCompany,
       userName: user.name,
       email: user.email,
+      companyName: company.name,
+      positionOfUser: positionOfUser,
+      description1: company.description_1,
+      description2: company.description_2,
+      country: company.country,
+      area: company.area,
+      typeOfBusiness: company.type_of_business,
+      commodity: company.commodity,
       willingTo,
       willingToText,
+      dateOfEstablishment: company.date_of_establishment,
+      annualRevenue: company.annual_revenue,
+      annualProfit: company.annual_profit,
+      numberOfEmployees: company.number_of_employees,
+      sellOfShares: company.sell_of_shares,
+      expectedPriceOfShares: company.expected_price_of_shares,
+      expectedPriceOfSharesPercent: company.expected_price_of_shares_percent,
+      issuanceRaiseMoney: company.issuance_raise_money,
+      issuancePriceOfShares: company.issuance_price_of_shares,
+      issuancePriceOfSharesPercent: company.issuance_price_of_shares_percent,
       businessCollaboration: company.business_collaboration ? 'Yes' : 'No',
+      collaborationDetail: company.collaboration_detail,
     };
+
+    const admins = await this.getUserByRoles([RolesEnum.admin]);
+    const adminEmails = _.map(admins, (admin) => admin.email);
+    const userEmail = user.email;
 
     const subjectAdmin = await this.i18n.t('_.email_register_company_for_admin', { lang: 'en' });
     const subjectUser = await this.i18n.t('_.email_register_company_for_user', { lang: 'en' });
