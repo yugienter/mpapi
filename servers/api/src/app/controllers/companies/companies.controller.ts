@@ -70,7 +70,7 @@ export class CompaniesController implements Coded {
       newCompany.user,
       newCompany.company,
       createCompanyDto.position_of_user,
-      UserTypeAction.update,
+      UserTypeAction.create,
     );
 
     return {
@@ -107,7 +107,7 @@ export class CompaniesController implements Coded {
       userRelation.user,
       updatedCompany,
       userRelation.position_of_user,
-      UserTypeAction.create,
+      UserTypeAction.update,
     );
 
     return {
