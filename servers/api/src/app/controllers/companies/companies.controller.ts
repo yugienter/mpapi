@@ -1,7 +1,6 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Logger, Param, Post, Put, Req } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
-import { UserAndCompanyRegisterRequest } from '@/app/controllers/dto/auth.dto';
 import { CreateCompanyRequest, UpdateCompanyInfoDto } from '@/app/controllers/dto/company.dto';
 import { Company } from '@/app/models/company';
 import { User } from '@/app/models/user';
@@ -103,9 +102,9 @@ export class CompaniesController implements Coded {
     const updatedCompany = await this.companiesService.updateCompany(companyId, updateCompanyInfoDto);
 
     await this.usersService.sendEmailNotificationForRegisterCompany(
-      userRelation,
+      userRelation.user,
       updatedCompany,
-      updateCompanyInfoDto.position_of_user,
+      userRelation.position_of_user,
     );
 
     return {
