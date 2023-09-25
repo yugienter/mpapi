@@ -127,7 +127,7 @@ export class AuthController implements Coded {
 
     const companyDetails = await this.companiesService.getFirstCompanyFullDetailsOfUser(user.id);
 
-    await this.usersService.sendEmailNotificationForRegisterCompany(
+    await this.usersService.sendEmailNotificationForInfoCompany(
       user,
       companyDetails.company,
       companyDetails.positionOfUser,

@@ -10,6 +10,11 @@ interface EmailContext {
   [key: string]: string | number | undefined;
 }
 
+export enum UserTypeAction {
+  create = 'create',
+  update = 'update',
+}
+
 @Injectable()
 export class EmailProvider implements Coded {
   private readonly logger = new Logger(EmailProvider.name);
@@ -71,12 +76,15 @@ export class EmailProvider implements Coded {
     });
   }
 
-  async sendNotificationRegisterCompanyEmail(subject: string, sendTo: string, params: EmailContext) {
+  async sendNotificationCreateOrUpdateCompanyEmail(subject: string, sendTo: string, params: EmailContext) {
     // await this.queueEmail(subject, sendTo, 'company-register', params);
     await this.mailerService.sendMail({
       to: sendTo,
       subject,
-      template: 'company-register',
+      template:
+        params?.action && [UserTypeAction.create, UserTypeAction.update].includes(params.action as UserTypeAction)
+          ? 'company-add-edit'
+          : 'company-register',
       context: params,
     });
   }

@@ -15,13 +15,12 @@ import { UserProfile } from '@/app/models/user-profile';
 import { FirebaseInfo } from '@/app/modules/firebase.module';
 import { UsersPersistence } from '@/app/persistence/users.persistence';
 import { ConfigProvider } from '@/app/providers/config.provider';
-import { EmailProvider } from '@/app/providers/email.provider';
+import { EmailProvider, UserTypeAction } from '@/app/providers/email.provider';
 import { I18nProvider } from '@/app/providers/i18n.provider';
 import { SlackProvider } from '@/app/providers/slack.provider';
 import { StorageProvider } from '@/app/providers/storage.provider';
 import { Coded } from '@/app/utils/coded';
 import { Service } from '@/app/utils/decorators';
-import { convertObjectToCamelCase } from '@/app/utils/utils';
 
 interface OTPs {
   setEmailVerified: boolean;
@@ -222,9 +221,9 @@ export class UsersService implements Coded {
     return { willingTo, willingToText };
   }
 
-  private async sendNotificationRegisterCompanyEmail(subject, email, params) {
+  private async sendNotificationCreateOrUpdateCompanyEmail(subject, email, params) {
     try {
-      await this.emailProvider.sendNotificationRegisterCompanyEmail(subject, email, params);
+      await this.emailProvider.sendNotificationCreateOrUpdateCompanyEmail(subject, email, params);
       this.logger.log(`Send register company email for: ${email}`);
     } catch (error) {
       this.logger.error(error);
@@ -397,7 +396,12 @@ export class UsersService implements Coded {
     };
   }
 
-  async sendEmailNotificationForRegisterCompany(user: Partial<User>, company: Company, positionOfUser: string) {
+  async sendEmailNotificationForInfoCompany(
+    user: Partial<User>,
+    company: Company,
+    positionOfUser: string,
+    action?: string,
+  ) {
     const { willingTo, willingToText } = this.getWillingToDetails(company);
     const params = {
       userName: user.name,
@@ -424,17 +428,29 @@ export class UsersService implements Coded {
       issuancePriceOfSharesPercent: company.issuance_price_of_shares_percent,
       businessCollaboration: company.business_collaboration ? 'Yes' : 'No',
       collaborationDetail: company.collaboration_detail,
+      action: action,
     };
 
     const admins = await this.getUserByRoles([RolesEnum.admin]);
     const adminEmails = _.map(admins, (admin) => admin.email);
     const userEmail = user.email;
 
-    const subjectAdmin = await this.i18n.t('_.email_register_company_for_admin', { lang: 'en' });
-    const subjectUser = await this.i18n.t('_.email_register_company_for_user', { lang: 'en' });
+    let subjectAdmin = await this.i18n.t('_.email_register_company_for_admin', { lang: 'en' });
+    let subjectUser = await this.i18n.t('_.email_register_company_for_user', { lang: 'en' });
 
-    this.sendNotificationRegisterCompanyEmail(subjectUser, userEmail, params);
-    adminEmails.forEach((email) => this.sendNotificationRegisterCompanyEmail(subjectAdmin, email, params));
+    if (action) {
+      if ((action = UserTypeAction.create)) {
+        subjectUser = await this.i18n.t('_.email_create_new_company_for_user', { lang: 'en' });
+      }
+      if ((action = UserTypeAction.update)) {
+        subjectUser = await this.i18n.t('_.email_update_company_for_user', { lang: 'en' });
+      }
+      subjectAdmin = await this.i18n.t('_.email_create_update_company_for_admin', { lang: 'en' });
+    }
+
+    this.sendNotificationCreateOrUpdateCompanyEmail(subjectUser, userEmail, params);
+
+    adminEmails.forEach((email) => this.sendNotificationCreateOrUpdateCompanyEmail(subjectAdmin, email, params));
   }
 }
 

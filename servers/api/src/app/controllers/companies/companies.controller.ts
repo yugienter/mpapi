@@ -4,6 +4,7 @@ import { ApiOperation } from '@nestjs/swagger';
 import { CreateCompanyRequest, UpdateCompanyInfoDto } from '@/app/controllers/dto/company.dto';
 import { Company } from '@/app/models/company';
 import { User } from '@/app/models/user';
+import { UserTypeAction } from '@/app/providers/email.provider';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
@@ -65,10 +66,11 @@ export class CompaniesController implements Coded {
       throw new HttpException('Failed to create and link company', HttpStatus.BAD_REQUEST);
     }
 
-    await this.usersService.sendEmailNotificationForRegisterCompany(
+    await this.usersService.sendEmailNotificationForInfoCompany(
       newCompany.user,
       newCompany.company,
       createCompanyDto.position_of_user,
+      UserTypeAction.update,
     );
 
     return {
@@ -101,10 +103,11 @@ export class CompaniesController implements Coded {
 
     const updatedCompany = await this.companiesService.updateCompany(companyId, updateCompanyInfoDto);
 
-    await this.usersService.sendEmailNotificationForRegisterCompany(
+    await this.usersService.sendEmailNotificationForInfoCompany(
       userRelation.user,
       updatedCompany,
       userRelation.position_of_user,
+      UserTypeAction.create,
     );
 
     return {
