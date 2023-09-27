@@ -88,4 +88,13 @@ export class EmailProvider implements Coded {
       context: params,
     });
   }
+
+  async sendNotificationCreateOrUpdateForAdmin(subject: string, sendTo: string, params: EmailContext) {
+    await this.mailerService.sendMail({
+      to: sendTo,
+      subject,
+      template: 'admin-registration-notification',
+      context: params,
+    });
+  }
 }

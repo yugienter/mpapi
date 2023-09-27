@@ -231,6 +231,18 @@ export class UsersService implements Coded {
     }
   }
 
+  private async sendNotificationCreateOrUpdateForAdmin(subject, email, params) {
+    try {
+      await this.emailProvider.sendNotificationCreateOrUpdateForAdmin(subject, email, params);
+      this.logger.log(
+        `Send  ${params.action ? params.action : 'registration'} notification for admin with email: ${email}`,
+      );
+    } catch (error) {
+      this.logger.error(error);
+      this.logger.log(`[sendNotificationCreateOrUpdateForAdmin] Fail to send email for ${email}`);
+    }
+  }
+
   private async autoVerifyEmail(uid: string): Promise<void> {
     try {
       await this.firebase.auth.updateUser(uid, {
@@ -433,6 +445,8 @@ export class UsersService implements Coded {
 
     const admins = await this.getUserByRoles([RolesEnum.admin]);
     const adminEmails = _.map(admins, (admin) => admin.email);
+    // for admin right now
+    adminEmails.push('mpa@mp-asia.com');
     const userEmail = user.email;
 
     let subjectAdmin = await this.i18n.t('_.email_register_company_for_admin', { lang: 'en' });
@@ -450,7 +464,7 @@ export class UsersService implements Coded {
 
     this.sendNotificationCreateOrUpdateCompanyEmail(subjectUser, userEmail, params);
 
-    adminEmails.forEach((email) => this.sendNotificationCreateOrUpdateCompanyEmail(subjectAdmin, email, params));
+    adminEmails.forEach((email) => this.sendNotificationCreateOrUpdateForAdmin(subjectAdmin, email, params));
   }
 }
 

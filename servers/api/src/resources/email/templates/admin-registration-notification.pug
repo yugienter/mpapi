@@ -1,0 +1,93 @@
+doctype html
+html
+  head
+    if action
+      if action == 'create'
+        title Information Created
+      else if action == 'update'
+        title Information Updated
+    else 
+      title Registration Completed
+
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    style.
+      @media only screen and (max-width: 600px) {
+        table {
+          width: 100% !important;
+        }
+      }
+  body(style="font-family: Arial, sans-serif; margin: 0; padding: 0;")
+    table(width="100%", border="0", cellpadding="0", cellspacing="0", bgcolor="#f4f4f4")
+      tr
+        td(align="center", valign="top")
+          table(width="600", border="0", cellpadding="20", cellspacing="0", bgcolor="#ffffff")
+            tr
+              td(align="center")
+              if action
+                if action == 'create'
+                  h1(style="font-size: 24px; margin-bottom: 20px;") Information Created
+                else if action == 'update'
+                  h1(style="font-size: 24px; margin-bottom: 20px;") Information Updated
+              else 
+                h1(style="font-size: 24px; margin-bottom: 20px;") Registration Completed
+            tr
+              td(align="left")
+              if action
+                if action == 'create'
+                  p A new company has been created with the following information on Asia M&A and Business Collaboration Platform:
+                else if action == 'update'
+                  p Registered information has been updated with the following information on Asia M&A and Business Collaboration Platform:
+              else 
+                p A new registration has been completed with the following information on Asia M&A and Business Collaboration Platform:
+            tr
+              td
+                hr
+            tr
+              td(align="center")
+                h2 BASIC INFORMATION
+                p Name: #{userName}
+                p Position: #{positionOfUser}
+                p Email Address: #{email}
+            tr
+              td(align="center")
+                h2 COMPANY INFORMATION
+                p Company name: #{companyName}
+                p Describe: #{description1}
+                p Description: #{description2}
+                p Country: #{country}
+                p Area: #{area}
+                p Type Of Business: #{typeOfBusiness}
+                p Commodity: #{commodity}
+                p #{willingToText} : #{willingTo} 
+                br
+                p Date Of Establishment : #{dateOfEstablishment} 
+                p Total Annual Revenue : #{annualRevenue} 
+                p Total Annual Profit : #{annualProfit} 
+                p Number of employees : #{numberOfEmployees} 
+                br
+                p The transactions that user interested in or willing to
+                br
+                p Sell of shares: #{sellOfShares} %
+                br
+                p What is your expected price? 
+                p #{expectedPriceOfShares} USD for #{expectedPriceOfSharesPercent}% of shares
+                br
+                p Issuance of new shares (receiving investment) 
+                p How much are you willing to raise money? : #{issuanceRaiseMoney}
+                p How much percent of shares are you willing to issue and at what price?
+                p #{issuancePriceOfShares} USD for #{issuancePriceOfSharesPercent} % of shares
+                br
+                p Business collaboration 
+                p Are you willing to do the business collaboration with Japanese, Chinese or Korean companies? : #{businessCollaboration}
+                br
+                p How do you wish to collaborate?
+                p #{collaborationDetail}
+            tr
+              td(align="left")
+                p Feel free to contact with our support team from 
+                  a(href="mailto:info@mp-asia.com", style="text-decoration: underline;") here 
+                  | if you wish to update any of the above information you registered.
+            tr
+              td(align="left", style="font-size: 12px; font-style: italic;")
+                span * 
+                | This is an automated message. Please do not reply directly to this email.
