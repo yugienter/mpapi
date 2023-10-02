@@ -8,13 +8,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AuthController } from '@/app/controllers/auth.controller';
 import { CompaniesController } from '@/app/controllers/companies/companies.controller';
+import { HealthController } from '@/app/controllers/health.controller';
 import { MastersController } from '@/app/controllers/masters.controller';
 import { PublicController } from '@/app/controllers/public.controller';
 import { SamplesController } from '@/app/controllers/samples.controller';
 import { UsersController } from '@/app/controllers/users/users.controller';
 import { CodedExceptionHandler } from '@/app/exceptions/handlers/coded.handlers';
 import { ExceptionHandler } from '@/app/exceptions/handlers/handler';
-import { ValidationExceptionHandler } from '@/app/exceptions/handlers/validation.exception.handler';
 import { ValidationExceptionFilter } from '@/app/exceptions/handlers/validation.filter';
 import { AuthMiddleware } from '@/app/middlewares/auth.middleware';
 import { CorsMiddleware } from '@/app/middlewares/cors.middleware';
@@ -31,6 +31,7 @@ import { authorizedControllers, mpplatformPersistences, mpplatformServices } fro
 const allControllers = [
   SamplesController,
   PublicController,
+  HealthController,
   AuthController,
   UsersController,
   CompaniesController,
