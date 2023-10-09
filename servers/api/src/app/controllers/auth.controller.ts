@@ -1,9 +1,13 @@
-import { Body, Controller, Logger, Post, Res } from '@nestjs/common';
+import { Body, Controller, Logger, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { FastifyReply } from 'fastify';
 import { getAuth as getAuthClient, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
 
-import { SignInRequest, UserAndCompanyRegisterRequest } from '@/app/controllers/dto/auth.dto';
+import {
+  ManualCreateCompanyUserRequest,
+  SignInRequest,
+  UserAndCompanyRegisterRequest,
+} from '@/app/controllers/dto/auth.dto';
 import { CreateCompanyRequest } from '@/app/controllers/dto/company.dto';
 import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
@@ -54,7 +58,10 @@ export class AuthController implements Coded {
     tags: ['auth'],
   })
   @Post('signin')
-  async signIn(@Res({ passthrough: true }) response: FastifyReply, @Body() dto: SignInRequest) {
+  async signIn(
+    @Res({ passthrough: true }) response: FastifyReply,
+    @Body() dto: SignInRequest,
+  ): Promise<{ user: ModifiedUser }> {
     const auth = getAuthClient(this.firebase.firebaseAppClient);
     let cred: UserCredential;
     try {
@@ -71,9 +78,7 @@ export class AuthController implements Coded {
     const refreshToken = fireUser.refreshToken;
     const result = await this.usersService.getUser(fireUser.uid);
     await this.authProvider.setTokenToCookie(response, accessToken, refreshToken);
-    return {
-      user: result.user,
-    };
+    return { user: result };
   }
 
   @ApiOperation({
@@ -82,7 +87,7 @@ export class AuthController implements Coded {
     tags: ['auth'],
   })
   @Post('company/signup')
-  async createUserAndCompany(@Body() dto: UserAndCompanyRegisterRequest) {
+  async createUserAndCompany(@Body() dto: UserAndCompanyRegisterRequest): Promise<boolean> {
     if (this.configProvider.config.isRestrictedServer && !dto.user.email.match(/@mp-asia\.com$/)) {
       throw new CodedUnauthorizedException(this.code, this.errorCodes.RESTRICTED_MP_PLATFORM('SG-001'));
     }
@@ -113,7 +118,7 @@ export class AuthController implements Coded {
     tags: ['auth'],
   })
   @Post('verify-email')
-  async verifyUser(@Body() body: { token: string }) {
+  async verifyUser(@Body() body: { token: string }): Promise<boolean> {
     const user = await this.usersService.findByToken(body.token);
 
     try {
@@ -133,7 +138,35 @@ export class AuthController implements Coded {
       companyDetails.positionOfUser,
     );
 
-    return { success: true, message: 'Success to verification' };
+    return true;
+  }
+
+  @ApiOperation({
+    summary: 'Manual sign up',
+    description: 'Admin can manual create user and company info',
+    tags: ['auth'],
+  })
+  @Post('manual-signup')
+  async manualSignup(@Body() dto: ManualCreateCompanyUserRequest): Promise<boolean> {
+    const createUser: { user: ModifiedUser } = await this.usersService.createNewUser({
+      email: dto.email,
+      password: null,
+      role: RolesEnum.company,
+    });
+    const userData: User = <User>createUser.user;
+
+    let company: CreateCompanyRequest = new CreateCompanyRequest();
+    company = { ...dto.company };
+    const companyData: Company = await this.companiesService.create(company);
+
+    this.companiesService.manyToManyCreateCompanyUser(company.position_of_user, companyData, userData);
+
+    // create user in firebase
+    // create user in database
+    // create company in database
+    // link user to company
+    // after - await this.firebase.auth.sendPasswordResetEmail(email);
+    return true;
   }
 
   // @ApiOperation({

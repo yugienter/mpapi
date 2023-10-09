@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { getAuth as getAuthClient, signInWithEmailAndPassword } from 'firebase/auth';
+// import { getAuth as getAuthClient, signInWithEmailAndPassword } from 'firebase/auth';
 import { UserRecord } from 'firebase-admin/auth';
 import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
@@ -10,7 +10,7 @@ import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauth
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
 import { Company, TypeOfBusinessEnum } from '@/app/models/company';
 import { EmailVerificationToken } from '@/app/models/email_verification_tokens';
-import { RolesEnum, StatusEnum, User } from '@/app/models/user';
+import { ModifiedUser, RolesEnum, StatusEnum, User } from '@/app/models/user';
 import { UserProfile } from '@/app/models/user-profile';
 import { FirebaseInfo } from '@/app/modules/firebase.module';
 import { UsersPersistence } from '@/app/persistence/users.persistence';
@@ -25,6 +25,16 @@ import { Service } from '@/app/utils/decorators';
 interface OTPs {
   setEmailVerified: boolean;
   userId: string | null;
+}
+
+interface WillingToDetails {
+  willingTo: string;
+  willingToText: string;
+}
+
+interface PayloadGeneratorToken {
+  userId: string;
+  action: string;
 }
 
 @Injectable()
@@ -65,9 +75,8 @@ export class UsersService implements Coded {
   }
 
   // Private utility methods
-  private async generateEmailVerificationToken(userId: string, email: string): Promise<string> {
-    const payload = { userId, action: 'email-verification' };
-    return jwt.sign(payload, this.configProvider.config.appSecretKey, { expiresIn: '1d' });
+  private async generateToken(payload: PayloadGeneratorToken, expiresIn = '1d'): Promise<string> {
+    return jwt.sign(payload, this.configProvider.config.appSecretKey, { expiresIn: expiresIn });
   }
 
   private async verifyEmailToken(token: string): Promise<any> {
@@ -97,17 +106,15 @@ export class UsersService implements Coded {
     }
   }
 
-  private async deleteUserFromFirebase(uid: string) {
-    await this.firebase.auth.deleteUser(uid);
-  }
-
   private async createOrUpdateUserInFirebase(
     userRec: UserRecord | null,
     email: string,
     password: string,
     opts: OTPs,
+    role?: RolesEnum,
   ): Promise<UserRecord> {
     try {
+      const customClaims = { roles: [role] || [] };
       if (userRec) {
         this.logger.log(`update: ${userRec.uid}`);
         await this.firebase.auth.updateUser(userRec.uid, {
@@ -119,12 +126,15 @@ export class UsersService implements Coded {
         userRec = await this.firebase.auth.createUser({
           ...(opts.userId ? { uid: opts.userId } : {}),
           email: email,
-          password: password,
+          ...(password ? { password: password } : {}),
           emailVerified: opts.setEmailVerified,
         });
       }
+      if (!_.isEmpty(customClaims) || !!userRec.customClaims) {
+        this.logger.log(`set custom user claim - role : ${customClaims}`);
+        await this.firebase.auth.setCustomUserClaims(userRec.uid, customClaims || userRec.customClaims);
+      }
     } catch (e) {
-      // https://firebase.google.com/docs/auth/admin/errors
       const code: string = e.code;
       if (code == 'auth/email-already-exists') {
         throw new CodedUnauthorizedException(this.code, this.errorCodes.USER_ALREADY_IN_USE('CNU-001'));
@@ -142,25 +152,21 @@ export class UsersService implements Coded {
     t: EntityManager,
     email: string,
     password: string,
-    opts: OTPs = {
-      setEmailVerified: false,
-      userId: null,
-    },
+    opts: OTPs,
+    role?: RolesEnum,
   ): Promise<UserRecord> {
     let userRec = await this.getUserFromFirebase(email);
-
     if (userRec && !(await t.getRepository(User).findOneBy({ email }))) {
-      await this.deleteUserFromFirebase(userRec.uid);
+      await this.firebase.auth.deleteUser(userRec.uid);
       userRec = null;
     } else if (userRec?.emailVerified) {
       this.logger.log('Already verified');
       throw new CodedUnauthorizedException(this.code, this.errorCodes.USER_ALREADY_IN_USE('CNU-003'));
     }
-
-    return await this.createOrUpdateUserInFirebase(userRec, email, password, opts);
+    return await this.createOrUpdateUserInFirebase(userRec, email, password, opts, role);
   }
 
-  private async saveUserData(t: any, userData: any) {
+  private async saveUserData(t: EntityManager, userData: Partial<User>): Promise<void> {
     const user = await t.getRepository(User).findOneBy({ id: userData.id, is_deleted: false });
     if (user) {
       await t.update(User, { id: userData.id }, userData);
@@ -169,7 +175,7 @@ export class UsersService implements Coded {
     }
   }
 
-  private async saveUserProfileData(t: any, profileData: any) {
+  private async saveUserProfileData(t: EntityManager, profileData: Partial<UserProfile>): Promise<void> {
     const userProfile = await t.getRepository(UserProfile).findOneBy({ user_id: profileData.user_id });
     if (userProfile) {
       await t.update(UserProfile, { user_id: profileData.user_id }, profileData);
@@ -178,9 +184,9 @@ export class UsersService implements Coded {
     }
   }
 
-  private async sendVerificationEmail(t: any, user: any, email: string) {
+  private async sendVerificationEmail(t: EntityManager, user: User, email: string): Promise<void> {
     try {
-      const emailVerificationToken = await this.generateEmailVerificationToken(user.id, email);
+      const emailVerificationToken = await this.generateToken({ userId: user.id, action: 'email-verification' });
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 1);
 
@@ -204,7 +210,7 @@ export class UsersService implements Coded {
     }
   }
 
-  private getWillingToDetails(company: Company) {
+  private getWillingToDetails(company: Company): WillingToDetails {
     let willingToText = '';
     let willingTo = '';
 
@@ -221,7 +227,7 @@ export class UsersService implements Coded {
     return { willingTo, willingToText };
   }
 
-  private async sendNotificationCreateOrUpdateCompanyEmail(subject, email, params) {
+  private async sendNotificationCreateOrUpdateCompanyEmail(subject, email, params): Promise<void> {
     try {
       await this.emailProvider.sendNotificationCreateOrUpdateCompanyEmail(subject, email, params);
       this.logger.log(`Send register company email for: ${email}`);
@@ -231,7 +237,7 @@ export class UsersService implements Coded {
     }
   }
 
-  private async sendNotificationCreateOrUpdateForAdmin(subject, email, params) {
+  private async sendNotificationCreateOrUpdateForAdmin(subject, email, params): Promise<void> {
     try {
       await this.emailProvider.sendNotificationCreateOrUpdateForAdmin(subject, email, params);
       this.logger.log(
@@ -266,16 +272,14 @@ export class UsersService implements Coded {
 
   async createNewUser(data: {
     email: string;
-    password: string;
+    password: string | null;
     role: RolesEnum;
     user_id?: string | null;
     name?: string;
-  }) {
+  }): Promise<{ user: ModifiedUser }> {
     const tranResult = await this.dataSource.manager.transaction(async (t) => {
-      const userRec = await this.createOrUpdateFirebaseUser(t, data.email, data.password, {
-        setEmailVerified: false,
-        userId: data.user_id ?? null,
-      });
+      const userOTPs: OTPs = { setEmailVerified: false, userId: data.user_id ?? null };
+      const userRec = await this.createOrUpdateFirebaseUser(t, data.email, data.password, userOTPs, data.role);
       const uid = userRec.uid;
       this.logger.debug(`user: ${uid}`);
 
@@ -291,21 +295,15 @@ export class UsersService implements Coded {
       };
       await this.saveUserData(t, userData);
 
-      const profileData = {
-        user_id: uid,
-        created_at: now,
-        updated_at: now,
-      };
+      const profileData = { user_id: uid, created_at: now, updated_at: now };
       await this.saveUserProfileData(t, profileData);
 
       this.logger.debug('Sending email...');
-      await this.sendVerificationEmail(t, userData, data.email);
+      await this.sendVerificationEmail(t, userData as User, data.email);
 
       return _.first(await this.usersPersistence.getUsers(t, [uid]));
     });
-    return {
-      user: tranResult,
-    };
+    return { user: tranResult };
   }
 
   async checkEmailExists(email: string, roles: RolesEnum): Promise<boolean> {
@@ -314,8 +312,8 @@ export class UsersService implements Coded {
     });
   }
 
-  async getUser(id: string) {
-    const tranResult = await this.dataSource.manager.transaction(async (t) => {
+  async getUser(id: string): Promise<ModifiedUser> {
+    return await this.dataSource.manager.transaction(async (t) => {
       const user = _.first(await this.usersPersistence.getUsers(t, [id], {}));
       if (!user) {
         await this.usersPersistence.deleteUserIfItDoesNotExistInDatabase(t, id);
@@ -323,10 +321,15 @@ export class UsersService implements Coded {
       }
       return user;
     });
-    return { user: tranResult };
   }
 
-  async getUserByRoles(roles: RolesEnum[]) {
+  async getUserByEmailAndRole(email: string, role: RolesEnum): Promise<User> {
+    return await this.dataSource.manager.transaction(async (transaction) => {
+      return await transaction.getRepository(User).findOne({ where: { email, role } });
+    });
+  }
+
+  async getUserByRoles(roles: RolesEnum[]): Promise<User[]> {
     return await this.dataSource.manager.transaction(async (transaction) => {
       return await transaction.getRepository(User).find({ where: { role: In([roles]) } });
     });
@@ -368,46 +371,6 @@ export class UsersService implements Coded {
     }
   }
 
-  async updateEmail(id: string, email: string, verificationCode: string) {
-    await this.dataSource.manager.transaction(async (t) => {
-      const fireUser = await this.firebase.auth.getUser(id);
-      this.logger.debug(`${fireUser.customClaims?.verification_code} vs ${verificationCode}`);
-      if (fireUser.customClaims?.verification_code != verificationCode) {
-        throw new CodedUnauthorizedException(this.code, this.errorCodes.INVALID_VERIFICATION_CODE('UE-001'));
-      }
-      const user = await t.findOneBy(User, { id, is_deleted: false });
-      user.email = email;
-      await t.save(user);
-      await this.firebase.auth.updateUser(id, {
-        email,
-      });
-      await this.firebase.auth.setCustomUserClaims(id, {
-        verification_code: null,
-      });
-    });
-  }
-
-  async updatePassword(id: string, data: { current_password: string; password: string }) {
-    const tranResult = await this.dataSource.manager.transaction(async (t) => {
-      const fireUser = await this.firebase.auth.getUser(id);
-      const auth = getAuthClient(this.firebase.firebaseAppClient);
-      try {
-        await signInWithEmailAndPassword(auth, fireUser.email, data.current_password);
-      } catch (e) {
-        this.logger.debug(e);
-        throw new CodedUnauthorizedException(this.code, this.errorCodes.INVALID_EMAIL_OR_PASSWORD('UP-001'));
-      }
-      await this.firebase.auth.updateUser(id, {
-        password: data.password,
-      });
-
-      return _.first(await this.usersPersistence.getUsers(t, [id]));
-    });
-    return {
-      user: tranResult,
-    };
-  }
-
   async sendEmailNotificationForInfoCompany(
     user: Partial<User>,
     company: Company,
@@ -446,7 +409,10 @@ export class UsersService implements Coded {
     const admins = await this.getUserByRoles([RolesEnum.admin]);
     const adminEmails = _.map(admins, (admin) => admin.email);
     // for admin right now
-    adminEmails.push('mpa@mp-asia.com');
+    const config = this.configProvider.config;
+    if (config.appEnv == 'production') {
+      adminEmails.push('mpa@mp-asia.com');
+    }
     const userEmail = user.email;
 
     let subjectAdmin = await this.i18n.t('_.email_register_company_for_admin', { lang: 'en' });
@@ -466,7 +432,64 @@ export class UsersService implements Coded {
 
     adminEmails.forEach((email) => this.sendNotificationCreateOrUpdateForAdmin(subjectAdmin, email, params));
   }
+
+  // private async generateEmailVerificationToken(userId: string): Promise<string> {
+  //   const payload = { userId, action: 'email-verification' };
+  //   return jwt.sign(payload, this.configProvider.config.appSecretKey, { expiresIn: '1d' });
+  // }
+
+  async sendPasswordSetupEmail(email: string): Promise<void> {
+    const user = this.getUserByEmailAndRole(email, RolesEnum.company);
+    //   // Tạo token
+    const emailSetPasswordToken = await this.generateToken({ userId: user.id, action: 'email-set-password' });
+    //   // Gửi email
+    //   const link = `https://yourapp.com/set-password?token=${token}`;
+    //   await this.mailService.sendMail({
+    //     to: email,
+    //     subject: 'Set Up Your Password',
+    //     text: `Click the following link to set up your password: ${link}`,
+    //     // html: `<p>Click the following link to set up your password: <a href="${link}">${link}</a></p>`, // Nếu bạn muốn sử dụng HTML
+    //   });
+    //   // Lưu token vào DB với thời gian hết hạn (nếu bạn muốn kiểm tra token khi người dùng click vào link)
+    //   // ...
+  }
 }
+
+// async updateEmail(id: string, email: string, verificationCode: string) {
+//   await this.dataSource.manager.transaction(async (t) => {
+//     const fireUser = await this.firebase.auth.getUser(id);
+//     this.logger.debug(`${fireUser.customClaims?.verification_code} vs ${verificationCode}`);
+//     if (fireUser.customClaims?.verification_code != verificationCode) {
+//       throw new CodedUnauthorizedException(this.code, this.errorCodes.INVALID_VERIFICATION_CODE('UE-001'));
+//     }
+//     const user = await t.findOneBy(User, { id, is_deleted: false });
+//     user.email = email;
+//     await t.save(user);
+//     await this.firebase.auth.updateUser(id, { email });
+//     await this.firebase.auth.setCustomUserClaims(id, { verification_code: null });
+//   });
+// }
+
+// async updatePassword(id: string, data: { current_password: string; password: string }) {
+//   const tranResult = await this.dataSource.manager.transaction(async (t) => {
+//     const fireUser = await this.firebase.auth.getUser(id);
+//     const auth = getAuthClient(this.firebase.firebaseAppClient);
+//     try {
+//       await signInWithEmailAndPassword(auth, fireUser.email, data.current_password);
+//     } catch (e) {
+//       this.logger.debug(e);
+//       throw new CodedUnauthorizedException(this.code, this.errorCodes.INVALID_EMAIL_OR_PASSWORD('UP-001'));
+//     }
+//     await this.firebase.auth.updateUser(id, {
+//       password: data.password,
+//     });
+
+//     return _.first(await this.usersPersistence.getUsers(t, [id]));
+//   });
+//   return {
+//     user: tranResult,
+//   };
+// }
 
 // async deleteUser(id: string) {
 //   await this.dataSource.manager.transaction(async (t) => {

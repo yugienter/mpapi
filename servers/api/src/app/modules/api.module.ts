@@ -6,6 +6,7 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { AdminController } from '@/app/controllers/admin/admin.controller';
 import { AuthController } from '@/app/controllers/auth.controller';
 import { CompaniesController } from '@/app/controllers/companies/companies.controller';
 import { HealthController } from '@/app/controllers/health.controller';
@@ -35,6 +36,7 @@ const allControllers = [
   AuthController,
   UsersController,
   CompaniesController,
+  AdminController,
   MastersController,
 ];
 

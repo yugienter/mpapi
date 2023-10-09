@@ -1,9 +1,23 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Logger, Param, Post, Put, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 import { CreateCompanyRequest, UpdateCompanyInfoDto } from '@/app/controllers/dto/company.dto';
+import { Roles } from '@/app/decorators/roles.decorator';
+import { RolesGuard } from '@/app/guards/roles.guard';
 import { Company } from '@/app/models/company';
-import { User } from '@/app/models/user';
+import { RolesEnum, User } from '@/app/models/user';
 import { UserTypeAction } from '@/app/providers/email.provider';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { UsersService } from '@/app/services/users/users.service';
@@ -13,13 +27,14 @@ import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
 @MpplatformApiDefault()
 @Authorized()
 @Controller('companies')
+@UseGuards(RolesGuard)
 export class CompaniesController implements Coded {
   private readonly logger = new Logger(CompaniesController.name);
 
   constructor(private readonly companiesService: CompaniesService, private readonly usersService: UsersService) {}
 
   get code(): string {
-    return 'CMP';
+    return 'CCP';
   }
 
   @ApiOperation({
@@ -27,8 +42,9 @@ export class CompaniesController implements Coded {
     tags: ['company'],
   })
   @Get('list')
+  @Roles(RolesEnum.company)
   async getMyCompanies(@Req() request) {
-    const requesterId = request.raw.uid;
+    const requesterId = request.raw.user.uid;
     const result = await this.companiesService.getCompaniesOfUser(requesterId);
     return {
       companies: result,
@@ -40,8 +56,9 @@ export class CompaniesController implements Coded {
     tags: ['company'],
   })
   @Get(':companyId')
+  @Roles(RolesEnum.company)
   async getCompanyDetail(@Param('companyId') companyId: string, @Req() request) {
-    const requesterId = request.raw.uid;
+    const requesterId = request.raw.user.uid;
     const result = await this.companiesService.getCompanyDetail(companyId, requesterId);
 
     return {
@@ -54,8 +71,9 @@ export class CompaniesController implements Coded {
     tags: ['company'],
   })
   @Post()
+  @Roles(RolesEnum.company)
   async createCompany(@Req() request, @Body() createCompanyDto: CreateCompanyRequest) {
-    const requesterId = request.raw.uid;
+    const requesterId = request.raw.user.uid;
 
     const newCompany: { company: Company; user: User } = await this.companiesService.createCompanyAndLinkUser(
       createCompanyDto,
@@ -83,12 +101,13 @@ export class CompaniesController implements Coded {
     tags: ['company'],
   })
   @Put(':companyId')
+  @Roles(RolesEnum.company)
   async updateCompanyInfo(
     @Param('companyId') companyId: string,
     @Req() request,
     @Body() updateCompanyInfoDto: UpdateCompanyInfoDto,
   ) {
-    const requesterId = request.raw.uid;
+    const requesterId = request.raw.user.uid;
     const company = await this.companiesService.getCompanyDetail(companyId, requesterId);
 
     if (!company) {
