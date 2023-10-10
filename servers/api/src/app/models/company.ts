@@ -3,15 +3,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { CompaniesUsers } from './companies-users';
-import { User } from './user';
 
 /*************************************************************************************
  * CAUTION: This enum is the same from CLIENT SIDE.                                  *

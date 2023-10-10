@@ -1,14 +1,21 @@
 import { Body, Controller, Logger, Post, Res } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { FastifyReply } from 'fastify';
-import { getAuth as getAuthClient, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
+import { getAuth as getAuthClient, getIdTokenResult, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
 
-import { SignInRequest, UserAndCompanyRegisterRequest } from '@/app/controllers/dto/auth.dto';
+import {
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  SignInRequest,
+  UserAndCompanyRegisterRequest,
+  VerifyEmailRequest,
+} from '@/app/controllers/dto/auth.dto';
 import { CreateCompanyRequest } from '@/app/controllers/dto/company.dto';
 import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
 import { Company } from '@/app/models/company';
+import { TokenActionEnum } from '@/app/models/email_verification_tokens';
 import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { FirebaseInfo } from '@/app/modules/firebase.module';
 import { AuthProvider } from '@/app/providers/auth.provider';
@@ -38,10 +45,13 @@ export class AuthController implements Coded {
   }
 
   static ERROR_CODES = {
+    INVALID_TOKEN: ErrorInfo.getBuilder('IVT', 'invalid_token'),
+    EXPIRED_TOKEN: ErrorInfo.getBuilder('EXT', 'token_error'),
     EMAIL_ALREADY_EXIST: ErrorInfo.getBuilder('EAE', 'email_already_exist'),
     INVALID_EMAIL_OR_PASSWORD: ErrorInfo.getBuilder('IVEP', 'invalid_email_or_password'),
     EMAIL_NOT_VERIFIED: ErrorInfo.getBuilder('ENV', 'email_not_verified'),
     RESTRICTED_MP_PLATFORM: ErrorInfo.getBuilder('RSTJCX', 'restricted_for_only_ma_platform_account'),
+    INSUFFICIENT_ROLE: ErrorInfo.getBuilder('INSUFR', 'Insufficient_role'),
   };
 
   get errorCodes() {
@@ -54,7 +64,10 @@ export class AuthController implements Coded {
     tags: ['auth'],
   })
   @Post('signin')
-  async signIn(@Res({ passthrough: true }) response: FastifyReply, @Body() dto: SignInRequest) {
+  async signIn(
+    @Res({ passthrough: true }) response: FastifyReply,
+    @Body() dto: SignInRequest,
+  ): Promise<{ user: ModifiedUser }> {
     const auth = getAuthClient(this.firebase.firebaseAppClient);
     let cred: UserCredential;
     try {
@@ -67,13 +80,21 @@ export class AuthController implements Coded {
     if (!fireUser.emailVerified) {
       throw new CodedUnauthorizedException(this.code, this.errorCodes.EMAIL_NOT_VERIFIED('SI-002'));
     }
+
+    const idTokenResult = await getIdTokenResult(fireUser);
+    const customClaims = idTokenResult.claims;
+    if (!customClaims.roles || !customClaims.roles.includes(dto.role)) {
+      throw new CodedUnauthorizedException(this.code, this.errorCodes.INSUFFICIENT_ROLE('SI-003'));
+    }
+
     const accessToken = await fireUser.getIdToken();
     const refreshToken = fireUser.refreshToken;
+
     const result = await this.usersService.getUser(fireUser.uid);
+    this.usersService.verifyUserRole(result as User, dto.role);
+
     await this.authProvider.setTokenToCookie(response, accessToken, refreshToken);
-    return {
-      user: result.user,
-    };
+    return { user: result };
   }
 
   @ApiOperation({
@@ -82,7 +103,7 @@ export class AuthController implements Coded {
     tags: ['auth'],
   })
   @Post('company/signup')
-  async createUserAndCompany(@Body() dto: UserAndCompanyRegisterRequest) {
+  async createUserAndCompany(@Body() dto: UserAndCompanyRegisterRequest): Promise<boolean> {
     if (this.configProvider.config.isRestrictedServer && !dto.user.email.match(/@mp-asia\.com$/)) {
       throw new CodedUnauthorizedException(this.code, this.errorCodes.RESTRICTED_MP_PLATFORM('SG-001'));
     }
@@ -96,7 +117,10 @@ export class AuthController implements Coded {
       ...dto.user,
       role: RolesEnum.company,
     });
+
     const userData: User = <User>createUser.user;
+
+    await this.usersService.sendVerificationEmail(userData);
 
     let company: CreateCompanyRequest = new CreateCompanyRequest();
     company = { ...dto.company };
@@ -113,17 +137,14 @@ export class AuthController implements Coded {
     tags: ['auth'],
   })
   @Post('verify-email')
-  async verifyUser(@Body() body: { token: string }) {
-    const user = await this.usersService.findByToken(body.token);
+  async verifyUser(@Body() dto: VerifyEmailRequest): Promise<boolean> {
+    const user = await this.usersService.findAndVerifyByToken(dto.token, TokenActionEnum.VERIFY_EMAIL);
 
-    try {
-      await this.usersService.updateVerificationStatus(user.id, true);
-    } catch (error) {
-      this.logger.error('Failed to update verification status in database', error);
-      throw new CodedUnauthorizedException(this.code, this.errorCodes.EMAIL_NOT_VERIFIED('VFE-001'));
-    }
+    this.usersService.verifyUserRole(user, dto.role);
 
-    await this.usersService.deleteEmailVerificationToken(body.token);
+    await this.usersService.updateVerificationStatus(user.id, true);
+
+    await this.usersService.deleteToken(dto.token);
 
     const companyDetails = await this.companiesService.getFirstCompanyFullDetailsOfUser(user.id);
 
@@ -133,27 +154,48 @@ export class AuthController implements Coded {
       companyDetails.positionOfUser,
     );
 
-    return { success: true, message: 'Success to verification' };
+    return true;
   }
 
-  // @ApiOperation({
-  //   summary: '『パスワードを忘れた場合はこちら』',
-  //   description: 'パスワードを忘れた場合のメールアドレスによるリセット',
-  //   tags: ['auth'],
-  // })
-  // @Put('reset-password')
-  // async updatePasswordWithEmail(@Req() request, @Body() dto: EmailRequest) {
-  //   await ValidationUtil.validate(dto, {
-  //     type: 'object',
-  //     properties: {
-  //       email: { type: 'string', maxLength: 200, format: 'email' },
-  //     },
-  //     required: ['email'],
-  //     additionalProperties: true,
-  //   });
-  //   // await this.usersService.sendPasswordResetEmail(dto.email)
-  //   return {};
-  // }
+  @ApiOperation({
+    summary: 'Click here if you have forgotten your password',
+    description: 'User can set or reset password by them self through this endpoint',
+    tags: ['auth'],
+  })
+  @Post('forgot-password')
+  async forgotPassword(@Body() dto: ForgotPasswordRequest): Promise<void> {
+    const user = await this.usersService.getUserByEmailAndRole(dto.email, RolesEnum.company);
+
+    // find another token about forgot password of this user and then delete this
+    const tokenOfUser = await this.usersService.findTokenOfUser(user, TokenActionEnum.RESET_PASSWORD);
+    const tokenIds = tokenOfUser.map((token) => token.token);
+    await this.usersService.deleteTokens(tokenIds);
+
+    await this.usersService.sendPasswordResetEmail(user, dto.email);
+  }
+
+  @ApiOperation({
+    summary: 'This endpoint reset your password with new password',
+    description: 'Reset by email address if you forget your password',
+    tags: ['auth'],
+  })
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordRequest): Promise<boolean> {
+    const user = await this.usersService.findAndVerifyByToken(dto.token, TokenActionEnum.RESET_PASSWORD);
+
+    console.log('user');
+    console.log(user);
+    this.usersService.verifyUserRole(user, dto.role);
+    await this.usersService.resetPassword(user, dto.new_password);
+    await this.usersService.deleteToken(dto.token);
+    return true;
+  }
+
+  @Post('create-admin')
+  async createAdmin(): Promise<boolean> {
+    await this.usersService.createAdmin({ email: 'admin@mp-asia.com', password: 'abcd1234', name: 'admin' });
+    return true;
+  }
 
   // @ApiOperation({
   //   summary: '内部API',

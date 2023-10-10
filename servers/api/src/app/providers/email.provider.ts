@@ -76,6 +76,24 @@ export class EmailProvider implements Coded {
     });
   }
 
+  async sendEmailResetPassword(subject: string, sendTo: string, params: EmailContext) {
+    const resetPasswordUrlObj = new URL(this.configProvider.config.exchangeBaseUrl);
+    resetPasswordUrlObj.pathname = 'authenticator/reset-password';
+    resetPasswordUrlObj.searchParams.set('token', String(params.resetPasswordToken));
+
+    const resetPasswordUrl = resetPasswordUrlObj.toString();
+
+    console.log('resetPasswordUrlObj', resetPasswordUrlObj);
+    console.log('resetPasswordUrl', resetPasswordUrl);
+
+    await this.mailerService.sendMail({
+      to: sendTo,
+      subject,
+      template: 'reset-password',
+      context: { ...params, actionLink: resetPasswordUrl },
+    });
+  }
+
   async sendNotificationCreateOrUpdateCompanyEmail(subject: string, sendTo: string, params: EmailContext) {
     // await this.queueEmail(subject, sendTo, 'company-register', params);
     await this.mailerService.sendMail({
