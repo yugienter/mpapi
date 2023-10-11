@@ -316,7 +316,8 @@ export class UsersService implements Coded {
       const profileData = { user_id: uid, created_at: now, updated_at: now };
       await this.saveUserProfileData(t, profileData);
 
-      return _.first(await this.usersPersistence.getUsers(t, [uid]));
+      return this.userRepository.findOne({ where: { id: uid } });
+      // return _.first(await this.usersPersistence.getUsers(t, [uid]));
     });
     return { user: tranResult };
   }
