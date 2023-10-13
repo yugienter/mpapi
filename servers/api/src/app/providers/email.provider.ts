@@ -60,6 +60,18 @@ export class EmailProvider implements Coded {
     );
   }
 
+  // private async sendMail({ subject, sendTo, params, template }) {
+  //   await this.mailerService.sendMail({
+  //     to: sendTo,
+  //     subject,
+  //     template,
+  //     context: params,
+  //     ses: {
+  //       ConfigurationSetName: 'YourConfigurationSetName',
+  //     },
+  //   });
+  // }
+
   async sendCustomEmailVerification(subject: string, sendTo: string, params: EmailContext) {
     const verificationUrlObj = new URL(this.configProvider.config.exchangeBaseUrl);
     verificationUrlObj.pathname = 'authenticator/email-verified';
@@ -83,15 +95,13 @@ export class EmailProvider implements Coded {
 
     const resetPasswordUrl = resetPasswordUrlObj.toString();
 
-    console.log('resetPasswordUrlObj', resetPasswordUrlObj);
-    console.log('resetPasswordUrl', resetPasswordUrl);
-
     await this.mailerService.sendMail({
       to: sendTo,
       subject,
       template: 'reset-password',
       context: { ...params, actionLink: resetPasswordUrl },
-    });
+      ses: { ConfigurationSetName: 'SESLoggingConfigStaging' },
+    } as any);
   }
 
   async sendNotificationCreateOrUpdateCompanyEmail(subject: string, sendTo: string, params: EmailContext) {

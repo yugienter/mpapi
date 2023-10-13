@@ -157,12 +157,12 @@ export class UsersService implements Coded {
     return await this.createOrUpdateUserInFirebase(userRec, email, password, opts, role);
   }
 
-  private async saveUserData(userData: Partial<User>): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { id: userData.id, is_deleted: false } });
+  private async saveUserData(t, userData: Partial<User>): Promise<void> {
+    const user = await t.getRepository(User).findOneBy({ id: userData.id, is_deleted: false });
     if (user) {
-      await this.userRepository.update({ id: userData.id }, userData);
+      await t.update(User, { id: userData.id }, userData);
     } else {
-      await this.userRepository.save(userData);
+      await t.save(User, userData);
     }
   }
 
@@ -311,13 +311,12 @@ export class UsersService implements Coded {
         created_at: now,
         updated_at: now,
       };
-      await this.saveUserData(userData);
+      await this.saveUserData(t, userData);
 
       const profileData = { user_id: uid, created_at: now, updated_at: now };
       await this.saveUserProfileData(t, profileData);
 
-      return this.userRepository.findOne({ where: { id: uid } });
-      // return _.first(await this.usersPersistence.getUsers(t, [uid]));
+      return _.first(await this.usersPersistence.getUsers(t, [uid]));
     });
     return { user: tranResult };
   }
@@ -356,7 +355,7 @@ export class UsersService implements Coded {
         created_at: now,
         updated_at: now,
       };
-      await this.saveUserData(userData);
+      await this.saveUserData(t, userData);
 
       const profileData = { user_id: uid, created_at: now, updated_at: now };
       await this.saveUserProfileData(t, profileData);
