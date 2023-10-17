@@ -333,8 +333,8 @@ export class UsersService implements Coded {
 
       this.logger.log(`Send custom email verification for user: ${user.email}`);
     } catch (error) {
-      this.logger.error(error);
       this.logger.log(`[sendCustomEmailVerification] Fail to send email for user ${user.email}`);
+      this.logger.error(error);
     }
   }
 

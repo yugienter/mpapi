@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { Equals, IsEmail, IsEnum, IsNotEmpty, IsString, Length, ValidateNested } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString, Length, ValidateNested } from 'class-validator';
 
 import { RolesEnum } from '@/app/models/user';
 import { IsEqualTo } from '@/app/validators/is-equal-to.validator';
@@ -35,7 +35,7 @@ export class ForgotPasswordRequest {
   role: RolesEnum;
 }
 
-export class ResetPasswordRequest {
+export class VerifyEmailRequest {
   @IsNotEmpty()
   @IsString()
   token: string;
@@ -43,7 +43,9 @@ export class ResetPasswordRequest {
   @IsNotEmpty()
   @IsEnum(RolesEnum)
   role: RolesEnum;
+}
 
+export class ResetPasswordRequest extends VerifyEmailRequest {
   @ApiProperty({ example: 'test1234' })
   @IsString()
   @Length(8, 20)
@@ -56,16 +58,6 @@ export class ResetPasswordRequest {
   @IsNotEmpty()
   @IsEqualTo('new_password', { message: 'Passwords do not match' })
   confirm_password: string;
-}
-
-export class VerifyEmailRequest {
-  @IsNotEmpty()
-  @IsString()
-  token: string;
-
-  @IsNotEmpty()
-  @IsEnum(RolesEnum)
-  role: RolesEnum;
 }
 
 export class SignupRequest {
@@ -84,7 +76,7 @@ export class SignupRequest {
   @IsString()
   @Length(8, 20)
   @IsNotEmpty()
-  @Equals('password', { message: 'Passwords do not match' })
+  @IsEqualTo('password', { message: 'Passwords do not match' })
   password_confirmation: string;
 }
 

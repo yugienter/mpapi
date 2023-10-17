@@ -183,8 +183,6 @@ export class AuthController implements Coded {
   async resetPassword(@Body() dto: ResetPasswordRequest): Promise<boolean> {
     const user = await this.usersService.findAndVerifyByToken(dto.token, TokenActionEnum.RESET_PASSWORD);
 
-    console.log('user');
-    console.log(user);
     this.usersService.verifyUserRole(user, dto.role);
     await this.usersService.resetPassword(user, dto.new_password);
     await this.usersService.deleteToken(dto.token);
