@@ -56,7 +56,12 @@ export class AuthMiddleware implements NestMiddleware, Coded {
     try {
       const decoded = await this.firebase.auth.verifyIdToken(accessToken);
       // throw {errorInfo: {code: 'auth/id-token-expired'}} // test
-      req.uid = decoded.uid;
+      req.user = {
+        roles: decoded.roles,
+        uid: decoded.uid,
+        email: decoded.email,
+        email_verified: decoded.email_verified,
+      };
     } catch (e) {
       // accessTokenに異常があった場合（壊れている/期限切れ/その他）
       /**
@@ -90,7 +95,13 @@ export class AuthMiddleware implements NestMiddleware, Coded {
           const data = await this.authProvider.refreshToken(refreshToken);
           await this.authProvider.setTokenToCookie(res, data.id_token, data.refresh_token, false);
           this.logger.debug('+++ token refreshed +++');
-          req.uid = data.user_id;
+          const decoded = await this.firebase.auth.verifyIdToken(data.id_token);
+          req.user = {
+            roles: decoded.roles,
+            uid: decoded.uid,
+            email: decoded.email,
+            email_verified: decoded.email_verified,
+          };
         } catch (e) {
           return next(new CodedUnauthorizedException(this.code, this.errorCodes.EXPIRED_TOKEN('U-004')));
         }

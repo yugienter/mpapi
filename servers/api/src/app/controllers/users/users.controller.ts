@@ -1,8 +1,11 @@
-import { Controller, Get, Logger, Req } from '@nestjs/common';
+import { Controller, Get, Logger, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import _ from 'lodash';
 
+import { Roles } from '@/app/decorators/roles.decorator';
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
+import { RolesGuard } from '@/app/guards/roles.guard';
+import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { AuthProvider } from '@/app/providers/auth.provider';
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
@@ -11,6 +14,7 @@ import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
 @MpplatformApiDefault()
 @Authorized()
 @Controller('users')
+@UseGuards(RolesGuard)
 export class UsersController implements Coded {
   private readonly logger = new Logger(UsersController.name);
 
@@ -36,12 +40,14 @@ export class UsersController implements Coded {
     tags: ['user'],
   })
   @Get('me')
-  async getMe(@Req() request) {
-    const requesterId = request.raw.uid;
+  @Roles(RolesEnum.company, RolesEnum.admin)
+  async getMe(@Req() request): Promise<{ user: ModifiedUser }> {
+    const requesterId: string = request.raw.user.uid;
+    const role: RolesEnum = request.raw.user.roles[0];
     const result = await this.usersService.getUser(requesterId);
 
-    return {
-      user: result.user,
-    };
+    this.usersService.verifyUserRole(result as User, role);
+
+    return { user: result };
   }
 }

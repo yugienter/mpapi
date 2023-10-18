@@ -42,6 +42,8 @@ export declare class Config {
   readonly emailPort: string;
   /** Environment variable: EMAIL_DEBUG_PREVIEW */
   readonly emailDebugPreview: boolean;
+  /** Environment variable: EMAIL_SES_TRACKING */
+  readonly emailSESTracking: string;
 
   readonly slackApiHost: string;
   /**
@@ -127,6 +129,7 @@ export class ConfigProvider {
       emailHost: this.getOrShowError<string>('EMAIL_HOST', null),
       emailPort: this.getOrShowError<string>('EMAIL_PORT', null),
       emailDebugPreview: this.getOrShowError<string>('EMAIL_DEBUG_PREVIEW', '0') == '1',
+      emailSESTracking: this.getOrShowError<string>('EMAIL_SES_TRACKING', null),
 
       slackApiHost: this.getOrShowError<string>('SLACK_API_HOST', null),
       slackAuthToken: this.getOrShowError<string>('SLACK_AUTH_TOKEN', null),

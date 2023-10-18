@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
+import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
 import Bull from 'bull';
 import Queue from 'bull';
 
@@ -15,12 +15,18 @@ export enum UserTypeAction {
   update = 'update',
 }
 
+interface ExtendedSendMailOptions extends ISendMailOptions {
+  ses?: { ConfigurationSetName: string };
+}
+
 @Injectable()
 export class EmailProvider implements Coded {
   private readonly logger = new Logger(EmailProvider.name);
   private readonly emailQueue: Bull.Queue;
+  private SESConfig;
 
   constructor(private readonly configProvider: ConfigProvider, private readonly mailerService: MailerService) {
+    this.SESConfig = { ConfigurationSetName: this.configProvider.config.emailSESTracking };
     this.emailQueue = new Queue('emails');
     this.initializeEmailQueueProcessor();
   }
@@ -38,63 +44,57 @@ export class EmailProvider implements Coded {
           subject,
           template,
           context,
-        });
+          ses: this.SESConfig,
+        } as ExtendedSendMailOptions);
       } catch (error) {
         this.logger.error('Error sending email:', error);
-        throw error; // Bull will automatically retry the job if there's an error
+        throw error;
       }
     });
   }
 
-  // This queue request redis so for now this project not need to add redis.
-  private async queueEmail(subject: string, sendTo: string, template: string, context: EmailContext) {
-    await this.emailQueue.add(
-      { subject, sendTo, template, context },
-      {
-        attempts: 3, // Number to try again.
-        backoff: {
-          type: 'exponential', // Type of backoff. 'exponential' is a popular choice.
-          delay: 5000, // delay time between each.
-        },
-      },
-    );
+  private async sendMailWithSES(subject: string, sendTo: string, template: string, context: EmailContext) {
+    const mailOptions: ExtendedSendMailOptions = {
+      to: sendTo,
+      subject,
+      template,
+      context,
+      ses: this.SESConfig,
+    };
+
+    await this.mailerService.sendMail(mailOptions);
   }
 
   async sendCustomEmailVerification(subject: string, sendTo: string, params: EmailContext) {
-    const verificationUrlObj = new URL(this.configProvider.config.exchangeBaseUrl);
+    const verificationUrlObj = new URL(this.configProvider.config.exchangeBaseUrl); // Construct verification URL
     verificationUrlObj.pathname = 'authenticator/email-verified';
     verificationUrlObj.searchParams.set('token', String(params.emailVerificationToken));
 
     const verificationUrl = verificationUrlObj.toString();
 
-    // await this.queueEmail(subject, sendTo, 'signup-verification', { ...params, actionLink: verificationUrl });
-    await this.mailerService.sendMail({
-      to: sendTo,
-      subject,
-      template: 'signup-verification',
-      context: { ...params, actionLink: verificationUrl },
-    });
+    await this.sendMailWithSES(subject, sendTo, 'signup-verification', { ...params, actionLink: verificationUrl });
+  }
+
+  async sendEmailResetPassword(subject: string, sendTo: string, params: EmailContext) {
+    const resetPasswordUrlObj = new URL(this.configProvider.config.exchangeBaseUrl); // Construct reset password URL
+    resetPasswordUrlObj.pathname = 'authenticator/reset-password';
+    resetPasswordUrlObj.searchParams.set('token', String(params.resetPasswordToken));
+
+    const resetPasswordUrl = resetPasswordUrlObj.toString();
+
+    await this.sendMailWithSES(subject, sendTo, 'reset-password', { ...params, actionLink: resetPasswordUrl });
   }
 
   async sendNotificationCreateOrUpdateCompanyEmail(subject: string, sendTo: string, params: EmailContext) {
-    // await this.queueEmail(subject, sendTo, 'company-register', params);
-    await this.mailerService.sendMail({
-      to: sendTo,
-      subject,
-      template:
-        params?.action && [UserTypeAction.create, UserTypeAction.update].includes(params.action as UserTypeAction)
-          ? 'company-add-edit'
-          : 'company-register',
-      context: params,
-    });
+    const templateName =
+      params?.action && [UserTypeAction.create, UserTypeAction.update].includes(params.action as UserTypeAction)
+        ? 'company-add-edit'
+        : 'company-register';
+
+    await this.sendMailWithSES(subject, sendTo, templateName, params);
   }
 
   async sendNotificationCreateOrUpdateForAdmin(subject: string, sendTo: string, params: EmailContext) {
-    await this.mailerService.sendMail({
-      to: sendTo,
-      subject,
-      template: 'admin-registration-notification',
-      context: params,
-    });
+    await this.sendMailWithSES(subject, sendTo, 'admin-registration-notification', params);
   }
 }
