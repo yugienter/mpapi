@@ -114,15 +114,3 @@ export class ManualCreateCompanyUserRequest {
   @Type(() => CreateCompanyRequest)
   company: CreateCompanyRequest;
 }
-
-export class ManualCreateCompanyUserRequest {
-  @ApiProperty({ example: 'test1@example.com' })
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @ApiProperty()
-  @ValidateNested({ each: true })
-  @Type(() => CreateCompanyRequest)
-  company: CreateCompanyRequest;
-}
