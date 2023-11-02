@@ -1,7 +1,7 @@
-import { Body, Controller, Logger, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpException, HttpStatus, Logger, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
-import { ManualCreateCompanyUserRequest } from '@/app/controllers/dto/auth.dto';
+import { ManualCreateCompanyUserRequest, ManualCreateUserRequest } from '@/app/controllers/dto/auth.dto';
 import { CreateCompanyRequest } from '@/app/controllers/dto/company.dto';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
@@ -30,9 +30,9 @@ export class AdminController implements Coded {
     description: 'Admin can manual create user and company info',
     tags: ['admin'],
   })
-  @Post('manual-signup')
+  @Post('create-user')
   @Roles(RolesEnum.admin)
-  async manualSignup(@Body() dto: ManualCreateCompanyUserRequest): Promise<boolean> {
+  async manualCreateUser(@Body() dto: ManualCreateUserRequest): Promise<boolean> {
     // check user is exits or not :
     let userData: User = await this.usersService.getUserByEmail(dto.email);
 
@@ -50,14 +50,38 @@ export class AdminController implements Coded {
         email: dto.email,
         password: null,
         role: RolesEnum.company,
+        name: dto.name,
       });
       userData = <User>createUser.user;
+    }
+
+    return true;
+  }
+
+  @ApiOperation({
+    summary: 'Manual sign up',
+    description: 'Admin can manual create user and company info',
+    tags: ['admin'],
+  })
+  @Post('manual-create-company')
+  @Roles(RolesEnum.admin)
+  async manualSignup(@Body() dto: ManualCreateCompanyUserRequest): Promise<boolean> {
+    // check user is exits or not :
+    const userData: User = await this.usersService.getUserByEmail(dto.email);
+
+    if (!userData) {
+      throw new HttpException('Can not find user in system', HttpStatus.NOT_FOUND);
+    }
+
+    this.usersService.verifyUserRole(userData, RolesEnum.company);
+    const firebaseUser = await this.usersService.getUserFromFirebase(dto.email);
+    if (!firebaseUser) {
+      throw new HttpException('Can not find user in firebase', HttpStatus.NOT_FOUND);
     }
 
     let company: CreateCompanyRequest = new CreateCompanyRequest();
     company = { ...dto.company };
     const companyData: Company = await this.companiesService.create(company);
-
     this.companiesService.manyToManyCreateCompanyUser(company.position_of_user, companyData, userData);
 
     return true;

@@ -78,20 +78,36 @@ export class SignupRequest {
   @IsNotEmpty()
   @IsEqualTo('password', { message: 'Passwords do not match' })
   password_confirmation: string;
+
+  @IsNotEmpty()
+  @IsEnum(RolesEnum)
+  role: RolesEnum;
 }
 
-class CompanyUserRequest extends SignupRequest {
+export class CompanyUserRequest extends SignupRequest {
   @ApiProperty({ example: 'John' })
   @IsString()
   @IsNotEmpty()
   name: string;
 }
 
-export class UserAndCompanyRegisterRequest {
-  @ApiProperty()
-  @ValidateNested({ each: true })
-  @Type(() => CompanyUserRequest)
-  user: CompanyUserRequest;
+export class ManualCreateUserRequest {
+  @ApiProperty({ example: 'test1@example.com' })
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @ApiProperty({ example: 'John' })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+}
+
+export class ManualCreateCompanyUserRequest {
+  @ApiProperty({ example: 'test1@example.com' })
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
 
   @ApiProperty()
   @ValidateNested({ each: true })

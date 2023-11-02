@@ -4,17 +4,15 @@ import { FastifyReply } from 'fastify';
 import { getAuth as getAuthClient, getIdTokenResult, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
 
 import {
+  CompanyUserRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
   SignInRequest,
-  UserAndCompanyRegisterRequest,
   VerifyEmailRequest,
 } from '@/app/controllers/dto/auth.dto';
-import { CreateCompanyRequest } from '@/app/controllers/dto/company.dto';
 import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
-import { Company } from '@/app/models/company';
 import { TokenActionEnum } from '@/app/models/email_verification_tokens';
 import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { FirebaseInfo } from '@/app/modules/firebase.module';
@@ -97,36 +95,28 @@ export class AuthController implements Coded {
     return { user: result };
   }
 
+  // Register a new user
   @ApiOperation({
-    summary: 'Company User register',
-    description: 'For case user register the company info to platform',
+    summary: 'User register',
+    description: 'For case user register to platform',
     tags: ['auth'],
   })
-  @Post('company/signup')
-  async createUserAndCompany(@Body() dto: UserAndCompanyRegisterRequest): Promise<boolean> {
-    if (this.configProvider.config.isRestrictedServer && !dto.user.email.match(/@mp-asia\.com$/)) {
+  @Post('signup')
+  async createUser(@Body() dto: CompanyUserRequest): Promise<boolean> {
+    if (this.configProvider.config.isRestrictedServer && !dto.email.match(/@mp-asia\.com$/)) {
       throw new CodedUnauthorizedException(this.code, this.errorCodes.RESTRICTED_MP_PLATFORM('SG-001'));
     }
 
-    const emailExist = await this.usersService.checkEmailExists(dto.user.email, RolesEnum.company);
+    const emailExist = await this.usersService.checkEmailExists(dto.email, RolesEnum.company);
     if (emailExist) {
       throw new CodedInvalidArgumentException(this.code, this.errorCodes.EMAIL_ALREADY_EXIST(null));
     }
 
-    const createUser: { user: ModifiedUser } = await this.usersService.createNewUser({
-      ...dto.user,
-      role: RolesEnum.company,
-    });
+    const createUser: { user: ModifiedUser } = await this.usersService.createNewUser(dto);
 
     const userData: User = <User>createUser.user;
 
     await this.usersService.sendVerificationEmail(userData);
-
-    let company: CreateCompanyRequest = new CreateCompanyRequest();
-    company = { ...dto.company };
-    const companyData: Company = await this.companiesService.create(company);
-
-    this.companiesService.manyToManyCreateCompanyUser(company.position_of_user, companyData, userData);
 
     return true;
   }
@@ -145,14 +135,6 @@ export class AuthController implements Coded {
     await this.usersService.updateVerificationStatus(user.id, true);
 
     await this.usersService.deleteToken(dto.token);
-
-    const companyDetails = await this.companiesService.getFirstCompanyFullDetailsOfUser(user.id);
-
-    await this.usersService.sendEmailNotificationForInfoCompany(
-      user,
-      companyDetails.company,
-      companyDetails.positionOfUser,
-    );
 
     return true;
   }
