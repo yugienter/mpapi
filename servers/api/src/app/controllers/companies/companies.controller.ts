@@ -110,10 +110,6 @@ export class CompaniesController implements Coded {
     const requesterId = request.raw.user.uid;
     const company = await this.companiesService.getCompanyDetail(companyId, requesterId);
 
-    if (!company) {
-      throw new HttpException('Company not found or you do not have permission', HttpStatus.FORBIDDEN);
-    }
-
     const userRelation = company.companiesUsers.find((userRelation) => userRelation.user.id === requesterId);
 
     if (!userRelation) {

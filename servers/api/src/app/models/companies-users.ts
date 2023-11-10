@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Company } from './company';
-import { User } from './user';
+import { Company } from '@/app/models/company';
+import { User } from '@/app/models/user';
 
 @Entity('companies_users')
 export class CompaniesUsers {

@@ -1,5 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateIf } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
 
 import { IsOptionalButNotEmpty } from '@/app/controllers/dto/custom';
 import { TypeOfBusinessEnum } from '@/app/models/company';
@@ -107,6 +118,11 @@ export class BaseCompanyDto {
   @IsString()
   @IsOptional()
   collaboration_detail?: string;
+
+  @ApiProperty({ type: [Number] })
+  @IsArray()
+  @IsInt({ each: true })
+  files?: number[];
 
   @ApiProperty({ type: User })
   users?: User[];

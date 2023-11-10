@@ -1,6 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { ValidationError } from 'class-validator';
+import _ from 'lodash';
 
 import { ValidationException } from '@/app/exceptions/errors/validation.exception';
 
@@ -40,11 +41,11 @@ export class ValidationExceptionFilter implements ExceptionFilter {
   formatErrors(errors: ValidationError[]): Record<string, unknown> {
     const formattedErrors = {};
 
-    errors.forEach((error) => {
+    _.forEach(errors, (error) => {
       if (error.children && error.children.length > 0) {
         formattedErrors[error.property] = this.formatErrors(error.children);
       } else {
-        formattedErrors[error.property] = Object.values(error.constraints)[0];
+        formattedErrors[error.property] = _.values(error.constraints)[0];
       }
     });
 

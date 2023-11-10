@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminController } from '@/app/controllers/admin/admin.controller';
 import { AuthController } from '@/app/controllers/auth.controller';
 import { CompaniesController } from '@/app/controllers/companies/companies.controller';
+import { FilesController } from '@/app/controllers/files/files.controller';
 import { HealthController } from '@/app/controllers/health.controller';
 import { MastersController } from '@/app/controllers/masters.controller';
 import { PublicController } from '@/app/controllers/public.controller';
@@ -24,6 +25,7 @@ import { AuthProvider } from '@/app/providers/auth.provider';
 import { ConfigProvider } from '@/app/providers/config.provider';
 import { EmailProvider } from '@/app/providers/email.provider';
 import { I18nProvider } from '@/app/providers/i18n.provider';
+import { S3Provider } from '@/app/providers/s3.provider';
 import { SlackProvider } from '@/app/providers/slack.provider';
 import { StorageProvider } from '@/app/providers/storage.provider';
 import { authorizedControllers, mpplatformPersistences, mpplatformServices } from '@/app/utils/decorators';
@@ -36,13 +38,22 @@ const allControllers = [
   AuthController,
   UsersController,
   CompaniesController,
+  FilesController,
   AdminController,
   MastersController,
 ];
 
 const publicControllers = [AuthController, SamplesController, PublicController];
 
-const providers = [AuthProvider, ConfigProvider, EmailProvider, StorageProvider, I18nProvider, SlackProvider];
+const providers = [
+  AuthProvider,
+  ConfigProvider,
+  EmailProvider,
+  StorageProvider,
+  I18nProvider,
+  SlackProvider,
+  S3Provider,
+];
 
 // ここに関してはproviders以外はcontrollerがimportされるとdocorator経由で入ってくる
 const services = [...mpplatformServices, ...mpplatformPersistences, ...providers];

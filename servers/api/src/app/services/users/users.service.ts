@@ -543,7 +543,9 @@ export class UsersService implements Coded {
 
     this.sendNotificationCreateOrUpdateCompanyEmail(subjectUser, userEmail, params);
 
-    adminEmails.forEach((email) => this.sendNotificationCreateOrUpdateForAdmin(subjectAdmin, email, params));
+    _.forEach(adminEmails, (email) => {
+      this.sendNotificationCreateOrUpdateForAdmin(subjectAdmin, email, params);
+    });
   }
 
   async sendPasswordResetEmail(user: User, email: string): Promise<void> {

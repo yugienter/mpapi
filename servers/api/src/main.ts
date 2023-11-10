@@ -2,7 +2,7 @@ import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import fastifyMultipart from '@fastify/multipart';
 import { fastifySwagger } from '@fastify/swagger';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -65,7 +65,9 @@ export function prepareApp(app: NestFastifyApplication) {
       callback(null, corsOptions);
     };
   });
-  app.register(fastifyMultipart);
+  app.register(fastifyMultipart, {
+    limits: { fileSize: 10 * 1024 * 1024 }, // limit size of file is 10MB
+  });
   app.register(fastifyCookie, {
     secret: configProvider.config.appSecretKey, // for cookies signature
   });

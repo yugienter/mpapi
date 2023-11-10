@@ -5,6 +5,7 @@ import { EntityManager, Repository } from 'typeorm';
 import { CreateCompanyRequest, UpdateCompanyInfoDto } from '@/app/controllers/dto/company.dto';
 import { CompaniesUsers } from '@/app/models/companies-users';
 import { Company } from '@/app/models/company';
+import { UploadedFile } from '@/app/models/uploaded-file';
 import { User } from '@/app/models/user';
 import { Service } from '@/app/utils/decorators';
 
@@ -15,12 +16,42 @@ export class CompaniesService {
 
   constructor(
     @InjectRepository(Company) private companiesRepository: Repository<Company>,
+    @InjectRepository(UploadedFile) private fileRepository: Repository<UploadedFile>,
     @InjectRepository(CompaniesUsers) private companiesUserRepository: Repository<CompaniesUsers>,
     @InjectEntityManager() private readonly _entityManager: EntityManager,
   ) {}
 
-  create(createCompany: CreateCompanyRequest): Promise<Company> {
-    return this.companiesRepository.save(this.companiesRepository.create(createCompany));
+  private async findAndValidateFiles(fileIds: number[], entityManager?: EntityManager): Promise<UploadedFile[]> {
+    return Promise.all(
+      fileIds.map(async (fileId) => {
+        let file: UploadedFile;
+
+        if (entityManager) {
+          file = await entityManager.findOne(UploadedFile, { where: { id: fileId } });
+        } else {
+          file = await this.fileRepository.findOne({ where: { id: fileId } });
+        }
+
+        if (!file) {
+          throw new NotFoundException(`File with ID ${fileId} not found`);
+        }
+
+        if (file.company) {
+          throw new Error(`File with ID ${fileId} is already assigned to another company`);
+        }
+
+        return file;
+      }),
+    );
+  }
+
+  async create(createCompany: CreateCompanyRequest): Promise<Company> {
+    const company = new Company();
+
+    if (createCompany.files && createCompany.files.length > 0) {
+      company.files = await this.findAndValidateFiles(createCompany.files);
+    }
+    return this.companiesRepository.save(this.companiesRepository.create(company));
   }
 
   manyToManyCreateCompanyUser(positionOfUser: string, company: Company, user: User) {
@@ -35,6 +66,11 @@ export class CompaniesService {
     return await this._entityManager.transaction(async (transactionalEntityManager) => {
       const company = new Company();
       Object.assign(company, createCompanyDto);
+
+      if (createCompanyDto.files && createCompanyDto.files.length > 0) {
+        company.files = await this.findAndValidateFiles(createCompanyDto.files, transactionalEntityManager);
+      }
+
       const savedCompany = await transactionalEntityManager.save(Company, company);
 
       const user = await transactionalEntityManager.findOne(User, { where: { id: userId } });
@@ -69,52 +105,75 @@ export class CompaniesService {
     });
 
     if (!userCompanyRelation) {
-      return null;
+      throw new NotFoundException('User is not associated with the requested company');
     }
 
     const company = await this.companiesRepository.findOne({
       where: { id: companyId },
-      relations: ['companiesUsers', 'companiesUsers.user'],
+      relations: ['companiesUsers', 'companiesUsers.user', 'files'],
     });
 
     if (!company) {
-      return null;
+      throw new NotFoundException('Company not found');
     }
 
     const result = {
       ...company,
       position_of_user: userCompanyRelation.position_of_user,
+      files: company.files?.map((file) => ({ id: file.id, path: file.path, name: file.name })),
     };
 
     return result;
   }
 
-  async getFirstCompanyFullDetailsOfUser(userId: string): Promise<{ company: Company; positionOfUser: string } | null> {
-    const result = await this.companiesRepository
-      .createQueryBuilder('c')
-      .innerJoinAndSelect('c.companiesUsers', 'cu')
-      .where('cu.user_id = :userId', { userId })
-      .getOne();
+  // async getFirstCompanyFullDetailsOfUser(userId: string): Promise<{ company: Company; positionOfUser: string } | null> {
+  //   const result = await this.companiesRepository
+  //     .createQueryBuilder('c')
+  //     .innerJoinAndSelect('c.companiesUsers', 'cu')
+  //     .where('cu.user_id = :userId', { userId })
+  //     .getOne();
 
-    if (result) {
-      return {
-        company: { ...result },
-        positionOfUser: result.companiesUsers[0].position_of_user,
-      };
-    }
-    return null;
-  }
+  //   if (result) {
+  //     return {
+  //       company: { ...result },
+  //       positionOfUser: result.companiesUsers[0].position_of_user,
+  //     };
+  //   }
+  //   return null;
+  // }
 
   async updateCompany(companyId: string, updateCompanyDto: UpdateCompanyInfoDto): Promise<Company> {
     return await this.companiesRepository.manager.transaction(async (manager) => {
-      const company = await manager.findOne(Company, { where: { id: companyId } });
+      const company = await manager.findOne(Company, {
+        where: { id: companyId },
+        relations: ['files'],
+      });
 
       if (!company) {
         throw new NotFoundException('Company not found');
       }
 
-      // Update company fields
       Object.assign(company, updateCompanyDto);
+
+      /** Start Update company files */
+      const existingFileIds = company.files.map((file) => file.id);
+      const newFileIds = updateCompanyDto.files || [];
+
+      const filesToDelete = existingFileIds.filter((id) => !newFileIds.includes(id));
+      if (filesToDelete.length > 0) {
+        await manager
+          .createQueryBuilder()
+          .update(UploadedFile)
+          .set({ is_deleted: true, deleted_at: new Date() })
+          .where('id IN (:...ids)', { ids: filesToDelete })
+          .execute();
+      }
+
+      if (newFileIds.length > 0) {
+        company.files = await this.findAndValidateFiles(newFileIds, manager);
+      }
+      /** End Update company files */
+
       await manager.save(Company, company);
 
       // Update position_of_user in companies_users table

@@ -52,6 +52,18 @@ export class ExceptionHandler implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const lang = request.headers['accept-language'] ?? request.headers['content-language'];
 
+    if ('code' in exception && exception['code'] === 'FST_ERR_CTP_BODY_TOO_LARGE') {
+      this.logger.error(`File size too large: ${exception.message}`, exception.stack);
+      const responseBody = {
+        message: 'File size exceeds the allowable limit of 10MB',
+        translated: this.i18n.translate('errors.file_too_large', { lang }),
+        code: 'FILE_TOO_LARGE',
+        errors: null,
+      };
+      httpAdapter.reply(ctx.getResponse<Response>(), responseBody, HttpStatus.BAD_REQUEST);
+      return;
+    }
+
     const responseBody = {
       message: this.configProvider.config.appEnv == 'local' ? exception.message : 'server_error',
       translated: this.i18n.translate('errors.server_error', { lang }),

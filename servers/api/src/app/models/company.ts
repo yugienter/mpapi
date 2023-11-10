@@ -8,7 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { CompaniesUsers } from './companies-users';
+import { CompaniesUsers } from '@/app/models/companies-users';
+import { UploadedFile } from '@/app/models/uploaded-file';
 
 /*************************************************************************************
  * CAUTION: This enum is the same from CLIENT SIDE.                                  *
@@ -121,4 +122,7 @@ export class Company {
 
   @OneToMany(() => CompaniesUsers, (companiesUsers) => companiesUsers.company)
   public companiesUsers: CompaniesUsers[];
+
+  @OneToMany(() => UploadedFile, (file) => file.company)
+  files: UploadedFile[];
 }

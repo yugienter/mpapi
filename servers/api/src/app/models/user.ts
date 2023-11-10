@@ -11,10 +11,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { CompaniesUsers } from '@/app/models/companies-users';
+import { EmailVerificationToken } from '@/app/models/email_verification_tokens';
+import { UploadedFile } from '@/app/models/uploaded-file';
 import { UserProfile } from '@/app/models/user-profile';
-
-import { CompaniesUsers } from './companies-users';
-import { EmailVerificationToken } from './email_verification_tokens';
 
 export enum StatusEnum {
   'active' = 'active',
@@ -76,6 +76,9 @@ export class User {
 
   @OneToMany(() => EmailVerificationToken, (emailVerificationToken) => emailVerificationToken.user)
   emailVerificationTokens: EmailVerificationToken[];
+
+  @OneToMany(() => UploadedFile, (file) => file.user)
+  files: UploadedFile[];
 }
 
 export class ModifiedUser {

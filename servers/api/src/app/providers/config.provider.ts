@@ -45,6 +45,9 @@ export declare class Config {
   /** Environment variable: EMAIL_SES_TRACKING */
   readonly emailSESTracking: string;
 
+  /** Environment variable: AWS_PUBLIC_BUCKET_NAME */
+  readonly awsPublicBucketName: string;
+
   readonly slackApiHost: string;
   /**
    * https://api.slack.com/apps/
@@ -130,6 +133,8 @@ export class ConfigProvider {
       emailPort: this.getOrShowError<string>('EMAIL_PORT', null),
       emailDebugPreview: this.getOrShowError<string>('EMAIL_DEBUG_PREVIEW', '0') == '1',
       emailSESTracking: this.getOrShowError<string>('EMAIL_SES_TRACKING', null),
+
+      awsPublicBucketName: this.getOrShowError<string>('AWS_PUBLIC_BUCKET_NAME', null),
 
       slackApiHost: this.getOrShowError<string>('SLACK_API_HOST', null),
       slackAuthToken: this.getOrShowError<string>('SLACK_AUTH_TOKEN', null),
