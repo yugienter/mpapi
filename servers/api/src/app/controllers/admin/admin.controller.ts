@@ -36,21 +36,31 @@ export class AdminController implements Coded {
     // check user is exits or not :
     let userData: User = await this.usersService.getUserByEmail(dto.email);
 
+    const passwordDefault = 'abcd1234';
+
     if (userData) {
       this.usersService.verifyUserRole(userData, RolesEnum.company);
       // if user in db exits - then check user in firebase
       const firebaseUser = await this.usersService.getUserFromFirebase(dto.email);
       if (!firebaseUser) {
         // if user in firebase is not exits, then create
-        const userOTPs = { setEmailVerified: false, userId: null };
-        await this.usersService.createOrUpdateUserInFirebase(null, dto.email, null, userOTPs, RolesEnum.company);
+        // const userOTPs = { setEmailVerified: false, userId: null };
+        const userOTPs = { setEmailVerified: true, userId: null };
+        await this.usersService.createOrUpdateUserInFirebase(
+          null,
+          dto.email,
+          passwordDefault,
+          userOTPs,
+          RolesEnum.company,
+        );
       }
     } else {
       const createUser: { user: ModifiedUser } = await this.usersService.createNewUser({
         email: dto.email,
-        password: null,
+        password: passwordDefault,
         role: RolesEnum.company,
         name: dto.name,
+        emailVerified: true,
       });
       userData = <User>createUser.user;
     }

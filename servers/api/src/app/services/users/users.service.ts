@@ -294,9 +294,10 @@ export class UsersService implements Coded {
     role: RolesEnum;
     user_id?: string | null;
     name?: string;
+    emailVerified?: boolean;
   }): Promise<{ user: ModifiedUser }> {
     const tranResult = await this.dataSource.manager.transaction(async (t) => {
-      const userOTPs: OTPs = { setEmailVerified: false, userId: data.user_id ?? null };
+      const userOTPs: OTPs = { setEmailVerified: data.emailVerified || false, userId: data.user_id ?? null };
       const userRec = await this.createOrUpdateFirebaseUser(t, data.email, data.password, userOTPs, data.role);
       const uid = userRec.uid;
       this.logger.debug(`user: ${uid}`);
@@ -307,7 +308,7 @@ export class UsersService implements Coded {
         email: data.email ?? null,
         name: data.name,
         role: data.role,
-        status: StatusEnum.inActive,
+        status: data.emailVerified === true ? StatusEnum.active : StatusEnum.inActive,
         created_at: now,
         updated_at: now,
       };
