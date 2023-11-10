@@ -84,12 +84,12 @@ export class CompaniesController implements Coded {
       throw new HttpException('Failed to create and link company', HttpStatus.BAD_REQUEST);
     }
 
-    await this.usersService.sendEmailNotificationForInfoCompany(
-      newCompany.user,
-      newCompany.company,
-      createCompanyDto.position_of_user,
-      UserTypeAction.create,
-    );
+    // await this.usersService.sendEmailNotificationForInfoCompany(
+    //   newCompany.user,
+    //   newCompany.company,
+    //   createCompanyDto.position_of_user,
+    //   UserTypeAction.create,
+    // );
 
     return {
       company: newCompany.company,
@@ -118,12 +118,12 @@ export class CompaniesController implements Coded {
 
     const updatedCompany = await this.companiesService.updateCompany(companyId, updateCompanyInfoDto);
 
-    await this.usersService.sendEmailNotificationForInfoCompany(
-      userRelation.user,
-      updatedCompany,
-      userRelation.position_of_user,
-      UserTypeAction.update,
-    );
+    // await this.usersService.sendEmailNotificationForInfoCompany(
+    //   userRelation.user,
+    //   updatedCompany,
+    //   userRelation.position_of_user,
+    //   UserTypeAction.update,
+    // );
 
     return {
       company: updatedCompany,
