@@ -8,6 +8,7 @@ import { Company } from '@/app/models/company';
 import { UploadedFile } from '@/app/models/uploaded-file';
 import { User } from '@/app/models/user';
 import { Service } from '@/app/utils/decorators';
+import _ from 'lodash';
 
 @Service()
 @Injectable()
@@ -108,10 +109,13 @@ export class CompaniesService {
       throw new NotFoundException('User is not associated with the requested company');
     }
 
-    const company = await this.companiesRepository.findOne({
-      where: { id: companyId },
-      relations: ['companiesUsers', 'companiesUsers.user', 'files'],
-    });
+    const company = await this.companiesRepository
+      .createQueryBuilder('company')
+      .leftJoinAndSelect('company.companiesUsers', 'companiesUsers')
+      .leftJoinAndSelect('companiesUsers.user', 'user')
+      .leftJoinAndSelect('company.files', 'file', 'file.is_deleted = false')
+      .where('company.id = :companyId', { companyId })
+      .getOne();
 
     if (!company) {
       throw new NotFoundException('Company not found');
@@ -120,7 +124,7 @@ export class CompaniesService {
     const result = {
       ...company,
       position_of_user: userCompanyRelation.position_of_user,
-      files: company.files?.map((file) => ({ id: file.id, path: file.path, name: file.name })),
+      files: _.map(company.files, (file) => ({ id: file.id, path: file.path, name: file.name })),
     };
 
     return result;
@@ -144,22 +148,27 @@ export class CompaniesService {
 
   async updateCompany(companyId: string, updateCompanyDto: UpdateCompanyInfoDto): Promise<Company> {
     return await this.companiesRepository.manager.transaction(async (manager) => {
-      const company = await manager.findOne(Company, {
-        where: { id: companyId },
-        relations: ['files'],
-      });
+      const company = await manager
+        .createQueryBuilder(Company, 'company')
+        .leftJoinAndSelect('company.files', 'file')
+        .where('company.id = :companyId', { companyId })
+        .getOne();
 
       if (!company) {
         throw new NotFoundException('Company not found');
       }
 
-      Object.assign(company, updateCompanyDto);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { files, ...updateDtoWithoutFiles } = updateCompanyDto;
+      Object.assign(company, updateDtoWithoutFiles);
 
       /** Start Update company files */
-      const existingFileIds = company.files.map((file) => file.id);
-      const newFileIds = updateCompanyDto.files || [];
+      const existingActiveFileIds = company.files.filter((file) => !file.is_deleted).map((file) => file.id);
 
-      const filesToDelete = existingFileIds.filter((id) => !newFileIds.includes(id));
+      const newFileIds = updateCompanyDto.files || [];
+      const filesToDelete = existingActiveFileIds.filter((id) => !newFileIds.includes(id));
+      const filesToAdd = newFileIds.filter((id) => !existingActiveFileIds.includes(id));
+
       if (filesToDelete.length > 0) {
         await manager
           .createQueryBuilder()
@@ -169,11 +178,12 @@ export class CompaniesService {
           .execute();
       }
 
-      if (newFileIds.length > 0) {
-        company.files = await this.findAndValidateFiles(newFileIds, manager);
+      if (filesToAdd.length > 0) {
+        const newFiles = await this.findAndValidateFiles(filesToAdd, manager);
+        company.files = [...company.files, ...newFiles];
       }
-      /** End Update company files */
 
+      /** End Update company files */
       await manager.save(Company, company);
 
       // Update position_of_user in companies_users table
@@ -185,6 +195,10 @@ export class CompaniesService {
         companyUserRelation.position_of_user = updateCompanyDto.position_of_user;
         await manager.save(CompaniesUsers, companyUserRelation);
       }
+
+      company.files = company.files.filter(
+        (file) => (!file.is_deleted || newFileIds.includes(file.id)) && !filesToDelete.includes(file.id),
+      );
 
       return company;
     });
