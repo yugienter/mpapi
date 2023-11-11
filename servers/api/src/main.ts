@@ -66,7 +66,7 @@ export function prepareApp(app: NestFastifyApplication) {
     };
   });
   app.register(fastifyMultipart, {
-    limits: { fileSize: 10 * 1024 * 1024 }, // limit size of file is 10MB
+    limits: { fileSize: 100 * 1024 * 1024 }, // limit size of file is 100MB
   });
   app.register(fastifyCookie, {
     secret: configProvider.config.appSecretKey, // for cookies signature
