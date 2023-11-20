@@ -3,109 +3,46 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-import { CompaniesUsers } from '@/app/models/companies-users';
-import { UploadedFile } from '@/app/models/uploaded-file';
+import { CompanyInformation } from '@/app/models/company_information';
+import { User } from '@/app/models/user';
 
-/*************************************************************************************
- * CAUTION: This enum is the same from CLIENT SIDE.                                  *
- * IF EDIT AND COMMIT THIS ENUM - PLEASE CLONE AND UPDATE THAT TO API WITH THE SAME  *
- *************************************************************************************/
-export enum TypeOfBusinessEnum {
-  MANUFACTURING = 'Manufacturing',
-  DISTRIBUTION = 'Distribution',
-  RETAIL = 'Retail',
-  RESTAURANT = 'Restaurant',
-  MEDICAL_SERVICE_AND_HEALTH_CARE = 'Medical Service, health care',
-  CONSTRUCTION = 'Construction',
-  EDUCATION = 'Education',
-  REAL_PROPERTY = 'Real property',
-  E_COMMERCE = 'E-commerce',
-  IT_SOFTWARE_ENGINEERING = 'IT, software, engineering',
-  TRAVE_SIGHTSEEING = 'Trave, sightseeing',
-  ADVERTISEMENT_ENTERTAINMENT_PUBLISHING = 'Advertisement, entertainment, publishing',
-  ENVIRONMENT_ESG_SOLUTION = 'Environment, ESG solution',
-  ENERGY_MINERAL_RESOURCES = 'Energy, mineral resources',
-  LOGISTICS = 'logistics',
+// import { CompaniesUsers } from '@/app/models/companies-users';
+// import { UploadedFile } from '@/app/models/uploaded-file';
+
+export enum StatusOfInformation {
+  DRAFT = 'DRAFT',
+  DRAFT_FROM_ADMIN = 'DRAFT_FROM_ADMIN',
+  REQUEST = 'REQUEST',
+  SUBMITTED = 'SUBMITTED',
+  PROCESSING = 'PROCESSING',
+  PROCESSED = 'PROCESSED',
 }
 
 @Entity('companies')
 export class Company {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column()
+  @Column({ length: 255 })
   name: string;
 
-  @Column()
-  description_1: string;
+  @Column({ length: 255, nullable: true })
+  position: string;
 
-  @Column()
-  description_2: string;
+  @Column({ length: 20, nullable: true })
+  phone_number: string;
 
-  @Column()
-  country: string;
+  @Column({ length: 255, nullable: true })
+  website: string;
 
-  // @ValidateIf((object) => object.areaOther)
-  @Column()
-  area: string;
-
-  @Column()
-  area_other: boolean;
-
-  @Column()
-  type_of_business: TypeOfBusinessEnum;
-
-  @Column()
-  commodity: string;
-
-  @Column()
-  willing_to: boolean;
-
-  @Column()
-  date_of_establishment: string;
-
-  /**
-   * store currency amounts with precision of 10 and upto 2 decimal places.
-   */
-  // @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
-  @Column({ type: Number, nullable: true })
-  annual_revenue: number;
-
-  // @Column({ type: 'numeric', precision: 10, scale: 2, nullable: true })
-  @Column({ type: Number, nullable: true })
-  annual_profit: number;
-
-  @Column({ type: Number, nullable: true })
-  number_of_employees: number;
-
-  @Column({ type: Number, nullable: true })
-  sell_of_shares: number;
-
-  @Column({ type: Number, nullable: true })
-  expected_price_of_shares: number;
-
-  @Column({ type: Number, nullable: true })
-  expected_price_of_shares_percent: number;
-
-  @Column({ type: Number, nullable: true })
-  issuance_raise_money: number;
-
-  @Column({ type: Number, nullable: true })
-  issuance_price_of_shares: number;
-
-  @Column({ type: Number, nullable: true })
-  issuance_price_of_shares_percent: number;
-
-  @Column('boolean', { default: false })
-  business_collaboration = false;
-
-  @Column({ type: String, nullable: true })
-  collaboration_detail: string | null;
+  @ManyToOne(() => User, (user) => user.companies)
+  user: User;
 
   @CreateDateColumn()
   created_at: Date;
@@ -116,13 +53,6 @@ export class Company {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  ///////////////////////////////////
-  //////////// RELATIONS ////////////
-  ///////////////////////////////////
-
-  @OneToMany(() => CompaniesUsers, (companiesUsers) => companiesUsers.company)
-  public companiesUsers: CompaniesUsers[];
-
-  @OneToMany(() => UploadedFile, (file) => file.company)
-  files: UploadedFile[];
+  @OneToMany(() => CompanyInformation, (companyInformation) => companyInformation.company)
+  company_information: CompanyInformation[];
 }

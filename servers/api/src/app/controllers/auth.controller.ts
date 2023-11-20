@@ -18,7 +18,6 @@ import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { FirebaseInfo } from '@/app/modules/firebase.module';
 import { AuthProvider } from '@/app/providers/auth.provider';
 import { ConfigProvider } from '@/app/providers/config.provider';
-import { CompaniesService } from '@/app/services/companies/companies.service';
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { MpplatformApiDefault } from '@/app/utils/decorators';
@@ -33,7 +32,6 @@ export class AuthController implements Coded {
     private readonly authProvider: AuthProvider,
     private readonly configProvider: ConfigProvider,
     private readonly usersService: UsersService,
-    private readonly companiesService: CompaniesService,
   ) {
     // nothing to do
   }

@@ -8,11 +8,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Company } from '@/app/models/company';
+import { CompanyInformation } from '@/app/models/company_information';
 import { User } from '@/app/models/user';
 
-@Entity('uploaded_files')
-export class UploadedFile {
+@Entity('file_attachments')
+export class FileAttachments {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -44,7 +44,7 @@ export class UploadedFile {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Company, (company) => company.files)
-  @JoinColumn({ name: 'company_id' })
-  company?: Company;
+  @ManyToOne(() => CompanyInformation, (company) => company.files)
+  @JoinColumn({ name: 'company_information_id' })
+  company_information?: CompanyInformation;
 }

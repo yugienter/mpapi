@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
-import { UploadedFile } from '@/app/models/uploaded-file';
+import { UploadedFile } from '@/app/models/file_attachments';
 import { User } from '@/app/models/user';
 import { Service } from '@/app/utils/decorators';
 

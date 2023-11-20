@@ -1,242 +1,208 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
-  IsBoolean,
-  IsIn,
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
-  ValidateIf,
+  MaxLength,
+  Min,
+  registerDecorator,
+  ValidateNested,
+  ValidationArguments,
+  ValidationOptions,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
 } from 'class-validator';
 
-import { IsOptionalButNotEmpty } from '@/app/controllers/dto/custom';
-import { TypeOfBusinessEnum } from '@/app/models/company';
-import { User } from '@/app/models/user';
+import { StatusOfInformation } from '@/app/models/company';
+import { TypeOfBusinessEnum } from '@/app/models/company_information';
+import { FileAttachments } from '@/app/models/file_attachments';
 
-export class BaseCompanyDto {
-  @ApiProperty({ example: 'Company Ltd' })
-  @IsString()
-  name?: string;
+@ValidatorConstraint({ async: true })
+class IsOneOfThreeGroupsConstraint implements ValidatorConstraintInterface {
+  validate(value: CompanyInformationDto, args: ValidationArguments) {
+    const object = args.object as CompanyInformationDto;
 
-  @ApiProperty()
-  @IsString()
-  position_of_user?: string;
+    const group1Filled =
+      object.transaction_sell_shares_percentage != null && object.transaction_sell_shares_amount != null;
+    const group2Filled =
+      object.transaction_issue_shares_percentage != null && object.transaction_issue_shares_amount != null;
+    const group3Filled = object.transaction_other_details != null;
 
-  @ApiProperty()
-  @IsString()
-  description_1?: string;
+    const groupsFilled = [group1Filled, group2Filled, group3Filled].filter((v) => v).length;
 
-  @ApiProperty()
-  @IsString()
-  description_2?: string;
+    return groupsFilled === 1;
+  }
 
-  @ApiProperty()
-  @IsString()
-  country?: string;
-
-  @ApiProperty()
-  @IsString()
-  area?: string;
-
-  @ApiProperty({ example: false })
-  @IsBoolean()
-  area_other?: boolean;
-
-  @ApiProperty({ example: 'Manufacturing' })
-  @IsIn(Object.values(TypeOfBusinessEnum))
-  @IsString()
-  type_of_business?: TypeOfBusinessEnum;
-
-  @ApiProperty()
-  @ValidateIf((o) => [TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(o.type_of_business))
-  @IsString()
-  commodity?: string;
-
-  @ApiProperty({ example: true })
-  @ValidateIf((o) => [TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(o.type_of_business))
-  @IsBoolean()
-  willing_to?: boolean;
-
-  @ApiProperty()
-  @IsString()
-  date_of_establishment?: string;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsNumber()
-  annual_revenue?: number;
-
-  @ApiProperty()
-  @IsOptional()
-  @IsNumber()
-  annual_profit?: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  number_of_employees?: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  sell_of_shares?: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  expected_price_of_shares?: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  expected_price_of_shares_percent?: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  issuance_raise_money?: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  issuance_price_of_shares?: number;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  issuance_price_of_shares_percent?: number;
-
-  @ApiProperty()
-  @IsBoolean()
-  @IsOptional()
-  business_collaboration?: boolean;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  collaboration_detail?: string;
-
-  @ApiProperty({ type: [Number] })
-  @IsArray()
-  @IsInt({ each: true })
-  files?: number[];
-
-  @ApiProperty({ type: User })
-  users?: User[];
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  defaultMessage(args: ValidationArguments) {
+    return 'One of three option of Transaction Session is not empty : [Sell Shares - Issue Share - Other].';
+  }
 }
 
-export class CreateCompanyRequest extends BaseCompanyDto {
+function IsOneOfThreeGroups(validationOptions?: ValidationOptions) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      constraints: [],
+      validator: IsOneOfThreeGroupsConstraint,
+    });
+  };
+}
+
+export class FinancialDataDto {
+  @IsInt()
+  year: number;
+
+  @IsOptional()
+  @IsNumber()
+  sales?: number;
+
+  @IsOptional()
+  @IsNumber()
+  profit?: number;
+
+  @IsOptional()
+  @IsNumber()
+  EBITDA?: number;
+
+  @IsOptional()
+  @IsNumber()
+  net_asset?: number;
+
+  @IsOptional()
+  @IsNumber()
+  net_debt?: number;
+}
+
+export class CompanyInformationDto {
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Company Name is not empty' })
+  @MaxLength(255)
   name: string;
 
-  @IsString()
-  @IsNotEmpty()
-  position_of_user: string;
-
-  @IsString()
-  @IsNotEmpty()
-  description_1: string;
-
-  @IsString()
-  @IsNotEmpty()
-  description_2: string;
-
-  @IsString()
-  @IsNotEmpty()
-  country: string;
-
-  @IsString()
-  @IsNotEmpty()
-  area: string;
-
-  @ApiProperty({ example: false })
-  @IsBoolean()
-  @IsNotEmpty()
-  area_other: boolean;
-
-  @ApiProperty({ example: 'Manufacturing' })
-  @IsIn(Object.values(TypeOfBusinessEnum))
-  @IsString()
-  @IsNotEmpty()
-  type_of_business: TypeOfBusinessEnum;
-
-  @ValidateIf((o) => [TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(o.type_of_business))
-  @IsString()
-  @IsNotEmpty()
-  commodity: string;
-
-  @ApiProperty({ example: true })
-  @ValidateIf((o) => [TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(o.type_of_business))
-  @IsBoolean()
-  @IsNotEmpty()
-  willing_to: boolean;
-
-  @IsString()
-  @IsNotEmpty()
-  date_of_establishment: string;
-}
-
-export class UpdateCompanyInfoDto extends BaseCompanyDto {
-  @IsString()
-  @IsOptionalButNotEmpty()
-  name?: string;
-
-  @IsString()
-  @IsOptionalButNotEmpty()
-  position_of_user?: string;
-
-  @IsString()
-  @IsOptionalButNotEmpty()
-  description_1?: string;
-
-  @IsString()
-  @IsOptionalButNotEmpty()
-  description_2?: string;
-
-  @IsString()
-  @IsOptionalButNotEmpty()
-  country?: string;
-
-  @IsString()
-  @IsOptionalButNotEmpty()
-  area?: string;
-
-  @IsBoolean()
-  @IsOptionalButNotEmpty()
-  area_other?: boolean;
-
-  @IsIn(Object.values(TypeOfBusinessEnum))
-  @IsString()
-  @IsOptionalButNotEmpty()
-  type_of_business?: TypeOfBusinessEnum;
-
-  @ValidateIf((o) => [TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(o.type_of_business))
-  @IsString()
-  @IsNotEmpty()
-  commodity?: string;
-
-  @ValidateIf((o) => [TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(o.type_of_business))
-  @IsBoolean()
-  @IsNotEmpty()
-  willing_to?: boolean;
-
-  @IsString()
   @IsOptional()
-  date_of_establishment?: string;
+  @IsString()
+  @MaxLength(255)
+  position?: string;
 
   @IsOptional()
-  @IsNumber()
-  annual_revenue?: number;
+  @IsString()
+  @MaxLength(20)
+  phone_number?: string;
 
   @IsOptional()
-  @IsNumber()
-  annual_profit?: number;
+  @IsString()
+  @MaxLength(255)
+  website?: string;
+
+  @IsOptional()
+  @IsString()
+  general_shareholder_structure?: string;
+
+  @IsOptional()
+  @IsString()
+  general_management_structure?: string;
+
+  @IsInt()
+  @Min(1900)
+  general_year_of_establishment: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  general_headquarter?: string;
+
+  @IsEnum(TypeOfBusinessEnum)
+  general_business_type: TypeOfBusinessEnum;
+
+  @IsString()
+  @MaxLength(50)
+  general_business_location_country: string;
+
+  @IsString()
+  @MaxLength(50)
+  general_business_location_area: string;
+
+  @IsInt()
+  @Min(0)
+  general_number_of_employees: number;
+
+  @IsOptional()
+  @IsString()
+  business_overview?: string;
+
+  @IsOptional()
+  @IsString()
+  business_main_products_services?: string;
+
+  @IsOptional()
+  @IsString()
+  business_major_clients?: string;
+
+  @IsOptional()
+  @IsString()
+  business_major_suppliers?: string;
+
+  @IsOptional()
+  @IsString()
+  business_future_growth_projection?: string;
+
+  // Financial Data
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FinancialDataDto)
+  financial_data: FinancialDataDto[];
 
   @IsNumber()
+  financial_current_valuation: number;
+
+  // End Financial Data
+
+  // Transaction Data
+
+  @IsInt()
+  @Min(0)
+  transaction_sell_shares_percentage: number;
+
+  @IsNumber()
+  transaction_sell_shares_amount: number;
+
+  @IsInt()
+  @Min(0)
+  transaction_issue_shares_percentage: number;
+
+  @IsNumber()
+  transaction_issue_shares_amount: number;
+
   @IsOptional()
-  number_of_employees?: number;
+  @IsString()
+  transaction_other_details?: string;
+
+  @IsOneOfThreeGroups()
+  _oneOfThreeGroups: boolean;
+
+  // End Transaction Data
+
+  @IsOptional()
+  @IsString()
+  reason_deal_reason?: string;
+
+  @IsOptional()
+  @IsString()
+  reason_deal_timeline?: string;
+
+  @IsEnum(StatusOfInformation)
+  status: StatusOfInformation;
+
+  @IsArray()
+  @ArrayNotEmpty()
+  files: FileAttachments[];
 }

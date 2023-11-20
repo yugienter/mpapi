@@ -56,12 +56,14 @@ export class CreateUploadedFilesTable1699609412415 implements MigrationInterface
         ],
         foreignKeys: [
           new TableForeignKey({
+            name: 'user',
             columnNames: ['user_id'],
             referencedTableName: 'users',
             referencedColumnNames: ['id'],
             onDelete: 'CASCADE',
           }),
           new TableForeignKey({
+            name: 'company',
             columnNames: ['company_id'],
             referencedTableName: 'companies',
             referencedColumnNames: ['id'],

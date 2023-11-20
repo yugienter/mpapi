@@ -9,7 +9,8 @@ import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
-import { Company, TypeOfBusinessEnum } from '@/app/models/company';
+import { Company } from '@/app/models/company';
+import { TypeOfBusinessEnum } from '@/app/models/company_information';
 import { EmailVerificationToken, TokenActionEnum } from '@/app/models/email_verification_tokens';
 import { ModifiedUser, RolesEnum, StatusEnum, User } from '@/app/models/user';
 import { UserProfile } from '@/app/models/user-profile';
@@ -179,15 +180,15 @@ export class UsersService implements Coded {
     let willingToText = '';
     let willingTo = '';
 
-    if (company.type_of_business === TypeOfBusinessEnum.MANUFACTURING) {
-      willingToText = 'Are you willing to manufacture products requested by foreign investor/company on a OEM basis?';
-    }
-    if (company.type_of_business === TypeOfBusinessEnum.DISTRIBUTION) {
-      willingToText = 'Are you willing to distribute products from foreign investor/company as a local distributor?';
-    }
-    if ([TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(company.type_of_business)) {
-      willingTo = company.willing_to ? 'Yes' : 'No';
-    }
+    // if (company.type_of_business === TypeOfBusinessEnum.MANUFACTURING) {
+    //   willingToText = 'Are you willing to manufacture products requested by foreign investor/company on a OEM basis?';
+    // }
+    // if (company.type_of_business === TypeOfBusinessEnum.DISTRIBUTION) {
+    //   willingToText = 'Are you willing to distribute products from foreign investor/company as a local distributor?';
+    // }
+    // if ([TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(company.type_of_business)) {
+    //   willingTo = company.willing_to ? 'Yes' : 'No';
+    // }
 
     return { willingTo, willingToText };
   }
@@ -497,26 +498,26 @@ export class UsersService implements Coded {
       email: user.email,
       companyName: company.name,
       positionOfUser: positionOfUser,
-      description1: company.description_1,
-      description2: company.description_2,
-      country: company.country,
-      area: company.area,
-      typeOfBusiness: company.type_of_business,
-      commodity: company.commodity,
-      willingTo,
-      willingToText,
-      dateOfEstablishment: company.date_of_establishment,
-      annualRevenue: company.annual_revenue,
-      annualProfit: company.annual_profit,
-      numberOfEmployees: company.number_of_employees,
-      sellOfShares: company.sell_of_shares,
-      expectedPriceOfShares: company.expected_price_of_shares,
-      expectedPriceOfSharesPercent: company.expected_price_of_shares_percent,
-      issuanceRaiseMoney: company.issuance_raise_money,
-      issuancePriceOfShares: company.issuance_price_of_shares,
-      issuancePriceOfSharesPercent: company.issuance_price_of_shares_percent,
-      businessCollaboration: company.business_collaboration ? 'Yes' : 'No',
-      collaborationDetail: company.collaboration_detail,
+      // description1: company.description_1,
+      // description2: company.description_2,
+      // country: company.country,
+      // area: company.area,
+      // typeOfBusiness: company.type_of_business,
+      // commodity: company.commodity,
+      // willingTo,
+      // willingToText,
+      // dateOfEstablishment: company.date_of_establishment,
+      // annualRevenue: company.annual_revenue,
+      // annualProfit: company.annual_profit,
+      // numberOfEmployees: company.number_of_employees,
+      // sellOfShares: company.sell_of_shares,
+      // expectedPriceOfShares: company.expected_price_of_shares,
+      // expectedPriceOfSharesPercent: company.expected_price_of_shares_percent,
+      // issuanceRaiseMoney: company.issuance_raise_money,
+      // issuancePriceOfShares: company.issuance_price_of_shares,
+      // issuancePriceOfSharesPercent: company.issuance_price_of_shares_percent,
+      // businessCollaboration: company.business_collaboration ? 'Yes' : 'No',
+      // collaborationDetail: company.collaboration_detail,
       action: action,
     };
 

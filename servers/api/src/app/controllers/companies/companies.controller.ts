@@ -13,13 +13,12 @@ import {
 } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
-import { CreateCompanyRequest, UpdateCompanyInfoDto } from '@/app/controllers/dto/company.dto';
+import { CompanyInformationDto } from '@/app/controllers/dto/company.dto';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
-import { Company } from '@/app/models/company';
+import { Company, StatusOfInformation } from '@/app/models/company';
 import { RolesEnum, User } from '@/app/models/user';
-import { UserTypeAction } from '@/app/providers/email.provider';
-import { CompaniesService } from '@/app/services/companies/companies.service';
+import { CompaniesService, CompanyDetail } from '@/app/services/companies/companies.service';
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
@@ -38,95 +37,58 @@ export class CompaniesController implements Coded {
   }
 
   @ApiOperation({
+    description: 'Create a new company of user',
+    tags: ['company'],
+  })
+  @Post('new/information')
+  @Roles(RolesEnum.company)
+  async createCompanyInfo(
+    @Req() request,
+    @Body() createCompanyInformationDto: CompanyInformationDto,
+  ): Promise<CompanyDetail> {
+    const requesterId = request.raw.user.uid;
+    if ([StatusOfInformation.PROCESSING, StatusOfInformation.PROCESSED].includes(createCompanyInformationDto.status)) {
+      this.logger.warn('[createCompany] : Invalid status');
+      throw Error('Invalid status of Information');
+    }
+    const createdCompany = await this.companiesService.createCompanyInfo(createCompanyInformationDto, requesterId);
+
+    return createdCompany;
+  }
+
+  @ApiOperation({
+    description: 'Update information of company',
+    tags: ['company'],
+  })
+  @Put(':companyId/information')
+  @Roles(RolesEnum.company)
+  async updateCompanyInfo(
+    @Param('companyId') companyId: number,
+    @Body() companyInfoDto: CompanyInformationDto,
+    @Req() request,
+  ) {
+    const userId = request.raw.user.uid;
+    return await this.companiesService.updateCompanyInfo(companyId, companyInfoDto, userId);
+  }
+
+  @ApiOperation({
     description: 'Get all company of user.',
     tags: ['company'],
   })
   @Get('list')
   @Roles(RolesEnum.company)
-  async getMyCompanies(@Req() request) {
-    const requesterId = request.raw.user.uid;
-    const result = await this.companiesService.getCompaniesOfUser(requesterId);
-    return {
-      companies: result,
-    };
+  async getMyCompanies(@Req() request): Promise<Company[]> {
+    const userId = request.raw.user.uid;
+    return await this.companiesService.getCompaniesOfUser(userId);
   }
 
   @ApiOperation({
-    description: 'Get company detail of user.',
+    description: 'Get company information.',
     tags: ['company'],
   })
-  @Get(':companyId')
-  @Roles(RolesEnum.company)
-  async getCompanyDetail(@Param('companyId') companyId: string, @Req() request) {
-    const requesterId = request.raw.user.uid;
-    const result = await this.companiesService.getCompanyDetail(companyId, requesterId);
-
-    return {
-      company: result,
-    };
-  }
-
-  @ApiOperation({
-    description: 'Create a new company and link with user.',
-    tags: ['company'],
-  })
-  @Post()
-  @Roles(RolesEnum.company)
-  async createCompany(@Req() request, @Body() createCompanyDto: CreateCompanyRequest) {
-    const requesterId = request.raw.user.uid;
-
-    const newCompany: { company: Company; user: User } = await this.companiesService.createCompanyAndLinkUser(
-      createCompanyDto,
-      requesterId,
-    );
-
-    if (!newCompany.company) {
-      throw new HttpException('Failed to create and link company', HttpStatus.BAD_REQUEST);
-    }
-
-    // await this.usersService.sendEmailNotificationForInfoCompany(
-    //   newCompany.user,
-    //   newCompany.company,
-    //   createCompanyDto.position_of_user,
-    //   UserTypeAction.create,
-    // );
-
-    return {
-      company: newCompany.company,
-    };
-  }
-
-  @ApiOperation({
-    description: 'Update company information.',
-    tags: ['company'],
-  })
-  @Put(':companyId')
-  @Roles(RolesEnum.company)
-  async updateCompanyInfo(
-    @Param('companyId') companyId: string,
-    @Req() request,
-    @Body() updateCompanyInfoDto: UpdateCompanyInfoDto,
-  ) {
-    const requesterId = request.raw.user.uid;
-    const company = await this.companiesService.getCompanyDetail(companyId, requesterId);
-
-    const userRelation = company.companiesUsers.find((userRelation) => userRelation.user.id === requesterId);
-
-    if (!userRelation) {
-      throw new HttpException('You do not have permission to update this company', HttpStatus.FORBIDDEN);
-    }
-
-    const updatedCompany = await this.companiesService.updateCompany(companyId, updateCompanyInfoDto);
-
-    // await this.usersService.sendEmailNotificationForInfoCompany(
-    //   userRelation.user,
-    //   updatedCompany,
-    //   userRelation.position_of_user,
-    //   UserTypeAction.update,
-    // );
-
-    return {
-      company: updatedCompany,
-    };
+  @Get(':companyId/information')
+  async getCompanyInfo(@Param('companyId') companyId: number, @Req() request) {
+    const userId = request.raw.user.uid;
+    return this.companiesService.getCompanyInfo(companyId, userId);
   }
 }

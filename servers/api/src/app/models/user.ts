@@ -11,9 +11,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { CompaniesUsers } from '@/app/models/companies-users';
+import { Company } from '@/app/models/company';
 import { EmailVerificationToken } from '@/app/models/email_verification_tokens';
-import { UploadedFile } from '@/app/models/uploaded-file';
+import { UploadedFile } from '@/app/models/file_attachments';
 import { UserProfile } from '@/app/models/user-profile';
 
 export enum StatusEnum {
@@ -48,12 +48,6 @@ export class User {
   @Column({ default: false, select: false })
   is_deleted: boolean;
 
-  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  // created_at: Date;
-
-  // @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  // updated_at: Date;
-
   @CreateDateColumn()
   created_at: Date;
 
@@ -71,8 +65,8 @@ export class User {
   @JoinColumn({ name: 'id', referencedColumnName: 'user_id' })
   profile: UserProfile;
 
-  @OneToMany(() => CompaniesUsers, (companiesUsers) => companiesUsers.user)
-  public companiesUsers: CompaniesUsers[];
+  @OneToMany(() => Company, (company) => company.user)
+  companies: Company[];
 
   @OneToMany(() => EmailVerificationToken, (emailVerificationToken) => emailVerificationToken.user)
   emailVerificationTokens: EmailVerificationToken[];
