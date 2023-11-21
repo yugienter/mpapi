@@ -13,7 +13,7 @@ import {
 
 import { Company } from '@/app/models/company';
 import { EmailVerificationToken } from '@/app/models/email_verification_tokens';
-import { UploadedFile } from '@/app/models/file_attachments';
+import { FileAttachments } from '@/app/models/file_attachments';
 import { UserProfile } from '@/app/models/user-profile';
 
 export enum StatusEnum {
@@ -71,8 +71,8 @@ export class User {
   @OneToMany(() => EmailVerificationToken, (emailVerificationToken) => emailVerificationToken.user)
   emailVerificationTokens: EmailVerificationToken[];
 
-  @OneToMany(() => UploadedFile, (file) => file.user)
-  files: UploadedFile[];
+  @OneToMany(() => FileAttachments, (file) => file.user)
+  files: FileAttachments[];
 }
 
 export class ModifiedUser {

@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { CompanyInformation } from '@/app/models/company_information';
 
@@ -6,9 +6,6 @@ import { CompanyInformation } from '@/app/models/company_information';
 export class CompanyFinancialData {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @ManyToOne(() => CompanyInformation, (companyInformation) => companyInformation.financial_data)
-  company_information: CompanyInformation;
 
   @Column()
   year: number;
@@ -27,4 +24,12 @@ export class CompanyFinancialData {
 
   @Column('bigint', { nullable: true })
   net_debt: number;
+
+  ///////////////////////////////////
+  //////////// RELATIONS ////////////
+  ///////////////////////////////////
+
+  @ManyToOne(() => CompanyInformation, (companyInformation) => companyInformation.financial_data)
+  @JoinColumn({ name: 'company_information_id' })
+  company_information: CompanyInformation;
 }

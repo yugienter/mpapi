@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
@@ -30,9 +30,6 @@ export enum TypeOfBusinessEnum {
 export class CompanyInformation {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @ManyToOne(() => Company, (company) => company.company_information)
-  company: Company;
 
   @Column('text', { nullable: true })
   general_shareholder_structure: string;
@@ -73,9 +70,6 @@ export class CompanyInformation {
   @Column('text', { nullable: true })
   business_future_growth_projection: string;
 
-  @OneToMany(() => CompanyFinancialData, (data) => data.company_information)
-  financial_data: CompanyFinancialData[];
-
   @Column('bigint')
   financial_current_valuation: number;
 
@@ -102,6 +96,17 @@ export class CompanyInformation {
 
   @Column({ length: 50 })
   status: StatusOfInformation;
+
+  ///////////////////////////////////
+  //////////// RELATIONS ////////////
+  ///////////////////////////////////
+
+  @ManyToOne(() => Company, (company) => company.company_information)
+  @JoinColumn({ name: 'company_id' })
+  company: Company;
+
+  @OneToMany(() => CompanyFinancialData, (data) => data.company_information)
+  financial_data: CompanyFinancialData[];
 
   @OneToMany(() => FileAttachments, (file) => file.company_information)
   files: FileAttachments[];

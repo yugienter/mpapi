@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -11,9 +12,6 @@ import {
 
 import { CompanyInformation } from '@/app/models/company_information';
 import { User } from '@/app/models/user';
-
-// import { CompaniesUsers } from '@/app/models/companies-users';
-// import { UploadedFile } from '@/app/models/uploaded-file';
 
 export enum StatusOfInformation {
   DRAFT = 'DRAFT',
@@ -41,9 +39,6 @@ export class Company {
   @Column({ length: 255, nullable: true })
   website: string;
 
-  @ManyToOne(() => User, (user) => user.companies)
-  user: User;
-
   @CreateDateColumn()
   created_at: Date;
 
@@ -53,6 +48,14 @@ export class Company {
   @DeleteDateColumn()
   deleted_at: Date;
 
+  ///////////////////////////////////
+  //////////// RELATIONS ////////////
+  ///////////////////////////////////
+
   @OneToMany(() => CompanyInformation, (companyInformation) => companyInformation.company)
   company_information: CompanyInformation[];
+
+  @ManyToOne(() => User, (user) => user.companies)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }

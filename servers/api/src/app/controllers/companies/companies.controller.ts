@@ -36,10 +36,7 @@ export class CompaniesController implements Coded {
     return 'CCP';
   }
 
-  @ApiOperation({
-    description: 'Create a new company of user',
-    tags: ['company'],
-  })
+  @ApiOperation({ description: 'Create a new company of user', tags: ['company'] })
   @Post('new/information')
   @Roles(RolesEnum.company)
   async createCompanyInfo(
@@ -47,8 +44,8 @@ export class CompaniesController implements Coded {
     @Body() createCompanyInformationDto: CompanyInformationDto,
   ): Promise<CompanyDetail> {
     const requesterId = request.raw.user.uid;
-    if ([StatusOfInformation.PROCESSING, StatusOfInformation.PROCESSED].includes(createCompanyInformationDto.status)) {
-      this.logger.warn('[createCompany] : Invalid status');
+    if (![StatusOfInformation.DRAFT, StatusOfInformation.SUBMITTED].includes(createCompanyInformationDto.status)) {
+      this.logger.error('[createCompany] : Invalid status');
       throw Error('Invalid status of Information');
     }
     const createdCompany = await this.companiesService.createCompanyInfo(createCompanyInformationDto, requesterId);
@@ -56,10 +53,7 @@ export class CompaniesController implements Coded {
     return createdCompany;
   }
 
-  @ApiOperation({
-    description: 'Update information of company',
-    tags: ['company'],
-  })
+  @ApiOperation({ description: 'Update information of company', tags: ['company'] })
   @Put(':companyId/information')
   @Roles(RolesEnum.company)
   async updateCompanyInfo(
@@ -68,13 +62,14 @@ export class CompaniesController implements Coded {
     @Req() request,
   ) {
     const userId = request.raw.user.uid;
+    if (![StatusOfInformation.DRAFT, StatusOfInformation.SUBMITTED].includes(companyInfoDto.status)) {
+      this.logger.error('[updateCompanyInfo] : Invalid status');
+      throw Error('Invalid status of Information');
+    }
     return await this.companiesService.updateCompanyInfo(companyId, companyInfoDto, userId);
   }
 
-  @ApiOperation({
-    description: 'Get all company of user.',
-    tags: ['company'],
-  })
+  @ApiOperation({ description: 'Get all company of user.', tags: ['company'] })
   @Get('list')
   @Roles(RolesEnum.company)
   async getMyCompanies(@Req() request): Promise<Company[]> {
@@ -82,10 +77,7 @@ export class CompaniesController implements Coded {
     return await this.companiesService.getCompaniesOfUser(userId);
   }
 
-  @ApiOperation({
-    description: 'Get company information.',
-    tags: ['company'],
-  })
+  @ApiOperation({ description: 'Get company information.', tags: ['company'] })
   @Get(':companyId/information')
   async getCompanyInfo(@Param('companyId') companyId: number, @Req() request) {
     const userId = request.raw.user.uid;

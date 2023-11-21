@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
-import { UploadedFile } from '@/app/models/file_attachments';
+import { FileAttachments } from '@/app/models/file_attachments';
 import { User } from '@/app/models/user';
 import { Service } from '@/app/utils/decorators';
 
@@ -13,7 +13,7 @@ export class FileService {
   private readonly logger = new Logger(FileService.name);
 
   constructor(
-    @InjectRepository(UploadedFile) private fileRepository: Repository<UploadedFile>,
+    @InjectRepository(FileAttachments) private fileRepository: Repository<FileAttachments>,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -23,7 +23,7 @@ export class FileService {
     size: number;
     path: string;
     user: User;
-  }): Promise<UploadedFile> {
+  }): Promise<FileAttachments> {
     const uploadedFile = this.fileRepository.create(fileData);
     return this.fileRepository.save(uploadedFile);
   }

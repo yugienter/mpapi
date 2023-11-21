@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { EntityManager, Repository } from 'typeorm';
 
 import { CompanyInformationDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
-import { Company } from '@/app/models/company';
+import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { CompanyInformation } from '@/app/models/company_information';
 import { FileAttachments } from '@/app/models/file_attachments';
@@ -38,26 +38,25 @@ export class CompaniesService {
     financialDataDto: FinancialDataDto[],
     mode: 'add' | 'edit' = 'edit',
   ): Promise<void> {
-    if (mode === 'edit') {
-      for (const data of financialDataDto) {
-        let financialData = await this.financialDataRepository.findOne({
-          where: { company_information: { id: companyInfo.id }, year: data.year },
-        });
+    for (const data of financialDataDto) {
+      try {
+        let financialData;
+        if (mode === 'edit') {
+          financialData = await this.financialDataRepository.findOne({
+            where: { company_information: { id: companyInfo.id }, year: data.year },
+          });
+        }
 
         if (!financialData) {
           financialData = this.financialDataRepository.create({ company_information: companyInfo });
         }
         Object.assign(financialData, data);
         await this.financialDataRepository.save(financialData);
+      } catch (error) {
+        this.logger.error(
+          `[handleFinancialData][${mode}] Error handling financial data: ${data.year}: ${error.message}`,
+        );
       }
-    }
-    if (mode === 'add') {
-      const financialDataEntities = financialDataDto.map((data) => {
-        const financialData = new CompanyFinancialData();
-        Object.assign(financialData, { company_information: companyInfo, ...data });
-        return financialData;
-      });
-      await this.financialDataRepository.save(financialDataEntities);
     }
   }
 
@@ -77,6 +76,8 @@ export class CompaniesService {
       Object.assign(companyInfo, companyInfoDto);
       companyInfo.company = savedCompany;
 
+      await this.companyInformationRepository.save(companyInfo);
+
       if (companyInfoDto.files) {
         // companyInfo.files = ...;
       }
@@ -84,8 +85,6 @@ export class CompaniesService {
       if (companyInfoDto.financial_data && companyInfoDto.financial_data.length > 0) {
         await this.handleFinancialData(companyInfo, companyInfoDto.financial_data, 'add');
       }
-
-      await this.companyInformationRepository.save(companyInfo);
 
       return {
         ...savedCompany,
@@ -122,15 +121,29 @@ export class CompaniesService {
       }
       const company = await this.companiesRepository.findOne({ where: { id: companyId, user: { id: userId } } });
       if (!company) {
-        throw new NotFoundException(`Company not found with ID: ${companyId}`);
+        this.logger.error(`[updateCompanyInfo] Company of user ${userId} not found with ID: ${companyId}`);
+        throw new NotFoundException(`[updateCompanyInfo] Company of user ${userId} not found with ID: ${companyId}`);
       }
 
-      Object.assign(company, companyInfoDto);
-      const savedCompany = await this.companiesRepository.save(company);
+      const companyInfo = await this.companyInformationRepository.findOne({ where: { company: { id: companyId } } });
 
-      const companyInfo = new CompanyInformation();
-      Object.assign(companyInfo, companyInfoDto);
-      companyInfo.company = savedCompany;
+      if (!companyInfo) {
+        this.logger.error(`[updateCompanyInfo] CompanyInfo of user ${userId} not found with ID: ${companyId}`);
+        throw new NotFoundException(
+          `[updateCompanyInfo] CompanyInfo of user ${userId} not found with ID: ${companyId}`,
+        );
+      }
+
+      if (
+        [
+          StatusOfInformation.PROCESSING, // Process then user can not action
+          StatusOfInformation.PROCESSING, // Processed then user can not action
+          StatusOfInformation.DRAFT_FROM_ADMIN, // from admin, so user can not edit in this case
+        ].includes(companyInfo.status)
+      ) {
+        this.logger.error('[updateCompanyInfo] : Invalid status');
+        throw Error('Invalid status of Information');
+      }
 
       if (companyInfoDto.files) {
         // companyInfo.files = ...;
@@ -140,6 +153,10 @@ export class CompaniesService {
         await this.handleFinancialData(companyInfo, companyInfoDto.financial_data);
       }
 
+      Object.assign(company, companyInfoDto);
+      const savedCompany = await this.companiesRepository.save(company);
+
+      Object.assign(companyInfo, companyInfoDto);
       await this.companyInformationRepository.save(companyInfo);
 
       return {

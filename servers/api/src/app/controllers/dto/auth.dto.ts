@@ -5,7 +5,7 @@ import { IsEmail, IsEnum, IsNotEmpty, IsString, Length, ValidateNested } from 'c
 import { RolesEnum } from '@/app/models/user';
 import { IsEqualTo } from '@/app/validators/is-equal-to.validator';
 
-import { CreateCompanyRequest } from './company.dto';
+// import { CreateCompanyRequest } from './company.dto';
 
 export class SignInRequest {
   @ApiProperty({ example: 'test1@example.com' })
@@ -103,14 +103,14 @@ export class ManualCreateUserRequest {
   name: string;
 }
 
-export class ManualCreateCompanyUserRequest {
-  @ApiProperty({ example: 'test1@example.com' })
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+// export class ManualCreateCompanyUserRequest {
+//   @ApiProperty({ example: 'test1@example.com' })
+//   @IsEmail()
+//   @IsNotEmpty()
+//   email: string;
 
-  @ApiProperty()
-  @ValidateNested({ each: true })
-  @Type(() => CreateCompanyRequest)
-  company: CreateCompanyRequest;
-}
+//   @ApiProperty()
+//   @ValidateNested({ each: true })
+//   @Type(() => CreateCompanyRequest)
+//   company: CreateCompanyRequest;
+// }
