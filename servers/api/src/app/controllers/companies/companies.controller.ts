@@ -14,6 +14,7 @@ import {
 import { ApiOperation } from '@nestjs/swagger';
 
 import { CompanyInformationDto } from '@/app/controllers/dto/company.dto';
+import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { Company, StatusOfInformation } from '@/app/models/company';
@@ -42,7 +43,7 @@ export class CompaniesController implements Coded {
   async createCompanyInfo(
     @Req() request,
     @Body() createCompanyInformationDto: CompanyInformationDto,
-  ): Promise<CompanyDetail> {
+  ): Promise<CompanyDetailResponse> {
     const requesterId = request.raw.user.uid;
     if (![StatusOfInformation.DRAFT, StatusOfInformation.SUBMITTED].includes(createCompanyInformationDto.status)) {
       this.logger.error('[createCompany] : Invalid status');
@@ -60,7 +61,7 @@ export class CompaniesController implements Coded {
     @Param('companyId') companyId: number,
     @Body() companyInfoDto: CompanyInformationDto,
     @Req() request,
-  ) {
+  ): Promise<CompanyDetailResponse> {
     const userId = request.raw.user.uid;
     if (![StatusOfInformation.DRAFT, StatusOfInformation.SUBMITTED].includes(companyInfoDto.status)) {
       this.logger.error('[updateCompanyInfo] : Invalid status');

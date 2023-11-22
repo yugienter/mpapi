@@ -1,9 +1,11 @@
 import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { plainToClass } from 'class-transformer';
 import _ from 'lodash';
 import { EntityManager, Repository } from 'typeorm';
 
 import { CompanyInformationDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
+import { CompanyDetailResponse, IFinancialData } from '@/app/controllers/viewmodels/company.response';
 import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { CompanyInformation } from '@/app/models/company_information';
@@ -60,7 +62,55 @@ export class CompaniesService {
     }
   }
 
-  async createCompanyInfo(companyInfoDto: CompanyInformationDto, userId: string): Promise<CompanyDetail> {
+  private async handleFileAttachments(
+    companyInfoId: number,
+    fileIds: number[],
+    userId: string,
+  ): Promise<{ id: number; name: string; path: string }[]> {
+    try {
+      const existingFiles = await this.filesRepository.find({ where: { company_information: { id: companyInfoId } } });
+
+      const updatedFiles: { id: number; name: string; path: string }[] = [];
+
+      const filesToRemove = existingFiles.filter((file) => !fileIds.includes(file.id));
+      const filesToAdd = fileIds.filter((id) => !existingFiles.some((file) => file.id === id));
+
+      for (const file of filesToRemove) {
+        file.is_deleted = true;
+        file.deleted_at = new Date();
+        await this.filesRepository.save(file);
+      }
+
+      for (const fileId of filesToAdd) {
+        const file = await this.filesRepository.findOne({
+          where: { id: fileId, is_deleted: false },
+          relations: ['user', 'company_information'],
+        });
+
+        if (!file || file.user.id !== userId || file.company_information) {
+          continue;
+        }
+
+        file.company_information = { id: companyInfoId } as CompanyInformation;
+        await this.filesRepository.save(file);
+
+        updatedFiles.push({ id: file.id, name: file.name, path: file.path });
+      }
+
+      existingFiles.forEach((file) => {
+        if (!file.is_deleted && !filesToRemove.some((f) => f.id === file.id)) {
+          updatedFiles.push({ id: file.id, name: file.name, path: file.path });
+        }
+      });
+
+      return updatedFiles;
+    } catch (error) {
+      this.logger.error(`[handleFileAttachments] Error: ${error.message}`);
+      throw new Error(`[handleFileAttachments] ${error.message}`);
+    }
+  }
+
+  async createCompanyInfo(companyInfoDto: CompanyInformationDto, userId: string): Promise<CompanyDetailResponse> {
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
       if (!user) {
@@ -78,42 +128,31 @@ export class CompaniesService {
 
       await this.companyInformationRepository.save(companyInfo);
 
+      let updateFile;
       if (companyInfoDto.files) {
-        // companyInfo.files = ...;
+        updateFile = await this.handleFileAttachments(companyInfo.id, companyInfoDto.files, userId);
       }
 
       if (companyInfoDto.financial_data && companyInfoDto.financial_data.length > 0) {
         await this.handleFinancialData(companyInfo, companyInfoDto.financial_data, 'add');
       }
 
-      return {
+      const result = new CompanyDetailResponse({
         ...savedCompany,
         ...companyInfo,
-        files: _.map(companyInfo.files, (file) => ({
-          id: file.id,
-          name: file.name,
-          path: file.path,
-        })),
-        financial_data: _.map(companyInfo.financial_data, (data) => ({
-          year: data.year,
-          sales: data.sales,
-          profit: data.profit,
-          EBITDA: data.EBITDA,
-          net_asset: data.net_asset,
-          net_debt: data.net_debt,
-        })),
-      };
+        id: savedCompany.id,
+        files: updateFile,
+        financial_data: companyInfoDto.financial_data,
+      });
+
+      return result;
     } catch (error) {
       this.logger.error(`[createCompany] failed for userId ${userId}`, error.stack);
       throw new Error(`[createCompany] error : ${error.message}`);
     }
   }
 
-  async updateCompanyInfo(
-    companyId: number,
-    companyInfoDto: CompanyInformationDto,
-    userId: string,
-  ): Promise<CompanyDetail> {
+  async updateCompanyInfo(companyId: number, companyInfoDto: CompanyInformationDto, userId: string): Promise<any> {
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
       if (!user) {
@@ -145,37 +184,32 @@ export class CompaniesService {
         throw Error('Invalid status of Information');
       }
 
+      Object.assign(company, companyInfoDto);
+      const savedCompany = await this.companiesRepository.save(company);
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { files, financial_data, ...companyInfoData } = companyInfoDto;
+      Object.assign(companyInfo, companyInfoData);
+      await this.companyInformationRepository.save(companyInfo);
+
+      let updateFile;
       if (companyInfoDto.files) {
-        // companyInfo.files = ...;
+        updateFile = await this.handleFileAttachments(companyInfo.id, companyInfoDto.files, userId);
       }
 
       if (companyInfoDto.financial_data && companyInfoDto.financial_data.length > 0) {
         await this.handleFinancialData(companyInfo, companyInfoDto.financial_data);
       }
 
-      Object.assign(company, companyInfoDto);
-      const savedCompany = await this.companiesRepository.save(company);
-
-      Object.assign(companyInfo, companyInfoDto);
-      await this.companyInformationRepository.save(companyInfo);
-
-      return {
+      const result = new CompanyDetailResponse({
         ...savedCompany,
         ...companyInfo,
-        files: _.map(companyInfo.files, (file) => ({
-          id: file.id,
-          name: file.name,
-          path: file.path,
-        })),
-        financial_data: _.map(companyInfo.financial_data, (data) => ({
-          year: data.year,
-          sales: data.sales,
-          profit: data.profit,
-          EBITDA: data.EBITDA,
-          net_asset: data.net_asset,
-          net_debt: data.net_debt,
-        })),
-      };
+        id: savedCompany.id,
+        files: updateFile,
+        financial_data: companyInfoDto.financial_data,
+      });
+
+      return result;
     } catch (error) {
       this.logger.error(`[createCompany] failed for userId ${userId}`, error.stack);
       throw new Error(`[createCompany] error : ${error.message}`);
@@ -195,11 +229,11 @@ export class CompaniesService {
     }
   }
 
-  async getCompanyInfo(companyId: number, userId: string): Promise<CompanyDetail> {
+  async getCompanyInfo(companyId: number, userId: string): Promise<CompanyDetailResponse> {
     try {
       const company = await this.companiesRepository.findOne({
         where: { id: companyId, user: { id: userId } },
-        relations: ['company_information'],
+        relations: ['user'],
       });
 
       if (!company) {
@@ -211,33 +245,27 @@ export class CompaniesService {
         this.logger.debug(`[getCompanyInfo]: UserId: ${userId} | Not have permission - CompanyId: ${companyId}`);
         throw new ForbiddenException('You do not have permission to access this company information');
       }
-      const companyInfo = await this.companyInformationRepository.findOne({
-        where: { company: { id: companyId } },
-        relations: ['files', 'financial_data'],
-      });
+
+      const companyInfo = await this.companyInformationRepository
+        .createQueryBuilder('companyInfo')
+        .leftJoinAndSelect('companyInfo.files', 'file')
+        .leftJoinAndSelect('companyInfo.financial_data', 'financialData')
+        .where('companyInfo.company_id = :companyId', { companyId })
+        .andWhere('file.is_deleted = :isDeleted', { isDeleted: false })
+        .getOne();
 
       if (!companyInfo) {
         this.logger.debug(`[getCompanyInfo]: UserId: ${userId} | Company Info not found - CompanyId: ${companyId}`);
         throw new NotFoundException(`[getCompanyInfo]: Company information not found for company ID: ${companyId}`);
       }
 
-      return {
+      const result = new CompanyDetailResponse({
         ...company,
         ...companyInfo,
-        files: _.map(companyInfo.files, (file) => ({
-          id: file.id,
-          name: file.name,
-          path: file.path,
-        })),
-        financial_data: _.map(companyInfo.financial_data, (financial) => ({
-          year: financial.year,
-          sales: financial.sales,
-          profit: financial.profit,
-          EBITDA: financial.EBITDA,
-          net_asset: financial.net_asset,
-          net_debt: financial.net_debt,
-        })),
-      };
+        id: companyId,
+      });
+
+      return result;
     } catch (error) {
       this.logger.error(`[getCompanyInfo] failed for get company info of userId ${userId}`, error.stack);
       throw new Error(`[getCompanyInfo] error : ${error}`);
