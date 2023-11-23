@@ -24,6 +24,7 @@ export enum TypeOfBusinessEnum {
   ENVIRONMENT_ESG_SOLUTION = 'Environment, ESG solution',
   ENERGY_MINERAL_RESOURCES = 'Energy, mineral resources',
   LOGISTICS = 'logistics',
+  FINANCE_AND_FINTECH = 'Finance and fintech',
 }
 
 @Entity('company_information')

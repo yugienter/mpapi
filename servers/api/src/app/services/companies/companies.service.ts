@@ -1,11 +1,10 @@
 import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { plainToClass } from 'class-transformer';
 import _ from 'lodash';
 import { EntityManager, Repository } from 'typeorm';
 
 import { CompanyInformationDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
-import { CompanyDetailResponse, IFinancialData } from '@/app/controllers/viewmodels/company.response';
+import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
 import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { CompanyInformation } from '@/app/models/company_information';
