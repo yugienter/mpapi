@@ -246,10 +246,8 @@ export class CompaniesService {
 
       const companyInfo = await this.companyInformationRepository
         .createQueryBuilder('companyInfo')
-        .leftJoinAndSelect('companyInfo.files', 'file')
         .leftJoinAndSelect('companyInfo.financial_data', 'financialData')
         .where('companyInfo.company_id = :companyId', { companyId })
-        .andWhere('file.is_deleted = :isDeleted', { isDeleted: false })
         .getOne();
 
       if (!companyInfo) {
@@ -257,10 +255,17 @@ export class CompaniesService {
         throw new NotFoundException(`[getCompanyInfo]: Company information not found for company ID: ${companyId}`);
       }
 
+      const files = await this.filesRepository
+        .createQueryBuilder('file')
+        .where('file.company_information_id = :companyInfoId', { companyInfoId: companyInfo.id })
+        .andWhere('file.is_deleted = :isDeleted', { isDeleted: false })
+        .getMany();
+
       const result = new CompanyDetailResponse({
         ...company,
         ...companyInfo,
         id: companyId,
+        files,
       });
 
       return result;
