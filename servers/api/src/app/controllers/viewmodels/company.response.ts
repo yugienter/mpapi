@@ -13,7 +13,7 @@ export interface ICompanyDetailResponse {
   general_business_type: string;
   general_business_location_country: string;
   general_business_location_area: string;
-  general_number_of_employees: number; // Number of employees should be a number
+  general_number_of_employees?: number; // Number of employees should be a number
   business_overview: string;
   business_main_products_services: string;
   business_major_clients: string;
@@ -94,7 +94,7 @@ export class CompanyDetailResponse {
     this.general_business_type = input.general_business_type;
     this.general_business_location_country = input.general_business_location_country;
     this.general_business_location_area = input.general_business_location_area;
-    this.general_number_of_employees = input.general_number_of_employees;
+    this.general_number_of_employees = input.general_number_of_employees || 0;
     this.business_overview = input.business_overview;
     this.business_main_products_services = input.business_main_products_services;
     this.business_major_clients = input.business_major_clients;

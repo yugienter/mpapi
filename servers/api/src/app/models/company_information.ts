@@ -71,19 +71,37 @@ export class CompanyInformation {
   @Column('text', { nullable: true })
   business_future_growth_projection: string;
 
-  @Column('bigint')
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value) => value,
+      from: (value) => parseInt(value, 10),
+    },
+  })
   financial_current_valuation: number;
 
   @Column()
   transaction_sell_shares_percentage: number;
 
-  @Column('bigint')
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value) => value,
+      from: (value) => parseInt(value, 10),
+    },
+  })
   transaction_sell_shares_amount: number;
 
   @Column()
   transaction_issue_shares_percentage: number;
 
-  @Column('bigint')
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value) => value,
+      from: (value) => parseInt(value, 10),
+    },
+  })
   transaction_issue_shares_amount: number;
 
   @Column('text', { nullable: true })

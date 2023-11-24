@@ -10,19 +10,54 @@ export class CompanyFinancialData {
   @Column()
   year: number;
 
-  @Column('bigint', { nullable: true })
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value) => value,
+      from: (value) => parseInt(value, 10),
+    },
+    nullable: true,
+  })
   sales: number;
 
-  @Column('bigint', { nullable: true })
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value) => value,
+      from: (value) => parseInt(value, 10),
+    },
+    nullable: true,
+  })
   profit: number;
 
-  @Column('bigint', { nullable: true })
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value) => value,
+      from: (value) => parseInt(value, 10),
+    },
+    nullable: true,
+  })
   EBITDA: number;
 
-  @Column('bigint', { nullable: true })
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value) => value,
+      from: (value) => parseInt(value, 10),
+    },
+    nullable: true,
+  })
   net_asset: number;
 
-  @Column('bigint', { nullable: true })
+  @Column({
+    type: 'bigint',
+    transformer: {
+      to: (value) => value,
+      from: (value) => parseInt(value, 10),
+    },
+    nullable: true,
+  })
   net_debt: number;
 
   ///////////////////////////////////

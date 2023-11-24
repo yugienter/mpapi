@@ -206,10 +206,9 @@ export class CompanyInformationDto {
   @MaxLength(50)
   general_business_location_area: string;
 
-  @ValidateIf((o) => o.status === StatusOfInformation.SUBMITTED)
-  @IsNotEmpty()
+  @IsOptional()
   @IsInt()
-  @Min(0)
+  @Min(1)
   general_number_of_employees: number;
 
   @ValidateIf((o) => o.status === StatusOfInformation.SUBMITTED)
@@ -239,6 +238,7 @@ export class CompanyInformationDto {
 
   // Financial Data
 
+  @ValidateIf((o) => o.status === StatusOfInformation.SUBMITTED)
   @IsArray()
   @ArrayNotEmpty()
   @ArrayMinSize(3)
@@ -285,6 +285,7 @@ export class CompanyInformationDto {
   @IsString()
   transaction_other_details?: string;
 
+  @ValidateIf((o) => o.status === StatusOfInformation.SUBMITTED)
   @IsOneOfThreeGroups()
   _oneOfThreeGroups: boolean;
 
