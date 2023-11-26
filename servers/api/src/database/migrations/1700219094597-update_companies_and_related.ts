@@ -4,10 +4,10 @@ import { TIME_STAMPS_AND_ITS_USERS, TIME_STAMPS_WITH_SOFT_DELETE } from './commo
 
 export class UpdateCompaniesAndRelated1700219094597 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.renameTable('uploaded_files', 'file_attachments');
-    await queryRunner.dropForeignKey('companies_users', 'company');
-    await queryRunner.dropForeignKey('companies_users', 'user');
-    await queryRunner.dropTable('companies_users', true);
+    // await queryRunner.renameTable('uploaded_files', 'file_attachments');
+    // await queryRunner.dropForeignKey('companies_users', 'company');
+    // await queryRunner.dropForeignKey('companies_users', 'user');
+    // await queryRunner.dropTable('companies_users', true);
     await queryRunner.dropForeignKey('file_attachments', 'FK_882efc26a8d783520002d0b88f9'); // company
     await queryRunner.dropForeignKey('file_attachments', 'FK_dbd75c6a10be3314708a397da86'); // user
     await queryRunner.dropColumn('file_attachments', 'company_id');

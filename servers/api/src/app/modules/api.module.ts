@@ -6,7 +6,7 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-// import { AdminController } from '@/app/controllers/admin/admin.controller';
+import { AdminController } from '@/app/controllers/admin/admin.controller';
 import { AuthController } from '@/app/controllers/auth.controller';
 import { CompaniesController } from '@/app/controllers/companies/companies.controller';
 import { FilesController } from '@/app/controllers/files/files.controller';
@@ -39,7 +39,7 @@ const allControllers = [
   UsersController,
   CompaniesController,
   FilesController,
-  // AdminController,
+  AdminController,
   MastersController,
 ];
 
