@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, HttpStatus, Logger, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Logger, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 import {
@@ -69,6 +69,12 @@ export class AdminController implements Coded {
     }
 
     return true;
+  }
+
+  @Get('/companies/users')
+  @Roles(RolesEnum.admin)
+  async getCompanyUsers() {
+    return this.usersService.getCompanyUsersWithCompanyDetails();
   }
 
   //   @ApiOperation({

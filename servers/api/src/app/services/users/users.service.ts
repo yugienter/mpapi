@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getAuth as getAuthClient, signInWithEmailAndPassword } from 'firebase/auth';
 import { UserRecord } from 'firebase-admin/auth';
@@ -71,6 +71,7 @@ export class UsersService implements Coded {
     private readonly dataSource: DataSource,
     private readonly slackProvider: SlackProvider,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(User) private readonly userProfileRepository: Repository<UserProfile>,
     @InjectRepository(EmailVerificationToken)
     private readonly emailVerificationTokenRepository: Repository<EmailVerificationToken>,
   ) {}
@@ -151,7 +152,7 @@ export class UsersService implements Coded {
     if (userRec && !(await t.getRepository(User).findOneBy({ email }))) {
       await this.firebase.auth.deleteUser(userRec.uid);
       userRec = null;
-    } else if (userRec?.emailVerified) {
+    } else if (userRec?.emailVerified && role !== 'admin') {
       this.logger.log('Already verified');
       throw new CodedUnauthorizedException(this.code, this.errorCodes.USER_ALREADY_IN_USE('CNU-003'));
     }
@@ -174,23 +175,6 @@ export class UsersService implements Coded {
     } else {
       await t.save(UserProfile, profileData);
     }
-  }
-
-  private getWillingToDetails(company: Company): WillingToDetails {
-    let willingToText = '';
-    let willingTo = '';
-
-    // if (company.type_of_business === TypeOfBusinessEnum.MANUFACTURING) {
-    //   willingToText = 'Are you willing to manufacture products requested by foreign investor/company on a OEM basis?';
-    // }
-    // if (company.type_of_business === TypeOfBusinessEnum.DISTRIBUTION) {
-    //   willingToText = 'Are you willing to distribute products from foreign investor/company as a local distributor?';
-    // }
-    // if ([TypeOfBusinessEnum.MANUFACTURING, TypeOfBusinessEnum.DISTRIBUTION].includes(company.type_of_business)) {
-    //   willingTo = company.willing_to ? 'Yes' : 'No';
-    // }
-
-    return { willingTo, willingToText };
   }
 
   private async sendNotificationCreateOrUpdateCompanyEmail(subject, email, params): Promise<void> {
@@ -413,6 +397,7 @@ export class UsersService implements Coded {
     }
   }
 
+  /** Token Service */
   async findTokenOfUser(user: User, type: TokenActionEnum): Promise<EmailVerificationToken[]> {
     try {
       const token = await this.emailVerificationTokenRepository.find({
@@ -462,7 +447,9 @@ export class UsersService implements Coded {
       throw new CodedInvalidArgumentException(this.code, this.errorCodes.UNKNOWN_ERROR('DTS-001'));
     }
   }
+  /** End Token Service */
 
+  /** Auth Service */
   async updateVerificationStatus(uid: string, status: boolean): Promise<void> {
     try {
       const verify: boolean = await this.autoVerifyEmail(uid, status);
@@ -484,70 +471,6 @@ export class UsersService implements Coded {
       this.logger.log(`[updateVerificationStatus] Fail to updateVerificationStatus for user ${uid} case UVS-002 `);
       throw new CodedUnauthorizedException(this.code, this.errorCodes.EMAIL_NOT_VERIFIED('UVS-002'));
     }
-  }
-
-  async sendEmailNotificationForInfoCompany(
-    user: Partial<User>,
-    company: Company,
-    positionOfUser: string,
-    action?: string,
-  ): Promise<void> {
-    const { willingTo, willingToText } = this.getWillingToDetails(company);
-    const params = {
-      userName: user.name,
-      email: user.email,
-      companyName: company.name,
-      positionOfUser: positionOfUser,
-      // description1: company.description_1,
-      // description2: company.description_2,
-      // country: company.country,
-      // area: company.area,
-      // typeOfBusiness: company.type_of_business,
-      // commodity: company.commodity,
-      // willingTo,
-      // willingToText,
-      // dateOfEstablishment: company.date_of_establishment,
-      // annualRevenue: company.annual_revenue,
-      // annualProfit: company.annual_profit,
-      // numberOfEmployees: company.number_of_employees,
-      // sellOfShares: company.sell_of_shares,
-      // expectedPriceOfShares: company.expected_price_of_shares,
-      // expectedPriceOfSharesPercent: company.expected_price_of_shares_percent,
-      // issuanceRaiseMoney: company.issuance_raise_money,
-      // issuancePriceOfShares: company.issuance_price_of_shares,
-      // issuancePriceOfSharesPercent: company.issuance_price_of_shares_percent,
-      // businessCollaboration: company.business_collaboration ? 'Yes' : 'No',
-      // collaborationDetail: company.collaboration_detail,
-      action: action,
-    };
-
-    const admins = await this.getUserByRoles([RolesEnum.admin]);
-    const adminEmails = _.map(admins, (admin) => admin.email);
-    // for admin right now
-    const config = this.configProvider.config;
-    if (config.appEnv == 'production') {
-      adminEmails.push('mpa@mp-asia.com');
-    }
-    const userEmail = user.email;
-
-    let subjectAdmin = await this.i18n.t('_.email_register_company_for_admin', { lang: 'en' });
-    let subjectUser = await this.i18n.t('_.email_register_company_for_user', { lang: 'en' });
-
-    if (action) {
-      if ((action = UserTypeAction.create)) {
-        subjectUser = await this.i18n.t('_.email_create_new_company_for_user', { lang: 'en' });
-      }
-      if ((action = UserTypeAction.update)) {
-        subjectUser = await this.i18n.t('_.email_update_company_for_user', { lang: 'en' });
-      }
-      subjectAdmin = await this.i18n.t('_.email_create_update_company_for_admin', { lang: 'en' });
-    }
-
-    this.sendNotificationCreateOrUpdateCompanyEmail(subjectUser, userEmail, params);
-
-    _.forEach(adminEmails, (email) => {
-      this.sendNotificationCreateOrUpdateForAdmin(subjectAdmin, email, params);
-    });
   }
 
   async sendPasswordResetEmail(user: User, email: string): Promise<void> {
@@ -589,143 +512,38 @@ export class UsersService implements Coded {
       throw new CodedInvalidArgumentException(this.code, this.errorCodes.UNKNOWN_ERROR('RSP-002'));
     }
   }
+  /** End Auth Service */
 
-  // async updatePassword(id: string, data: { current_password: string; password: string }) {
-  //   const tranResult = await this.dataSource.manager.transaction(async (t) => {
-  //     const fireUser = await this.firebase.auth.getUser(id);
-  //     const auth = getAuthClient(this.firebase.firebaseAppClient);
-  //     try {
-  //       await signInWithEmailAndPassword(auth, fireUser.email, data.current_password);
-  //     } catch (e) {
-  //       this.logger.debug(e);
-  //       throw new CodedUnauthorizedException(this.code, this.errorCodes.INVALID_EMAIL_OR_PASSWORD('UP-001'));
-  //     }
-  //     await this.firebase.auth.updateUser(id, {
-  //       password: data.password,
-  //     });
+  /** Admin Service */
+  async getCompanyUsersWithCompanyDetails(): Promise<any[]> {
+    try {
+      const companyUsers = await this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.companies', 'company')
+        .where('user.role = :role', { role: RolesEnum.company })
+        .orderBy('user.created_at', 'ASC')
+        .getMany();
 
-  //     return _.first(await this.usersPersistence.getUsers(t, [id]));
-  //   });
-  //   return {
-  //     user: tranResult,
-  //   };
-  // }
+      return companyUsers.map((user) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        status: user.status,
+        created_at: user.created_at,
+        updated_at: user.updated_at,
+        companies: user.companies.map((company) => ({
+          id: company.id,
+          name: company.name,
+          position: company.position,
+          phone_number: company.phone_number,
+          website: company.website,
+          created_at: company.created_at,
+          updated_at: company.updated_at,
+        })),
+      }));
+    } catch (error) {
+      this.logger.error(`[getCompanyUsersWithCompanyDetails] Error when getting company users: ${error.message}`);
+      throw new InternalServerErrorException('[getCompanyUsersWithCompanyDetails] Failed to get company users');
+    }
+  }
 }
-
-// async updateEmail(id: string, email: string, verificationCode: string) {
-//   await this.dataSource.manager.transaction(async (t) => {
-//     const fireUser = await this.firebase.auth.getUser(id);
-//     this.logger.debug(`${fireUser.customClaims?.verification_code} vs ${verificationCode}`);
-//     if (fireUser.customClaims?.verification_code != verificationCode) {
-//       throw new CodedUnauthorizedException(this.code, this.errorCodes.INVALID_VERIFICATION_CODE('UE-001'));
-//     }
-//     const user = await t.findOneBy(User, { id, is_deleted: false });
-//     user.email = email;
-//     await t.save(user);
-//     await this.firebase.auth.updateUser(id, { email });
-//     await this.firebase.auth.setCustomUserClaims(id, { verification_code: null });
-//   });
-// }
-
-// async updatePassword(id: string, data: { current_password: string; password: string }) {
-//   const tranResult = await this.dataSource.manager.transaction(async (t) => {
-//     const fireUser = await this.firebase.auth.getUser(id);
-//     const auth = getAuthClient(this.firebase.firebaseAppClient);
-//     try {
-//       await signInWithEmailAndPassword(auth, fireUser.email, data.current_password);
-//     } catch (e) {
-//       this.logger.debug(e);
-//       throw new CodedUnauthorizedException(this.code, this.errorCodes.INVALID_EMAIL_OR_PASSWORD('UP-001'));
-//     }
-//     await this.firebase.auth.updateUser(id, {
-//       password: data.password,
-//     });
-
-//     return _.first(await this.usersPersistence.getUsers(t, [id]));
-//   });
-//   return {
-//     user: tranResult,
-//   };
-// }
-
-// async deleteUser(id: string) {
-//   await this.dataSource.manager.transaction(async (t) => {
-//     const user = await t.findOneBy(User, { id, is_deleted: false });
-//     if (!user) {
-//       throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('DUS-001'));
-//     }
-//     user.is_deleted = true;
-//     await t.save(user);
-//   });
-// }
-
-// async getUserDetails(id: string, maxNumberOfSignInHistories = 10) {
-//   const tranResult = await this.dataSource.manager.transaction(async (t) => {
-//     const users = await this.usersPersistence.getUsers(t, [id], {
-//       maxNumberOfSignInHistories: maxNumberOfSignInHistories,
-//     });
-//     const user = _.first(users);
-//     if (!user) {
-//       throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('GUD-001'));
-//     }
-//     let fireUser = null;
-//     try {
-//       fireUser = await this.firebase.auth.getUser(id);
-//     } catch (e) {
-//       const code: string = e.code;
-//       if (code == 'auth/user-not-found') {
-//         throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('GUD-002'));
-//       } else {
-//         this.logger.error(e);
-//       }
-//     }
-//     return user;
-//   });
-//   return {
-//     user: tranResult,
-//   };
-// }
-
-// async updateUser(id: string, data) {
-//   const tranResult = await this.dataSource.manager.transaction(async (t) => {
-//     const user = await t.findOneBy(User, { id, is_deleted: false });
-//     if (!user) {
-//       throw new CodedInvalidArgumentException(this.code, this.errorCodes.INVALID_ID_USER('UUSR-001'));
-//     }
-
-//     const userProfile = await t.findOneBy(UserProfile, { user_id: id });
-
-//     const now = new Date();
-//     const acceptableKeys = _.chain(['name_sei', 'name_mei', 'kana_name_sei', 'kana_name_mei', 'gender', 'birthday'])
-//       .invert()
-//       .mapValues(() => true)
-//       .value();
-
-//     const partialData = {
-//       updated_at: now,
-//     };
-//     _.chain(data)
-//       .keys()
-//       .filter((x) => acceptableKeys[x])
-//       .each((dataKey) => {
-//         const dbKey = dataKey == 'gender' ? 'gender_type' : dataKey;
-//         partialData[dbKey] = data[dataKey];
-//       })
-//       .commit();
-
-//     if (userProfile) {
-//       await t.update(UserProfile, { user_id: id }, partialData);
-//     } else {
-//       await t.save(UserProfile, {
-//         user_id: id,
-//         created_at: now,
-//         ...partialData,
-//       });
-//     }
-//     return _.first(await this.usersPersistence.getUsers(t, [id], {}));
-//   });
-//   return {
-//     user: tranResult,
-//   };
-// }
-// }

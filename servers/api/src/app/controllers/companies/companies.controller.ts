@@ -80,6 +80,7 @@ export class CompaniesController implements Coded {
 
   @ApiOperation({ description: 'Get company information.', tags: ['company'] })
   @Get(':companyId/information')
+  @Roles(RolesEnum.company)
   async getCompanyInfo(@Param('companyId') companyId: number, @Req() request) {
     const userId = request.raw.user.uid;
     return this.companiesService.getCompanyInfo(companyId, userId);
