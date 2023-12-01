@@ -3,7 +3,7 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
 import { CompanyInformationDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
-import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
+import { CompanyDetailResponse, IFileAttachment } from '@/app/controllers/viewmodels/company.response';
 import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { CompanyInformation } from '@/app/models/company_information';
@@ -106,6 +106,27 @@ export class CompaniesService {
       this.logger.error(`[handleFileAttachments] Error: ${error.message}`);
       throw new Error(`[handleFileAttachments] ${error.message}`);
     }
+  }
+
+  private async getCompanyInformation(companyId: number): Promise<CompanyInformation> {
+    const companyInfo = await this.companyInformationRepository
+      .createQueryBuilder('companyInfo')
+      .leftJoinAndSelect('companyInfo.financial_data', 'financialData')
+      .where('companyInfo.company_id = :companyId', { companyId })
+      .getOne();
+
+    if (!companyInfo) {
+      this.logger.debug(`[getCompanyInfo]: Company Info not found - CompanyId: ${companyId}`);
+      throw new NotFoundException(`[getCompanyInfo]: Company information not found for company ID: ${companyId}`);
+    }
+
+    const files = await this.filesRepository
+      .createQueryBuilder('file')
+      .where('file.company_information_id = :companyInfoId', { companyInfoId: companyInfo.id })
+      .andWhere('file.is_deleted = :isDeleted', { isDeleted: false })
+      .getMany();
+
+    return { ...companyInfo, files };
   }
 
   async createCompanyInfo(companyInfoDto: CompanyInformationDto, userId: string): Promise<CompanyDetailResponse> {
@@ -227,7 +248,7 @@ export class CompaniesService {
     }
   }
 
-  async getCompanyInfo(companyId: number, userId: string): Promise<CompanyDetailResponse> {
+  async getCompanyInfo(companyId: number, userId: string, isAdmin = false): Promise<CompanyDetailResponse> {
     try {
       const company = await this.companiesRepository.findOne({
         where: { id: companyId, user: { id: userId } },
@@ -239,39 +260,43 @@ export class CompaniesService {
         throw new NotFoundException(`[getCompanyInfo]: Company with ID ${companyId} not found`);
       }
 
-      if (company.user.id !== userId) {
+      if (!isAdmin && company.user.id !== userId) {
         this.logger.debug(`[getCompanyInfo]: UserId: ${userId} | Not have permission - CompanyId: ${companyId}`);
         throw new ForbiddenException('You do not have permission to access this company information');
       }
 
-      const companyInfo = await this.companyInformationRepository
-        .createQueryBuilder('companyInfo')
-        .leftJoinAndSelect('companyInfo.financial_data', 'financialData')
-        .where('companyInfo.company_id = :companyId', { companyId })
-        .getOne();
-
-      if (!companyInfo) {
-        this.logger.debug(`[getCompanyInfo]: UserId: ${userId} | Company Info not found - CompanyId: ${companyId}`);
-        throw new NotFoundException(`[getCompanyInfo]: Company information not found for company ID: ${companyId}`);
-      }
-
-      const files = await this.filesRepository
-        .createQueryBuilder('file')
-        .where('file.company_information_id = :companyInfoId', { companyInfoId: companyInfo.id })
-        .andWhere('file.is_deleted = :isDeleted', { isDeleted: false })
-        .getMany();
+      const companyInfo = await this.getCompanyInformation(companyId);
 
       const result = new CompanyDetailResponse({
         ...company,
         ...companyInfo,
         id: companyId,
-        files,
       });
 
       return result;
     } catch (error) {
       this.logger.error(`[getCompanyInfo] failed for get company info of userId ${userId}`, error.stack);
       throw new Error(`[getCompanyInfo] error : ${error}`);
+    }
+  }
+
+  async getCompanyInfoForAdmin(companyId: number): Promise<CompanyDetailResponse> {
+    try {
+      const company = await this.companiesRepository.findOne({ where: { id: companyId } });
+      if (!company) {
+        throw new NotFoundException(`Company with ID ${companyId} not found`);
+      }
+
+      const companyInfo = await this.getCompanyInformation(companyId);
+
+      return new CompanyDetailResponse({
+        ...company,
+        ...companyInfo,
+        id: companyId,
+      });
+    } catch (error) {
+      this.logger.error(`[getCompanyInfoForAdmin] failed for companyId ${companyId}`, error.stack);
+      throw new Error(`[getCompanyInfoForAdmin] error : ${error.message}`);
     }
   }
 }
