@@ -7,6 +7,8 @@ import moment from 'moment';
 export declare class Config {
   /** Environment variable: APP_ENV */
   readonly appEnv: string;
+  /** Environment variable: ALLOWED_ORIGINS */
+  readonly allowedOrigins: string;
   /** Environment variable: APP_SECRET_KEY */
   readonly appSecretKey: string;
   /** Environment variable: SERVER_PORT */
@@ -113,6 +115,7 @@ export class ConfigProvider {
     const dt = this.configService.get<string>('APP_LAST_UPDATE_DATETIME');
     this._config = {
       appEnv: this.getOrShowError<string>('APP_ENV'),
+      allowedOrigins: this.getOrShowError<string>('ALLOWED_ORIGINS'),
       appSecretKey: this.getOrShowError<string>('APP_SECRET_KEY'),
       serverPort: this.getOrShowError<string>('SERVER_PORT'),
       appBaseUrl: this.getOrShowError<string>('APP_BASE_URL'),

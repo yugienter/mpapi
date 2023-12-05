@@ -51,17 +51,23 @@ export function prepareApp(app: NestFastifyApplication) {
   // const fastify: FastifyInstance = app.getHttpAdapter().getInstance()
   // https://github.com/fastify/fastify-cors
   // preflight-request(OPTIONS) を許可するために使わざるを得なかった
+  let allowedOrigins = [];
+  if (configProvider.config.appEnv !== 'production') {
+    const origins = configProvider.config.allowedOrigins || '';
+    allowedOrigins = origins.split(',');
+  }
   app.register(fastifyCors, () => {
     return (req, callback) => {
       const origin = req.headers.origin;
+      const isAllowed = allowedOrigins.includes(origin);
       const corsOptions = {
         credentials: true,
         methods: CONSTANTS.allowed_methods,
-        origin: origin,
+        origin: isAllowed ? origin : false,
       };
-      if (!origin) {
-        delete corsOptions.origin;
-      }
+      // if (!origin) {
+      //   delete corsOptions.origin;
+      // }
       callback(null, corsOptions);
     };
   });
