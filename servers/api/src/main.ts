@@ -60,11 +60,13 @@ export function prepareApp(app: NestFastifyApplication) {
     return (req, callback) => {
       const origin = req.headers.origin;
       const isAllowed = allowedOrigins.includes(origin);
+      console.log(isAllowed);
       const corsOptions = {
         credentials: true,
         methods: CONSTANTS.allowed_methods,
         origin: isAllowed ? origin : false,
       };
+      console.log(corsOptions);
       // if (!origin) {
       //   delete corsOptions.origin;
       // }
