@@ -1,16 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Logger,
-  Param,
-  Post,
-  Put,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 import { CompanyInformationDto } from '@/app/controllers/dto/company.dto';
@@ -18,8 +6,8 @@ import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.resp
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { Company, StatusOfInformation } from '@/app/models/company';
-import { RolesEnum, User } from '@/app/models/user';
-import { CompaniesService, CompanyDetail } from '@/app/services/companies/companies.service';
+import { RolesEnum } from '@/app/models/user';
+import { CompaniesService } from '@/app/services/companies/companies.service';
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';

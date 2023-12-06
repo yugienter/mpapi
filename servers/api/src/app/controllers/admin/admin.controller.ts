@@ -1,19 +1,18 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Logger, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
-import {
-  // ManualCreateCompanyUserRequest,
-  ManualCreateUserRequest,
-} from '@/app/controllers/dto/auth.dto';
-// import { CreateCompanyRequest } from '@/app/controllers/dto/company.dto';
+import { ManualCreateUserRequest } from '@/app/controllers/dto/auth.dto';
+import { CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
+import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
+import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
-import { Company } from '@/app/models/company';
 import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
+import { CompanySummary } from '@/app/models/company_summaries';
 
 @MpplatformApiDefault()
 @Authorized()
@@ -79,7 +78,32 @@ export class AdminController implements Coded {
 
   @Get('/companies/:companyId/information')
   @Roles(RolesEnum.admin)
-  async getCompanyInformation(@Param('companyId') companyId: number) {
+  async getCompanyInformation(@Param('companyId') companyId: number): Promise<CompanyDetailResponse> {
     return this.companiesService.getCompanyInfoForAdmin(companyId);
+  }
+
+  @Get('/companies/:companyInformationId/summaries')
+  @Roles(RolesEnum.admin)
+  getSummary(@Param('companyInformationId') companyInformationId: number): Promise<CompanySummary> {
+    return this.companiesService.getSummary(companyInformationId);
+  }
+
+  @Post('/companies/:companyInformationId/summaries')
+  @Roles(RolesEnum.admin)
+  createSummary(
+    @Param('companyInformationId') companyInformationId: number,
+    @Body() createSummaryDto: CompanySummaryDto,
+  ): Promise<CompanySummaryResponse> {
+    return this.companiesService.createSummary(companyInformationId, createSummaryDto);
+  }
+
+  @Put('/companies/:companyInformationId/summaries/:summaryId')
+  @Roles(RolesEnum.admin)
+  updateSummary(
+    @Param('companyInformationId') companyInformationId: number,
+    @Param('summaryId') summaryId: number,
+    @Body() updateSummaryDto: CompanySummaryDto,
+  ): Promise<CompanySummaryResponse> {
+    return this.companiesService.updateSummary(companyInformationId, summaryId, updateSummaryDto);
   }
 }

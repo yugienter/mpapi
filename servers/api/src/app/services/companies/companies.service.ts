@@ -1,15 +1,24 @@
-import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 
 import { CompanyInformationDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
-import { CompanyDetailResponse, IFileAttachment } from '@/app/controllers/viewmodels/company.response';
+import { CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
+import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
 import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { CompanyInformation } from '@/app/models/company_information';
+import { CompanySummary } from '@/app/models/company_summaries';
 import { FileAttachments } from '@/app/models/file_attachments';
 import { User } from '@/app/models/user';
 import { Service } from '@/app/utils/decorators';
+import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
 
 type SimplifiedCompany = Omit<Company, 'user'>;
 type SimplifiedCompanyInformation = Omit<CompanyInformation, 'company' | 'files' | 'financial_data'>;
@@ -28,6 +37,7 @@ export class CompaniesService {
     @InjectRepository(Company) private companiesRepository: Repository<Company>,
     @InjectRepository(CompanyInformation) private companyInformationRepository: Repository<CompanyInformation>,
     @InjectRepository(CompanyFinancialData) private financialDataRepository: Repository<CompanyFinancialData>,
+    @InjectRepository(CompanySummary) private companySummaryRepository: Repository<CompanySummary>,
     @InjectRepository(FileAttachments) private filesRepository: Repository<FileAttachments>,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectEntityManager() private readonly _entityManager: EntityManager,
@@ -248,7 +258,7 @@ export class CompaniesService {
     }
   }
 
-  async getCompanyInfo(companyId: number, userId: string, isAdmin = false): Promise<CompanyDetailResponse> {
+  async getCompanyInfo(companyId: number, userId: string): Promise<CompanyDetailResponse> {
     try {
       const company = await this.companiesRepository.findOne({
         where: { id: companyId, user: { id: userId } },
@@ -260,7 +270,7 @@ export class CompaniesService {
         throw new NotFoundException(`[getCompanyInfo]: Company with ID ${companyId} not found`);
       }
 
-      if (!isAdmin && company.user.id !== userId) {
+      if (company.user.id !== userId) {
         this.logger.debug(`[getCompanyInfo]: UserId: ${userId} | Not have permission - CompanyId: ${companyId}`);
         throw new ForbiddenException('You do not have permission to access this company information');
       }
@@ -297,6 +307,92 @@ export class CompaniesService {
     } catch (error) {
       this.logger.error(`[getCompanyInfoForAdmin] failed for companyId ${companyId}`, error.stack);
       throw new Error(`[getCompanyInfoForAdmin] error : ${error.message}`);
+    }
+  }
+
+  async getSummary(companyInformationId: number): Promise<CompanySummary> {
+    try {
+      // TODO
+      // check user if call from user, no need if call from admin
+      return this.companySummaryRepository.findOne({
+        where: { companyInformation: { id: companyInformationId } },
+      });
+    } catch (error) {
+      this.logger.error(`[getSummary] Failed to get summary: ${error.message}`);
+      throw new InternalServerErrorException('Failed to get summary');
+    }
+  }
+
+  async createSummary(
+    companyInformationId: number,
+    createSummaryDto: CompanySummaryDto,
+  ): Promise<CompanySummaryResponse> {
+    try {
+      const companyInformation = await this.companyInformationRepository.findOne({
+        where: { id: companyInformationId },
+      });
+      if (!companyInformation) {
+        this.logger.error(`[createSummary] CompanyInformation with ID ${companyInformationId} not found`);
+        throw new NotFoundException(`CompanyInformation with ID ${companyInformationId} not found`);
+      }
+
+      // if have summary, can not create
+      const exitSummary = await this.companySummaryRepository.findOne({
+        where: { companyInformation: { id: companyInformationId } },
+      });
+
+      if (exitSummary) {
+        this.logger.error(
+          `[createSummary] Already exit another summary for CompanyInformation ID ${companyInformationId}`,
+        );
+        throw new NotFoundException(` Already exit another summary for CompanyInformation ID ${companyInformationId}`);
+      }
+
+      const summary = this.companySummaryRepository.create({
+        ...createSummaryDto,
+        companyInformation: companyInformation,
+      });
+      const summarySave = await this.companySummaryRepository.save(summary);
+      return new CompanySummaryResponse(summarySave);
+    } catch (error) {
+      this.logger.error(`[createSummary] Failed to create summary: ${error.message}`);
+      throw new InternalServerErrorException('Failed to create summary');
+    }
+  }
+
+  async updateSummary(
+    companyInformationId: number,
+    summaryId: number,
+    updateSummaryDto: CompanySummaryDto,
+  ): Promise<CompanySummaryResponse> {
+    try {
+      const summary = await this.companySummaryRepository.findOne({
+        where: { id: summaryId, companyInformation: { id: companyInformationId } },
+      });
+
+      if (!summary) {
+        this.logger.error(
+          `[updateSummary] Summary with ID ${summaryId} not found for CompanyInformation ID ${companyInformationId}`,
+        );
+        throw new NotFoundException(
+          `Summary with ID ${summaryId} not found for CompanyInformation ID ${companyInformationId}`,
+        );
+      }
+
+      const companyInformation = await this.companyInformationRepository.findOne({
+        where: { id: companyInformationId },
+      });
+      if (!companyInformation) {
+        throw new NotFoundException(`CompanyInformation with ID ${companyInformationId} not found`);
+      }
+      summary.companyInformation = companyInformation;
+
+      Object.assign(summary, updateSummaryDto);
+      const summarySave = await this.companySummaryRepository.save(summary);
+      return new CompanySummaryResponse(summarySave);
+    } catch (error) {
+      this.logger.error(`[updateSummary] Failed to update summary: ${error.message}`);
+      throw new InternalServerErrorException('Failed to update summary');
     }
   }
 }
