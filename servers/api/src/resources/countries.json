@@ -1,0 +1,3779 @@
+[
+  {
+    "countryCode": "AF",
+    "countryName": "Afghanistan",
+    "states": [
+      {
+        "name": "Badakhshān",
+        "code": "AF-BDS"
+      },
+      {
+        "name": "Baghlān",
+        "code": "AF-BGL"
+      },
+      {
+        "name": "Balkh",
+        "code": "AF-BAL"
+      },
+      {
+        "name": "Bādghīs",
+        "code": "AF-BDG"
+      },
+      {
+        "name": "Bāmyān",
+        "code": "AF-BAM"
+      },
+      {
+        "name": "Dāykundī",
+        "code": "AF-DAY"
+      },
+      {
+        "name": "Farāh",
+        "code": "AF-FRA"
+      },
+      {
+        "name": "Fāryāb",
+        "code": "AF-FYB"
+      },
+      {
+        "name": "Ghaznī",
+        "code": "AF-GHA"
+      },
+      {
+        "name": "Ghōr",
+        "code": "AF-GHO"
+      },
+      {
+        "name": "Helmand",
+        "code": "AF-HEL"
+      },
+      {
+        "name": "Herāt",
+        "code": "AF-HER"
+      },
+      {
+        "name": "Jowzjān",
+        "code": "AF-JOW"
+      },
+      {
+        "name": "Kandahār",
+        "code": "AF-KAN"
+      },
+      {
+        "name": "Khōst",
+        "code": "AF-KHO"
+      },
+      {
+        "name": "Kunar",
+        "code": "AF-KNR"
+      },
+      {
+        "name": "Kunduz",
+        "code": "AF-KDZ"
+      },
+      {
+        "name": "Kābul",
+        "code": "AF-KAB"
+      },
+      {
+        "name": "Kāpīsā",
+        "code": "AF-KAP"
+      },
+      {
+        "name": "Laghmān",
+        "code": "AF-LAG"
+      },
+      {
+        "name": "Lōgar",
+        "code": "AF-LOG"
+      },
+      {
+        "name": "Nangarhār",
+        "code": "AF-NAN"
+      },
+      {
+        "name": "Nīmrōz",
+        "code": "AF-NIM"
+      },
+      {
+        "name": "Nūristān",
+        "code": "AF-NUR"
+      },
+      {
+        "name": "Paktiyā",
+        "code": "AF-PIA"
+      },
+      {
+        "name": "Paktīkā",
+        "code": "AF-PKA"
+      },
+      {
+        "name": "Panjshayr",
+        "code": "AF-PAN"
+      },
+      {
+        "name": "Parwān",
+        "code": "AF-PAR"
+      },
+      {
+        "name": "Samangān",
+        "code": "AF-SAM"
+      },
+      {
+        "name": "Sar-e Pul",
+        "code": "AF-SAR"
+      },
+      {
+        "name": "Takhār",
+        "code": "AF-TAK"
+      },
+      {
+        "name": "Uruzgān",
+        "code": "AF-URU"
+      },
+      {
+        "name": "Wardak",
+        "code": "AF-WAR"
+      },
+      {
+        "name": "Zābul",
+        "code": "AF-ZAB"
+      }
+    ]
+  },
+  {
+    "countryCode": "AM",
+    "countryName": "Armenia",
+    "states": [
+      {
+        "name": "Aragac̣otn",
+        "code": "AM-AG"
+      },
+      {
+        "name": "Ararat",
+        "code": "AM-AR"
+      },
+      {
+        "name": "Armavir",
+        "code": "AM-AV"
+      },
+      {
+        "name": "Erevan",
+        "code": "AM-ER"
+      },
+      {
+        "name": "Geġark'unik'",
+        "code": "AM-GR"
+      },
+      {
+        "name": "Kotayk'",
+        "code": "AM-KT"
+      },
+      {
+        "name": "Loṙi",
+        "code": "AM-LO"
+      },
+      {
+        "name": "Syunik'",
+        "code": "AM-SU"
+      },
+      {
+        "name": "Tavuš",
+        "code": "AM-TV"
+      },
+      {
+        "name": "Vayoć Jor",
+        "code": "AM-VD"
+      },
+      {
+        "name": "Širak",
+        "code": "AM-SH"
+      }
+    ]
+  },
+  {
+    "countryCode": "AZ",
+    "countryName": "Azerbaijan",
+    "states": [
+      {
+        "name": "Naxçıvan",
+        "code": "AZ-NX"
+      }
+    ]
+  },
+  {
+    "countryCode": "BH",
+    "countryName": "Bahrain",
+    "states": [
+      {
+        "name": "Al Janūbīyah",
+        "code": "BH-14"
+      },
+      {
+        "name": "Al Manāmah",
+        "code": "BH-13"
+      },
+      {
+        "name": "Al Muḩarraq",
+        "code": "BH-15"
+      },
+      {
+        "name": "Al Wusţá",
+        "code": "BH-16"
+      },
+      {
+        "name": "Ash Shamālīyah",
+        "code": "BH-17"
+      }
+    ]
+  },
+  {
+    "countryCode": "BD",
+    "countryName": "Bangladesh",
+    "states": [
+      {
+        "name": "Barisal",
+        "code": "BD-A"
+      },
+      {
+        "name": "Chittagong",
+        "code": "BD-B"
+      },
+      {
+        "name": "Dhaka",
+        "code": "BD-C"
+      },
+      {
+        "name": "Khulna",
+        "code": "BD-D"
+      },
+      {
+        "name": "Rajshahi",
+        "code": "BD-E"
+      },
+      {
+        "name": "Rangpur",
+        "code": "BD-F"
+      },
+      {
+        "name": "Sylhet",
+        "code": "BD-G"
+      }
+    ]
+  },
+  {
+    "countryCode": "BT",
+    "countryName": "Bhutan",
+    "states": [
+      {
+        "name": "Bumthang",
+        "code": "BT-33"
+      },
+      {
+        "name": "Chhukha",
+        "code": "BT-12"
+      },
+      {
+        "name": "Dagana",
+        "code": "BT-22"
+      },
+      {
+        "name": "Gasa",
+        "code": "BT-GA"
+      },
+      {
+        "name": "Ha",
+        "code": "BT-13"
+      },
+      {
+        "name": "Lhuentse",
+        "code": "BT-44"
+      },
+      {
+        "name": "Monggar",
+        "code": "BT-42"
+      },
+      {
+        "name": "Paro",
+        "code": "BT-11"
+      },
+      {
+        "name": "Pemagatshel",
+        "code": "BT-43"
+      },
+      {
+        "name": "Punakha",
+        "code": "BT-23"
+      },
+      {
+        "name": "Samdrup Jongkha",
+        "code": "BT-45"
+      },
+      {
+        "name": "Samtse",
+        "code": "BT-14"
+      },
+      {
+        "name": "Sarpang",
+        "code": "BT-31"
+      },
+      {
+        "name": "Thimphu",
+        "code": "BT-15"
+      },
+      {
+        "name": "Trashi Yangtse",
+        "code": "BT-TY"
+      },
+      {
+        "name": "Trashigang",
+        "code": "BT-41"
+      },
+      {
+        "name": "Trongsa",
+        "code": "BT-32"
+      },
+      {
+        "name": "Tsirang",
+        "code": "BT-21"
+      },
+      {
+        "name": "Wangdue Phodrang",
+        "code": "BT-24"
+      },
+      {
+        "name": "Zhemgang",
+        "code": "BT-34"
+      }
+    ]
+  },
+  {
+    "countryCode": "BN",
+    "countryName": "Brunei",
+    "states": [
+      {
+        "name": "Belait",
+        "code": "BN-BE"
+      },
+      {
+        "name": "Brunei-Muara",
+        "code": "BN-BM"
+      },
+      {
+        "name": "Temburong",
+        "code": "BN-TE"
+      },
+      {
+        "name": "Tutong",
+        "code": "BN-TU"
+      }
+    ]
+  },
+  {
+    "countryCode": "KH",
+    "countryName": "Cambodia",
+    "states": [
+      {
+        "name": "Baat Dambang",
+        "code": "KH-2"
+      },
+      {
+        "name": "Banteay Mean Chey",
+        "code": "KH-1"
+      },
+      {
+        "name": "Kampong Chaam",
+        "code": "KH-3"
+      },
+      {
+        "name": "Kampong Chhnang",
+        "code": "KH-4"
+      },
+      {
+        "name": "Kampong Spueu",
+        "code": "KH-5"
+      },
+      {
+        "name": "Kampong Thum",
+        "code": "KH-6"
+      },
+      {
+        "name": "Kampot",
+        "code": "KH-7"
+      },
+      {
+        "name": "Kandaal",
+        "code": "KH-8"
+      },
+      {
+        "name": "Kaoh Kong",
+        "code": "KH-9"
+      },
+      {
+        "name": "Kracheh",
+        "code": "KH-10"
+      },
+      {
+        "name": "Krong Kaeb",
+        "code": "KH-23"
+      },
+      {
+        "name": "Krong Pailin",
+        "code": "KH-24"
+      },
+      {
+        "name": "Krong Preah Sihanouk",
+        "code": "KH-18"
+      },
+      {
+        "name": "Mondol Kiri",
+        "code": "KH-11"
+      },
+      {
+        "name": "Otdar Mean Chey",
+        "code": "KH-22"
+      },
+      {
+        "name": "Phnom Penh",
+        "code": "KH-12"
+      },
+      {
+        "name": "Pousaat",
+        "code": "KH-15"
+      },
+      {
+        "name": "Preah Vihear",
+        "code": "KH-13"
+      },
+      {
+        "name": "Prey Veaeng",
+        "code": "KH-14"
+      },
+      {
+        "name": "Rotanak Kiri",
+        "code": "KH-16"
+      },
+      {
+        "name": "Siem Reab",
+        "code": "KH-17"
+      },
+      {
+        "name": "Stueng Traeng",
+        "code": "KH-19"
+      },
+      {
+        "name": "Svaay Rieng",
+        "code": "KH-20"
+      },
+      {
+        "name": "Taakaev",
+        "code": "KH-21"
+      }
+    ]
+  },
+  {
+    "countryCode": "CN",
+    "countryName": "China",
+    "states": [
+      {
+        "name": "Guangxi",
+        "code": "CN-45",
+        "subdivision": "Autonomous region",
+        "native": "广西"
+      },
+      {
+        "name": "Nei Mongol",
+        "code": "CN-15",
+        "subdivision": "Autonomous region",
+        "native": "内蒙古"
+      },
+      {
+        "name": "Ningxia",
+        "code": "CN-64",
+        "subdivision": "Autonomous region",
+        "native": "宁夏"
+      },
+      {
+        "name": "Xinjiang",
+        "code": "CN-65",
+        "subdivision": "Autonomous region",
+        "native": "新疆"
+      },
+      {
+        "name": "Xizang",
+        "code": "CN-54",
+        "subdivision": "Autonomous region",
+        "native": "西藏"
+      },
+      {
+        "name": "Beijing",
+        "code": "CN-11",
+        "subdivision": "Municipality",
+        "native": "北京"
+      },
+      {
+        "name": "Chongqing",
+        "code": "CN-50",
+        "subdivision": "Municipality",
+        "native": "重庆"
+      },
+      {
+        "name": "Shanghai",
+        "code": "CN-31",
+        "subdivision": "Municipality",
+        "native": "上海"
+      },
+      {
+        "name": "Tianjin",
+        "code": "CN-12",
+        "subdivision": "Municipality",
+        "native": "天津"
+      },
+      {
+        "name": "Anhui",
+        "code": "CN-34",
+        "subdivision": "Province",
+        "native": "安徽"
+      },
+      {
+        "name": "Fujian",
+        "code": "CN-35",
+        "subdivision": "Province",
+        "native": "福建"
+      },
+      {
+        "name": "Gansu",
+        "code": "CN-62",
+        "subdivision": "Province",
+        "native": "甘肃"
+      },
+      {
+        "name": "Guangdong",
+        "code": "CN-44",
+        "subdivision": "Province",
+        "native": "广东"
+      },
+      {
+        "name": "Guizhou",
+        "code": "CN-52",
+        "subdivision": "Province",
+        "native": "贵州"
+      },
+      {
+        "name": "Hainan",
+        "code": "CN-46",
+        "subdivision": "Province",
+        "native": "海南"
+      },
+      {
+        "name": "Hebei",
+        "code": "CN-13",
+        "subdivision": "Province",
+        "native": "河北"
+      },
+      {
+        "name": "Heilongjiang",
+        "code": "CN-23",
+        "subdivision": "Province",
+        "native": "黑龙江"
+      },
+      {
+        "name": "Henan",
+        "code": "CN-41",
+        "subdivision": "Province",
+        "native": "河南"
+      },
+      {
+        "name": "Hubei",
+        "code": "CN-42",
+        "subdivision": "Province",
+        "native": "湖北"
+      },
+      {
+        "name": "Hunan",
+        "code": "CN-43",
+        "subdivision": "Province",
+        "native": "湖南"
+      },
+      {
+        "name": "Jiangsu",
+        "code": "CN-32",
+        "subdivision": "Province",
+        "native": "江苏"
+      },
+      {
+        "name": "Jiangxi",
+        "code": "CN-36",
+        "subdivision": "Province",
+        "native": "江西"
+      },
+      {
+        "name": "Jilin",
+        "code": "CN-22",
+        "subdivision": "Province",
+        "native": "吉林"
+      },
+      {
+        "name": "Liaoning",
+        "code": "CN-21",
+        "subdivision": "Province",
+        "native": "辽宁"
+      },
+      {
+        "name": "Qinghai",
+        "code": "CN-63",
+        "subdivision": "Province",
+        "native": "青海"
+      },
+      {
+        "name": "Shaanxi",
+        "code": "CN-61",
+        "subdivision": "Province",
+        "native": "陕西"
+      },
+      {
+        "name": "Shandong",
+        "code": "CN-37",
+        "subdivision": "Province",
+        "native": "山东"
+      },
+      {
+        "name": "Shanxi",
+        "code": "CN-14",
+        "subdivision": "Province",
+        "native": "山西"
+      },
+      {
+        "name": "Sichuan",
+        "code": "CN-51",
+        "subdivision": "Province",
+        "native": "四川"
+      },
+      {
+        "name": "Taiwan",
+        "code": "CN-71",
+        "subdivision": "Province",
+        "native": "台湾"
+      },
+      {
+        "name": "Yunnan",
+        "code": "CN-53",
+        "subdivision": "Province",
+        "native": "云南"
+      },
+      {
+        "name": "Zhejiang",
+        "code": "CN-33",
+        "subdivision": "Province",
+        "native": "浙江"
+      }
+    ]
+  },
+  {
+    "countryCode": "CY",
+    "countryName": "Cyprus",
+    "states": [
+      {
+        "name": "Ammochostos",
+        "code": "CY-04"
+      },
+      {
+        "name": "Keryneia",
+        "code": "CY-06"
+      },
+      {
+        "name": "Larnaka",
+        "code": "CY-03"
+      },
+      {
+        "name": "Lefkosia",
+        "code": "CY-01"
+      },
+      {
+        "name": "Lemesos",
+        "code": "CY-02"
+      },
+      {
+        "name": "Pafos",
+        "code": "CY-05"
+      }
+    ]
+  },
+  {
+    "countryCode": "GE",
+    "countryName": "Georgia",
+    "states": [
+      {
+        "name": "Abkhazia",
+        "code": "GE-AB"
+      },
+      {
+        "name": "Ajaria",
+        "code": "GE-AJ"
+      },
+      {
+        "name": "Guria",
+        "code": "GE-GU"
+      },
+      {
+        "name": "Imereti",
+        "code": "GE-IM"
+      },
+      {
+        "name": "K'akheti",
+        "code": "GE-KA"
+      },
+      {
+        "name": "Kvemo Kartli",
+        "code": "GE-KK"
+      },
+      {
+        "name": "Mtskheta-Mtianeti",
+        "code": "GE-MM"
+      },
+      {
+        "name": "Rach'a-Lechkhumi-Kvemo Svaneti",
+        "code": "GE-RL"
+      },
+      {
+        "name": "Samegrelo-Zemo Svaneti",
+        "code": "GE-SZ"
+      },
+      {
+        "name": "Samtskhe-Javakheti",
+        "code": "GE-SJ"
+      },
+      {
+        "name": "Shida Kartli",
+        "code": "GE-SK"
+      },
+      {
+        "name": "Tbilisi",
+        "code": "GE-TB"
+      }
+    ]
+  },
+  {
+    "countryCode": "IN",
+    "countryName": "India",
+    "states": [
+      {
+        "name": "Andaman and Nicobar Islands",
+        "code": "IN-AN",
+        "subdivision": "Union territory"
+      },
+      {
+        "name": "Chandigarh",
+        "code": "IN-CH",
+        "subdivision": "Union territory"
+      },
+      {
+        "name": "Dadra and Nagar Haveli",
+        "code": "IN-DN",
+        "subdivision": "Union territory"
+      },
+      {
+        "name": "Daman and Diu",
+        "code": "IN-DD",
+        "subdivision": "Union territory"
+      },
+      {
+        "name": "Delhi",
+        "code": "IN-DL",
+        "subdivision": "Union territory"
+      },
+      {
+        "name": "Lakshadweep",
+        "code": "IN-LD",
+        "subdivision": "Union territory"
+      },
+      {
+        "name": "Puducherry",
+        "code": "IN-PY",
+        "subdivision": "Union territory"
+      },
+      {
+        "name": "Andhra Pradesh",
+        "code": "IN-AP",
+        "subdivision": "state"
+      },
+      {
+        "name": "Arunachal Pradesh",
+        "code": "IN-AR",
+        "subdivision": "state"
+      },
+      {
+        "name": "Assam",
+        "code": "IN-AS",
+        "subdivision": "state"
+      },
+      {
+        "name": "Bihar",
+        "code": "IN-BR",
+        "subdivision": "state"
+      },
+      {
+        "name": "Chhattisgarh",
+        "code": "IN-CT",
+        "subdivision": "state"
+      },
+      {
+        "name": "Goa",
+        "code": "IN-GA",
+        "subdivision": "state"
+      },
+      {
+        "name": "Gujarat",
+        "code": "IN-GJ",
+        "subdivision": "state"
+      },
+      {
+        "name": "Haryana",
+        "code": "IN-HR",
+        "subdivision": "state"
+      },
+      {
+        "name": "Himachal Pradesh",
+        "code": "IN-HP",
+        "subdivision": "state"
+      },
+      {
+        "name": "Jammu and Kashmir",
+        "code": "IN-JK",
+        "subdivision": "state"
+      },
+      {
+        "name": "Jharkhand",
+        "code": "IN-JH",
+        "subdivision": "state"
+      },
+      {
+        "name": "Karnataka",
+        "code": "IN-KA",
+        "subdivision": "state"
+      },
+      {
+        "name": "Kerala",
+        "code": "IN-KL",
+        "subdivision": "state"
+      },
+      {
+        "name": "Madhya Pradesh",
+        "code": "IN-MP",
+        "subdivision": "state"
+      },
+      {
+        "name": "Maharashtra",
+        "code": "IN-MH",
+        "subdivision": "state"
+      },
+      {
+        "name": "Manipur",
+        "code": "IN-MN",
+        "subdivision": "state"
+      },
+      {
+        "name": "Meghalaya",
+        "code": "IN-ML",
+        "subdivision": "state"
+      },
+      {
+        "name": "Mizoram",
+        "code": "IN-MZ",
+        "subdivision": "state"
+      },
+      {
+        "name": "Nagaland",
+        "code": "IN-NL",
+        "subdivision": "state"
+      },
+      {
+        "name": "Odisha",
+        "code": "IN-OR",
+        "subdivision": "state"
+      },
+      {
+        "name": "Punjab",
+        "code": "IN-PB",
+        "subdivision": "state"
+      },
+      {
+        "name": "Rajasthan",
+        "code": "IN-RJ",
+        "subdivision": "state"
+      },
+      {
+        "name": "Sikkim",
+        "code": "IN-SK",
+        "subdivision": "state"
+      },
+      {
+        "name": "Tamil Nadu",
+        "code": "IN-TN",
+        "subdivision": "state"
+      },
+      {
+        "name": "Telangana",
+        "code": "IN-TG",
+        "subdivision": "state"
+      },
+      {
+        "name": "Tripura",
+        "code": "IN-TR",
+        "subdivision": "state"
+      },
+      {
+        "name": "Uttar Pradesh",
+        "code": "IN-UP",
+        "subdivision": "state"
+      },
+      {
+        "name": "Uttarakhand",
+        "code": "IN-UT",
+        "subdivision": "state"
+      },
+      {
+        "name": "West Bengal",
+        "code": "IN-WB",
+        "subdivision": "state"
+      }
+    ]
+  },
+  {
+    "countryCode": "ID",
+    "countryName": "Indonesia",
+    "states": [
+      { "name": "Nanggroe Aceh Darussalam", "code": "ID-AC" },
+      { "name": "Sumatera Utara", "code": "ID-SU" },
+      { "name": "Sumatera Selatan", "code": "ID-SS" },
+      { "name": "Sumatera Barat", "code": "ID-SB" },
+      { "name": "Bengkulu", "code": "ID-BE" },
+      { "name": "Riau", "code": "ID-RI" },
+      { "name": "Kepulauan Riau", "code": "ID-KR" },
+      { "name": "Jambi", "code": "ID-JA" },
+      { "name": "Lampung", "code": "ID-LA" },
+      { "name": "Bangka Belitung", "code": "ID-BB" },
+      { "name": "Kalimantan Barat", "code": "ID-KB" },
+      { "name": "Kalimantan Timur", "code": "ID-KI" },
+      { "name": "Kalimantan Selatan", "code": "ID-KS" },
+      { "name": "Kalimantan Tengah", "code": "ID-KT" },
+      { "name": "Kalimantan Utara", "code": "ID-KU" },
+      { "name": "Banten", "code": "ID-BT" },
+      { "name": "DKI Jakarta", "code": "ID-JK" },
+      { "name": "Jawa Barat", "code": "ID-JB" },
+      { "name": "Jawa Tengah", "code": "ID-JT" },
+      { "name": "Daerah Istimewa Yogyakarta", "code": "ID-YO" },
+      { "name": "Jawa Timur", "code": "ID-JI" },
+      { "name": "Bali", "code": "ID-BA" },
+      { "name": "Nusa Tenggara Timur", "code": "ID-NT" },
+      { "name": "Nusa Tenggara Barat", "code": "ID-NB" },
+      { "name": "Gorontalo", "code": "ID-GO" },
+      { "name": "Sulawesi Barat", "code": "ID-SR" },
+      { "name": "Sulawesi Tengah", "code": "ID-ST" },
+      { "name": "Sulawesi Utara", "code": "ID-SA" },
+      { "name": "Sulawesi Tenggara", "code": "ID-SG" },
+      { "name": "Sulawesi Selatan", "code": "ID-SN" },
+      { "name": "Maluku Utara", "code": "ID-MU" },
+      { "name": "Maluku", "code": "ID-MA" },
+      { "name": "Papua Barat", "code": "ID-PB" },
+      { "name": "Papua", "code": "ID-PA" },
+      { "name": "Papua Tengah", "code": "ID-PT" },
+      { "name": "Papua Pegunungan", "code": "ID-PE" },
+      { "name": "Papua Selatan", "code": "ID-PS" },
+      { "name": "Papua Barat Daya", "code": "ID-PD" }
+    ]
+  },
+  {
+    "countryCode": "IR",
+    "countryName": "Iran",
+    "states": [
+      {
+        "name": "Alborz",
+        "code": "IR-32"
+      },
+      {
+        "name": "Ardabīl",
+        "code": "IR-03"
+      },
+      {
+        "name": "Būshehr",
+        "code": "IR-06"
+      },
+      {
+        "name": "Chahār Maḩāll va Bakhtīārī",
+        "code": "IR-08"
+      },
+      {
+        "name": "Eşfahān",
+        "code": "IR-04"
+      },
+      {
+        "name": "Fārs",
+        "code": "IR-14"
+      },
+      {
+        "name": "Golestān",
+        "code": "IR-27"
+      },
+      {
+        "name": "Gīlān",
+        "code": "IR-19"
+      },
+      {
+        "name": "Hamadān",
+        "code": "IR-24"
+      },
+      {
+        "name": "Hormozgān",
+        "code": "IR-23"
+      },
+      {
+        "name": "Kermān",
+        "code": "IR-15"
+      },
+      {
+        "name": "Kermānshāh",
+        "code": "IR-17"
+      },
+      {
+        "name": "Khorāsān-e Janūbī",
+        "code": "IR-29"
+      },
+      {
+        "name": "Khorāsān-e Razavī",
+        "code": "IR-30"
+      },
+      {
+        "name": "Khorāsān-e Shemālī",
+        "code": "IR-31"
+      },
+      {
+        "name": "Khūzestān",
+        "code": "IR-10"
+      },
+      {
+        "name": "Kohgīlūyeh va Būyer Aḩmad",
+        "code": "IR-18"
+      },
+      {
+        "name": "Kordestān",
+        "code": "IR-16"
+      },
+      {
+        "name": "Lorestān",
+        "code": "IR-20"
+      },
+      {
+        "name": "Markazī",
+        "code": "IR-22"
+      },
+      {
+        "name": "Māzandarān",
+        "code": "IR-21"
+      },
+      {
+        "name": "Qazvīn",
+        "code": "IR-28"
+      },
+      {
+        "name": "Qom",
+        "code": "IR-26"
+      },
+      {
+        "name": "Semnān",
+        "code": "IR-12"
+      },
+      {
+        "name": "Sīstān va Balūchestān",
+        "code": "IR-13"
+      },
+      {
+        "name": "Tehrān",
+        "code": "IR-07"
+      },
+      {
+        "name": "Yazd",
+        "code": "IR-25"
+      },
+      {
+        "name": "Zanjān",
+        "code": "IR-11"
+      },
+      {
+        "name": "Āz̄arbāyjān-e Gharbī",
+        "code": "IR-02"
+      },
+      {
+        "name": "Āz̄arbāyjān-e Sharqī",
+        "code": "IR-01"
+      },
+      {
+        "name": "Īlām",
+        "code": "IR-05"
+      }
+    ]
+  },
+  {
+    "countryCode": "IQ",
+    "countryName": "Iraq",
+    "states": [
+      {
+        "name": "Al Anbār",
+        "code": "IQ-AN"
+      },
+      {
+        "name": "Al Başrah",
+        "code": "IQ-BA"
+      },
+      {
+        "name": "Al Muthanná",
+        "code": "IQ-MU"
+      },
+      {
+        "name": "Al Qādisīyah",
+        "code": "IQ-QA"
+      },
+      {
+        "name": "An Najaf",
+        "code": "IQ-NA"
+      },
+      {
+        "name": "Arbīl",
+        "code": "IQ-AR"
+      },
+      {
+        "name": "As Sulaymānīyah",
+        "code": "IQ-SU"
+      },
+      {
+        "name": "At Ta'mīm",
+        "code": "IQ-TS"
+      },
+      {
+        "name": "Baghdād",
+        "code": "IQ-BG"
+      },
+      {
+        "name": "Bābil",
+        "code": "IQ-BB"
+      },
+      {
+        "name": "Dahūk",
+        "code": "IQ-DA"
+      },
+      {
+        "name": "Dhī Qār",
+        "code": "IQ-DQ"
+      },
+      {
+        "name": "Diyālá",
+        "code": "IQ-DI"
+      },
+      {
+        "name": "Karbalā'",
+        "code": "IQ-KA"
+      },
+      {
+        "name": "Maysān",
+        "code": "IQ-MA"
+      },
+      {
+        "name": "Nīnawá",
+        "code": "IQ-NI"
+      },
+      {
+        "name": "Wāsiţ",
+        "code": "IQ-WA"
+      },
+      {
+        "name": "Şalāḩ ad Dīn",
+        "code": "IQ-SD"
+      }
+    ]
+  },
+  {
+    "countryCode": "IL",
+    "countryName": "Israel",
+    "states": [
+      {
+        "name": "HaDarom",
+        "code": "IL-D"
+      },
+      {
+        "name": "HaMerkaz",
+        "code": "IL-M"
+      },
+      {
+        "name": "HaTsafon",
+        "code": "IL-Z"
+      },
+      {
+        "name": "H̱efa",
+        "code": "IL-HA"
+      },
+      {
+        "name": "Tel-Aviv",
+        "code": "IL-TA"
+      },
+      {
+        "name": "Yerushalayim",
+        "code": "IL-JM"
+      }
+    ]
+  },
+  {
+    "countryCode": "JP",
+    "countryName": "Japan",
+    "states": [
+      { "name": "Hokkaidō", "code": "JP-01" },
+      { "name": "Aomori", "code": "JP-02" },
+      { "name": "Iwate", "code": "JP-03" },
+      { "name": "Miyagi", "code": "JP-04" },
+      { "name": "Akita", "code": "JP-05" },
+      { "name": "Yamagata", "code": "JP-06" },
+      { "name": "Fukushima", "code": "JP-07" },
+      { "name": "Ibaraki", "code": "JP-08" },
+      { "name": "Tochigi", "code": "JP-09" },
+      { "name": "Gunma", "code": "JP-10" },
+      { "name": "Saitama", "code": "JP-11" },
+      { "name": "Chiba", "code": "JP-12" },
+      { "name": "Tokyo", "code": "JP-13" },
+      { "name": "Kanagawa", "code": "JP-14" },
+      { "name": "Niigata", "code": "JP-15" },
+      { "name": "Toyama", "code": "JP-16" },
+      { "name": "Ishikawa", "code": "JP-17" },
+      { "name": "Fukui", "code": "JP-18" },
+      { "name": "Yamanashi", "code": "JP-19" },
+      { "name": "Nagano", "code": "JP-20" },
+      { "name": "Gifu", "code": "JP-21" },
+      { "name": "Shizuoka", "code": "JP-22" },
+      { "name": "Aichi", "code": "JP-23" },
+      { "name": "Mie", "code": "JP-24" },
+      { "name": "Shiga", "code": "JP-25" },
+      { "name": "Kyoto", "code": "JP-26" },
+      { "name": "Osaka", "code": "JP-27" },
+      { "name": "Hyōgo", "code": "JP-28" },
+      { "name": "Nara", "code": "JP-29" },
+      { "name": "Wakayama", "code": "JP-30" },
+      { "name": "Tottori", "code": "JP-31" },
+      { "name": "Shimane", "code": "JP-32" },
+      { "name": "Okayama", "code": "JP-33" },
+      { "name": "Hiroshima", "code": "JP-34" },
+      { "name": "Yamaguchi", "code": "JP-35" },
+      { "name": "Tokushima", "code": "JP-36" },
+      { "name": "Kagawa", "code": "JP-37" },
+      { "name": "Ehime", "code": "JP-38" },
+      { "name": "Kōchi", "code": "JP-39" },
+      { "name": "Fukuoka", "code": "JP-40" },
+      { "name": "Saga", "code": "JP-41" },
+      { "name": "Nagasaki", "code": "JP-42" },
+      { "name": "Kumamoto", "code": "JP-43" },
+      { "name": "Ōita", "code": "JP-44" },
+      { "name": "Miyazaki", "code": "JP-45" },
+      { "name": "Kagoshima", "code": "JP-46" },
+      { "name": "Okinawa", "code": "JP-47" }
+    ]
+  },
+  {
+    "countryCode": "JO",
+    "countryName": "Jordan",
+    "states": [
+      {
+        "name": "Al Balqā'",
+        "code": "JO-BA"
+      },
+      {
+        "name": "Al ʽAqabah",
+        "code": "JO-AQ"
+      },
+      {
+        "name": "Az Zarqā'",
+        "code": "JO-AZ"
+      },
+      {
+        "name": "Aţ Ţafīlah",
+        "code": "JO-AT"
+      },
+      {
+        "name": "Irbid",
+        "code": "JO-IR"
+      },
+      {
+        "name": "Jerash",
+        "code": "JO-JA"
+      },
+      {
+        "name": "Karak",
+        "code": "JO-KA"
+      },
+      {
+        "name": "Ma'ān",
+        "code": "JO-MN"
+      },
+      {
+        "name": "Mafraq",
+        "code": "JO-MA"
+      },
+      {
+        "name": "Mādabā",
+        "code": "JO-MD"
+      },
+      {
+        "name": "ʽAjlūn",
+        "code": "JO-AJ"
+      },
+      {
+        "name": "‘Ammān",
+        "code": "JO-AM"
+      }
+    ]
+  },
+  {
+    "countryCode": "KZ",
+    "countryName": "Kazakhstan",
+    "states": [
+      {
+        "name": "Almaty",
+        "code": "KZ-ALA"
+      },
+      {
+        "name": "Almaty oblysy",
+        "code": "KZ-ALM"
+      },
+      {
+        "name": "Aqmola oblysy",
+        "code": "KZ-AKM"
+      },
+      {
+        "name": "Aqtöbe oblysy",
+        "code": "KZ-AKT"
+      },
+      {
+        "name": "Astana",
+        "code": "KZ-AST"
+      },
+      {
+        "name": "Atyraū oblysy",
+        "code": "KZ-ATY"
+      },
+      {
+        "name": "Batys Qazaqstan oblysy",
+        "code": "KZ-ZAP"
+      },
+      {
+        "name": "Mangghystaū oblysy",
+        "code": "KZ-MAN"
+      },
+      {
+        "name": "Ongtüstik Qazaqstan oblysy",
+        "code": "KZ-YUZ"
+      },
+      {
+        "name": "Pavlodar oblysy",
+        "code": "KZ-PAV"
+      },
+      {
+        "name": "Qaraghandy oblysy",
+        "code": "KZ-KAR"
+      },
+      {
+        "name": "Qostanay oblysy",
+        "code": "KZ-KUS"
+      },
+      {
+        "name": "Qyzylorda oblysy",
+        "code": "KZ-KZY"
+      },
+      {
+        "name": "Shyghys Qazaqstan oblysy",
+        "code": "KZ-VOS"
+      },
+      {
+        "name": "Soltüstik Qazaqstan oblysy",
+        "code": "KZ-SEV"
+      },
+      {
+        "name": "Zhambyl oblysy",
+        "code": "KZ-ZHA"
+      }
+    ]
+  },
+  {
+    "countryCode": "KW",
+    "countryName": "Kuwait",
+    "states": [
+      {
+        "name": "Al Aḩmadi",
+        "code": "KW-AH"
+      },
+      {
+        "name": "Al Farwānīyah",
+        "code": "KW-FA"
+      },
+      {
+        "name": "Al Jahrā’",
+        "code": "KW-JA"
+      },
+      {
+        "name": "Al Kuwayt",
+        "code": "KW-KU"
+      },
+      {
+        "name": "Mubārak al Kabīr",
+        "code": "KW-MU"
+      },
+      {
+        "name": "Ḩawallī",
+        "code": "KW-HA"
+      }
+    ]
+  },
+  {
+    "countryCode": "KG",
+    "countryName": "Kyrgyzstan",
+    "states": [
+      {
+        "name": "Batken",
+        "code": "KG-B"
+      },
+      {
+        "name": "Bishkek",
+        "code": "KG-GB"
+      },
+      {
+        "name": "Chü",
+        "code": "KG-C"
+      },
+      {
+        "name": "Jalal-Abad",
+        "code": "KG-J"
+      },
+      {
+        "name": "Naryn",
+        "code": "KG-N"
+      },
+      {
+        "name": "Osh",
+        "code": "KG-O"
+      },
+      {
+        "name": "Talas",
+        "code": "KG-T"
+      },
+      {
+        "name": "Ysyk-Köl",
+        "code": "KG-Y"
+      }
+    ]
+  },
+  {
+    "countryCode": "LA",
+    "countryName": "Laos",
+    "states": [
+      {
+        "name": "Attapu",
+        "code": "LA-AT"
+      },
+      {
+        "name": "Bokèo",
+        "code": "LA-BK"
+      },
+      {
+        "name": "Bolikhamxai",
+        "code": "LA-BL"
+      },
+      {
+        "name": "Champasak",
+        "code": "LA-CH"
+      },
+      {
+        "name": "Houaphan",
+        "code": "LA-HO"
+      },
+      {
+        "name": "Khammouan",
+        "code": "LA-KH"
+      },
+      {
+        "name": "Louang Namtha",
+        "code": "LA-LM"
+      },
+      {
+        "name": "Louangphabang",
+        "code": "LA-LP"
+      },
+      {
+        "name": "Oudômxai",
+        "code": "LA-OU"
+      },
+      {
+        "name": "Phôngsali",
+        "code": "LA-PH"
+      },
+      {
+        "name": "Salavan",
+        "code": "LA-SL"
+      },
+      {
+        "name": "Savannakhét",
+        "code": "LA-SV"
+      },
+      {
+        "name": "Vientiane",
+        "code": "LA-VT"
+      },
+      {
+        "name": "Vientiane",
+        "code": "LA-VI"
+      },
+      {
+        "name": "Xaignabouli",
+        "code": "LA-XA"
+      },
+      {
+        "name": "Xaisômboun",
+        "code": "LA-XN"
+      },
+      {
+        "name": "Xiangkhoang",
+        "code": "LA-XI"
+      },
+      {
+        "name": "Xékong",
+        "code": "LA-XE"
+      }
+    ]
+  },
+  {
+    "countryCode": "LB",
+    "countryName": "Lebanon",
+    "states": [
+      {
+        "name": "Aakkâr",
+        "code": "LB-AK"
+      },
+      {
+        "name": "Baalbek-Hermel",
+        "code": "LB-BH"
+      },
+      {
+        "name": "Beyrouth",
+        "code": "LB-BA"
+      },
+      {
+        "name": "Béqaa",
+        "code": "LB-BI"
+      },
+      {
+        "name": "Liban-Nord",
+        "code": "LB-AS"
+      },
+      {
+        "name": "Liban-Sud",
+        "code": "LB-JA"
+      },
+      {
+        "name": "Mont-Liban",
+        "code": "LB-JL"
+      },
+      {
+        "name": "Nabatîyé",
+        "code": "LB-NA"
+      }
+    ]
+  },
+  {
+    "countryCode": "MY",
+    "countryName": "Malaysia",
+    "states": [
+      {
+        "name": "Wilayah Persekutuan Kuala Lumpur",
+        "code": "MY-14",
+        "subdivision": "federal territory"
+      },
+      {
+        "name": "Wilayah Persekutuan Labuan",
+        "code": "MY-15",
+        "subdivision": "federal territory"
+      },
+      {
+        "name": "Wilayah Persekutuan Putrajaya",
+        "code": "MY-16",
+        "subdivision": "federal territory"
+      },
+      {
+        "name": "Johor",
+        "code": "MY-01",
+        "subdivision": "state"
+      },
+      {
+        "name": "Kedah",
+        "code": "MY-02",
+        "subdivision": "state"
+      },
+      {
+        "name": "Kelantan",
+        "code": "MY-03",
+        "subdivision": "state"
+      },
+      {
+        "name": "Melaka",
+        "code": "MY-04",
+        "subdivision": "state"
+      },
+      {
+        "name": "Negeri Sembilan",
+        "code": "MY-05",
+        "subdivision": "state"
+      },
+      {
+        "name": "Pahang",
+        "code": "MY-06",
+        "subdivision": "state"
+      },
+      {
+        "name": "Perak",
+        "code": "MY-08",
+        "subdivision": "state"
+      },
+      {
+        "name": "Perlis",
+        "code": "MY-09",
+        "subdivision": "state"
+      },
+      {
+        "name": "Pulau Pinang",
+        "code": "MY-07",
+        "subdivision": "state"
+      },
+      {
+        "name": "Sabah",
+        "code": "MY-12",
+        "subdivision": "state"
+      },
+      {
+        "name": "Sarawak",
+        "code": "MY-13",
+        "subdivision": "state"
+      },
+      {
+        "name": "Selangor",
+        "code": "MY-10",
+        "subdivision": "state"
+      },
+      {
+        "name": "Terengganu",
+        "code": "MY-11",
+        "subdivision": "state"
+      }
+    ]
+  },
+  {
+    "countryCode": "MV",
+    "countryName": "Maldives",
+    "states": [
+      {
+        "name": "Central",
+        "code": "MV-CE"
+      },
+      {
+        "name": "Male",
+        "code": "MV-MLE"
+      },
+      {
+        "name": "North",
+        "code": "MV-NO"
+      },
+      {
+        "name": "North Central",
+        "code": "MV-NC"
+      },
+      {
+        "name": "South",
+        "code": "MV-SU"
+      },
+      {
+        "name": "South Central",
+        "code": "MV-SC"
+      },
+      {
+        "name": "Upper North",
+        "code": "MV-UN"
+      },
+      {
+        "name": "Upper South",
+        "code": "MV-US"
+      }
+    ]
+  },
+  {
+    "countryCode": "MN",
+    "countryName": "Mongolia",
+    "states": [
+      {
+        "name": "Arhangay",
+        "code": "MN-073"
+      },
+      {
+        "name": "Bayan-Ölgiy",
+        "code": "MN-071"
+      },
+      {
+        "name": "Bayanhongor",
+        "code": "MN-069"
+      },
+      {
+        "name": "Bulgan",
+        "code": "MN-067"
+      },
+      {
+        "name": "Darhan uul",
+        "code": "MN-037"
+      },
+      {
+        "name": "Dornod",
+        "code": "MN-061"
+      },
+      {
+        "name": "Dornogovĭ",
+        "code": "MN-063"
+      },
+      {
+        "name": "Dundgovĭ",
+        "code": "MN-059"
+      },
+      {
+        "name": "Dzavhan",
+        "code": "MN-057"
+      },
+      {
+        "name": "Govĭ-Altay",
+        "code": "MN-065"
+      },
+      {
+        "name": "Govĭ-Sümber",
+        "code": "MN-064"
+      },
+      {
+        "name": "Hentiy",
+        "code": "MN-039"
+      },
+      {
+        "name": "Hovd",
+        "code": "MN-043"
+      },
+      {
+        "name": "Hövsgöl",
+        "code": "MN-041"
+      },
+      {
+        "name": "Orhon",
+        "code": "MN-035"
+      },
+      {
+        "name": "Selenge",
+        "code": "MN-049"
+      },
+      {
+        "name": "Sühbaatar",
+        "code": "MN-051"
+      },
+      {
+        "name": "Töv",
+        "code": "MN-047"
+      },
+      {
+        "name": "Ulaanbaatar",
+        "code": "MN-1"
+      },
+      {
+        "name": "Uvs",
+        "code": "MN-046"
+      },
+      {
+        "name": "Ömnögovĭ",
+        "code": "MN-053"
+      },
+      {
+        "name": "Övörhangay",
+        "code": "MN-055"
+      }
+    ]
+  },
+  {
+    "countryCode": "MM",
+    "countryName": "Myanmar",
+    "states": [
+      {
+        "name": "Ayeyarwady",
+        "code": "MM-07"
+      },
+      {
+        "name": "Bago",
+        "code": "MM-02"
+      },
+      {
+        "name": "Chin",
+        "code": "MM-14"
+      },
+      {
+        "name": "Kachin",
+        "code": "MM-11"
+      },
+      {
+        "name": "Kayah",
+        "code": "MM-12"
+      },
+      {
+        "name": "Kayin",
+        "code": "MM-13"
+      },
+      {
+        "name": "Magway",
+        "code": "MM-03"
+      },
+      {
+        "name": "Mandalay",
+        "code": "MM-04"
+      },
+      {
+        "name": "Mon",
+        "code": "MM-15"
+      },
+      {
+        "name": "Rakhine",
+        "code": "MM-16"
+      },
+      {
+        "name": "Sagaing",
+        "code": "MM-01"
+      },
+      {
+        "name": "Shan",
+        "code": "MM-17"
+      },
+      {
+        "name": "Tanintharyi",
+        "code": "MM-05"
+      },
+      {
+        "name": "Yangon",
+        "code": "MM-06"
+      }
+    ]
+  },
+  {
+    "countryCode": "NP",
+    "countryName": "Nepal",
+    "states": [
+      {
+        "name": "Madhya Pashchimanchal",
+        "code": "NP-2"
+      },
+      {
+        "name": "Madhyamanchal",
+        "code": "NP-1"
+      },
+      {
+        "name": "Pashchimanchal",
+        "code": "NP-3"
+      },
+      {
+        "name": "Purwanchal",
+        "code": "NP-4"
+      },
+      {
+        "name": "Sudur Pashchimanchal",
+        "code": "NP-5"
+      }
+    ]
+  },
+  {
+    "countryCode": "KP",
+    "countryName": "North Korea",
+    "states": [
+      {
+        "name": "Chagang",
+        "code": "KP-04"
+      },
+      {
+        "name": "Kangwon",
+        "code": "KP-07"
+      },
+      {
+        "name": "North Hamgyong",
+        "code": "KP-09"
+      },
+      {
+        "name": "North Hwanghae",
+        "code": "KP-06"
+      },
+      {
+        "name": "North Pyongan",
+        "code": "KP-03"
+      },
+      {
+        "name": "Pyongyang",
+        "code": "KP-01"
+      },
+      {
+        "name": "Rason",
+        "code": "KP-13"
+      },
+      {
+        "name": "Ryanggang",
+        "code": "KP-10"
+      },
+      {
+        "name": "South Hamgyong",
+        "code": "KP-08"
+      },
+      {
+        "name": "South Hwanghae",
+        "code": "KP-05"
+      },
+      {
+        "name": "South Pyongan",
+        "code": "KP-02"
+      }
+    ]
+  },
+  {
+    "countryCode": "OM",
+    "countryName": "Oman",
+    "states": [
+      {
+        "name": "Ad Dākhilīyah",
+        "code": "OM-DA"
+      },
+      {
+        "name": "Al Buraymī",
+        "code": "OM-BU"
+      },
+      {
+        "name": "Al Bāţinah",
+        "code": "OM-BA"
+      },
+      {
+        "name": "Al Wusţá",
+        "code": "OM-WU"
+      },
+      {
+        "name": "Ash Sharqīyah",
+        "code": "OM-SH"
+      },
+      {
+        "name": "Az̧ Z̧āhirah",
+        "code": "OM-ZA"
+      },
+      {
+        "name": "Masqaţ",
+        "code": "OM-MA"
+      },
+      {
+        "name": "Musandam",
+        "code": "OM-MU"
+      },
+      {
+        "name": "Z̧ufār",
+        "code": "OM-ZU"
+      }
+    ]
+  },
+  {
+    "countryCode": "PK",
+    "countryName": "Pakistan",
+    "states": [
+      {
+        "name": "Azad Kashmir",
+        "code": "PK-JK"
+      },
+      {
+        "name": "Balochistan",
+        "code": "PK-BA"
+      },
+      {
+        "name": "Federally Administered Tribal Areas",
+        "code": "PK-TA"
+      },
+      {
+        "name": "Gilgit-Baltistan",
+        "code": "PK-GB"
+      },
+      {
+        "name": "Islamabad",
+        "code": "PK-IS"
+      },
+      {
+        "name": "Khyber Pakhtunkhwa",
+        "code": "PK-KP"
+      },
+      {
+        "name": "Punjab",
+        "code": "PK-PB"
+      },
+      {
+        "name": "Sindh",
+        "code": "PK-SD"
+      }
+    ]
+  },
+  {
+    "countryCode": "PS",
+    "countryName": "Palestine",
+    "states": [
+      {
+        "name": "Bethlehem",
+        "code": "PS-BTH"
+      },
+      {
+        "name": "Deir El Balah",
+        "code": "PS-DEB"
+      },
+      {
+        "name": "Gaza",
+        "code": "PS-GZA"
+      },
+      {
+        "name": "Hebron",
+        "code": "PS-HBN"
+      },
+      {
+        "name": "Jenin",
+        "code": "PS-JEN"
+      },
+      {
+        "name": "Jericho – Al Aghwar",
+        "code": "PS-JRH"
+      },
+      {
+        "name": "Jerusalem",
+        "code": "PS-JEM"
+      },
+      {
+        "name": "Khan Yunis",
+        "code": "PS-KYS"
+      },
+      {
+        "name": "Nablus",
+        "code": "PS-NBS"
+      },
+      {
+        "name": "North Gaza",
+        "code": "PS-NGZ"
+      },
+      {
+        "name": "Qalqilya",
+        "code": "PS-QQA"
+      },
+      {
+        "name": "Rafah",
+        "code": "PS-RFH"
+      },
+      {
+        "name": "Ramallah",
+        "code": "PS-RBH"
+      },
+      {
+        "name": "Salfit",
+        "code": "PS-SLT"
+      },
+      {
+        "name": "Tubas",
+        "code": "PS-TBS"
+      },
+      {
+        "name": "Tulkarm",
+        "code": "PS-TKM"
+      }
+    ]
+  },
+  {
+    "countryCode": "PH",
+    "countryName": "Philippines",
+    "states": [
+      {
+        "name": "Autonomous Region in Muslim Mindanao",
+        "code": "PH-14"
+      },
+      {
+        "name": "Bicol",
+        "code": "PH-05"
+      },
+      {
+        "name": "Cagayan Valley",
+        "code": "PH-02"
+      },
+      {
+        "name": "Calabarzon",
+        "code": "PH-40"
+      },
+      {
+        "name": "Caraga",
+        "code": "PH-13"
+      },
+      {
+        "name": "Central Luzon",
+        "code": "PH-03"
+      },
+      {
+        "name": "Central Visayas",
+        "code": "PH-07"
+      },
+      {
+        "name": "Cordillera Administrative Region",
+        "code": "PH-15"
+      },
+      {
+        "name": "Davao",
+        "code": "PH-11"
+      },
+      {
+        "name": "Eastern Visayas",
+        "code": "PH-08"
+      },
+      {
+        "name": "Ilocos",
+        "code": "PH-01"
+      },
+      {
+        "name": "Mimaropa",
+        "code": "PH-41"
+      },
+      {
+        "name": "National Capital Region",
+        "code": "PH-00"
+      },
+      {
+        "name": "Northern Mindanao",
+        "code": "PH-10"
+      },
+      {
+        "name": "Soccsksargen",
+        "code": "PH-12"
+      },
+      {
+        "name": "Western Visayas",
+        "code": "PH-06"
+      },
+      {
+        "name": "Zamboanga Peninsula",
+        "code": "PH-09"
+      }
+    ]
+  },
+  {
+    "countryCode": "QA",
+    "countryName": "Qatar",
+    "states": [
+      {
+        "name": "Ad Dawḩah",
+        "code": "QA-DA"
+      },
+      {
+        "name": "Al Khawr wa adh Dhakhīrah",
+        "code": "QA-KH"
+      },
+      {
+        "name": "Al Wakrah",
+        "code": "QA-WA"
+      },
+      {
+        "name": "Ar Rayyān",
+        "code": "QA-RA"
+      },
+      {
+        "name": "Ash Shamāl",
+        "code": "QA-MS"
+      },
+      {
+        "name": "Az̧ Za̧`āyin",
+        "code": "QA-ZA"
+      },
+      {
+        "name": "Umm Şalāl",
+        "code": "QA-US"
+      }
+    ]
+  },
+  {
+    "countryCode": "SA",
+    "countryName": "Saudi Arabia",
+    "states": [
+      {
+        "name": "Al Bāḩah",
+        "code": "SA-11"
+      },
+      {
+        "name": "Al Jawf",
+        "code": "SA-12"
+      },
+      {
+        "name": "Al Madīnah",
+        "code": "SA-03"
+      },
+      {
+        "name": "Al Qaşīm",
+        "code": "SA-05"
+      },
+      {
+        "name": "Al Ḩudūd ash Shamālīyah",
+        "code": "SA-08"
+      },
+      {
+        "name": "Ar Riyāḑ",
+        "code": "SA-01"
+      },
+      {
+        "name": "Ash Sharqīyah",
+        "code": "SA-04"
+      },
+      {
+        "name": "Jīzān",
+        "code": "SA-09"
+      },
+      {
+        "name": "Makkah",
+        "code": "SA-02"
+      },
+      {
+        "name": "Najrān",
+        "code": "SA-10"
+      },
+      {
+        "name": "Tabūk",
+        "code": "SA-07"
+      },
+      {
+        "name": "ٰĀsīr",
+        "code": "SA-14"
+      },
+      {
+        "name": "Ḩā'il",
+        "code": "SA-06"
+      }
+    ]
+  },
+  {
+    "countryCode": "SG",
+    "countryName": "Singapore",
+    "states": [
+      {
+        "name": "Central Singapore",
+        "code": "SG-01"
+      },
+      {
+        "name": "North East",
+        "code": "SG-02"
+      },
+      {
+        "name": "North West",
+        "code": "SG-03"
+      },
+      {
+        "name": "South East",
+        "code": "SG-04"
+      },
+      {
+        "name": "South West",
+        "code": "SG-05"
+      }
+    ]
+  },
+  {
+    "countryCode": "KR",
+    "countryName": "South Korea",
+    "states": [
+      {
+        "name": "Busan-gwangyeoksi",
+        "code": "KR-26"
+      },
+      {
+        "name": "Chungcheongbuk-do",
+        "code": "KR-43"
+      },
+      {
+        "name": "Chungcheongnam-do",
+        "code": "KR-44"
+      },
+      {
+        "name": "Daegu-gwangyeoksi",
+        "code": "KR-27"
+      },
+      {
+        "name": "Daejeon-gwangyeoksi",
+        "code": "KR-30"
+      },
+      {
+        "name": "Gangwon-do",
+        "code": "KR-42"
+      },
+      {
+        "name": "Gwangju-gwangyeoksi",
+        "code": "KR-29"
+      },
+      {
+        "name": "Gyeonggi-do",
+        "code": "KR-41"
+      },
+      {
+        "name": "Gyeongsangbuk-do",
+        "code": "KR-47"
+      },
+      {
+        "name": "Gyeongsangnam-do",
+        "code": "KR-48"
+      },
+      {
+        "name": "Incheon-gwangyeoksi",
+        "code": "KR-28"
+      },
+      {
+        "name": "Jeju-teukbyeoljachido",
+        "code": "KR-49"
+      },
+      {
+        "name": "Jeollabuk-do",
+        "code": "KR-45"
+      },
+      {
+        "name": "Jeollanam-do",
+        "code": "KR-46"
+      },
+      {
+        "name": "Sejong",
+        "code": "KR-50"
+      },
+      {
+        "name": "Seoul-teukbyeolsi",
+        "code": "KR-11"
+      },
+      {
+        "name": "Ulsan-gwangyeoksi",
+        "code": "KR-31"
+      }
+    ]
+  },
+  {
+    "countryCode": "LK",
+    "countryName": "Sri Lanka",
+    "states": [
+      {
+        "name": "Central Province",
+        "code": "LK-2"
+      },
+      {
+        "name": "Eastern Province",
+        "code": "LK-5"
+      },
+      {
+        "name": "North Central Province",
+        "code": "LK-7"
+      },
+      {
+        "name": "North Western Province",
+        "code": "LK-6"
+      },
+      {
+        "name": "Northern Province",
+        "code": "LK-4"
+      },
+      {
+        "name": "Sabaragamuwa Province",
+        "code": "LK-9"
+      },
+      {
+        "name": "Southern Province",
+        "code": "LK-3"
+      },
+      {
+        "name": "Uva Province",
+        "code": "LK-8"
+      },
+      {
+        "name": "Western Province",
+        "code": "LK-1"
+      }
+    ]
+  },
+  {
+    "countryCode": "SY",
+    "countryName": "Syria",
+    "states": [
+      {
+        "name": "Al Lādhiqīyah",
+        "code": "SY-LA"
+      },
+      {
+        "name": "Al Qunayţirah",
+        "code": "SY-QU"
+      },
+      {
+        "name": "Al Ḩasakah",
+        "code": "SY-HA"
+      },
+      {
+        "name": "Ar Raqqah",
+        "code": "SY-RA"
+      },
+      {
+        "name": "As Suwaydā'",
+        "code": "SY-SU"
+      },
+      {
+        "name": "Darٰā",
+        "code": "SY-DR"
+      },
+      {
+        "name": "Dayr az Zawr",
+        "code": "SY-DY"
+      },
+      {
+        "name": "Dimashq",
+        "code": "SY-DI"
+      },
+      {
+        "name": "Idlib",
+        "code": "SY-ID"
+      },
+      {
+        "name": "Rīf Dimashq",
+        "code": "SY-RD"
+      },
+      {
+        "name": "Ţarţūs",
+        "code": "SY-TA"
+      },
+      {
+        "name": "Ḩalab",
+        "code": "SY-HL"
+      },
+      {
+        "name": "Ḩamāh",
+        "code": "SY-HM"
+      },
+      {
+        "name": "Ḩimş",
+        "code": "SY-HI"
+      }
+    ]
+  },
+  {
+    "countryCode": "TW",
+    "countryName": "Taiwan",
+    "states": [
+      {
+        "name": "Changhua",
+        "code": "TW-CHA"
+      },
+      {
+        "name": "Chiayi",
+        "code": "TW-CYQ"
+      },
+      {
+        "name": "Chiayi",
+        "code": "TW-CYI"
+      },
+      {
+        "name": "Hsinchu",
+        "code": "TW-HSZ"
+      },
+      {
+        "name": "Hsinchu",
+        "code": "TW-HSQ"
+      },
+      {
+        "name": "Hualien",
+        "code": "TW-HUA"
+      },
+      {
+        "name": "Ilan",
+        "code": "TW-ILA"
+      },
+      {
+        "name": "Kaohsiung",
+        "code": "TW-KHQ"
+      },
+      {
+        "name": "Kaohsiung",
+        "code": "TW-KHH"
+      },
+      {
+        "name": "Keelung",
+        "code": "TW-KEE"
+      },
+      {
+        "name": "Miaoli",
+        "code": "TW-MIA"
+      },
+      {
+        "name": "Nantou",
+        "code": "TW-NAN"
+      },
+      {
+        "name": "Penghu",
+        "code": "TW-PEN"
+      },
+      {
+        "name": "Pingtung",
+        "code": "TW-PIF"
+      },
+      {
+        "name": "Taichung",
+        "code": "TW-TXG"
+      },
+      {
+        "name": "Taichung",
+        "code": "TW-TXQ"
+      },
+      {
+        "name": "Tainan",
+        "code": "TW-TNN"
+      },
+      {
+        "name": "Tainan",
+        "code": "TW-TNQ"
+      },
+      {
+        "name": "Taipei",
+        "code": "TW-TPE"
+      },
+      {
+        "name": "Taipei",
+        "code": "TW-TPQ"
+      },
+      {
+        "name": "Taitung",
+        "code": "TW-TTT"
+      },
+      {
+        "name": "Taoyuan",
+        "code": "TW-TAO"
+      },
+      {
+        "name": "Yunlin",
+        "code": "TW-YUN"
+      }
+    ]
+  },
+  {
+    "countryCode": "TJ",
+    "countryName": "Tajikistan",
+    "states": [
+      {
+        "name": "Dushanbe",
+        "code": "TJ-DU"
+      },
+      {
+        "name": "Khatlon",
+        "code": "TJ-KT"
+      },
+      {
+        "name": "Kŭhistoni Badakhshon",
+        "code": "TJ-GB"
+      },
+      {
+        "name": "Sughd",
+        "code": "TJ-SU"
+      }
+    ]
+  },
+  {
+    "countryCode": "TH",
+    "countryName": "Thailand",
+    "states": [
+      {
+        "name": "Amnat Charoen",
+        "code": "TH-37"
+      },
+      {
+        "name": "Ang Thong",
+        "code": "TH-15"
+      },
+      {
+        "name": "Bueng Kan",
+        "code": "TH-38"
+      },
+      {
+        "name": "Buri Ram",
+        "code": "TH-31"
+      },
+      {
+        "name": "Chachoengsao",
+        "code": "TH-24"
+      },
+      {
+        "name": "Chai Nat",
+        "code": "TH-18"
+      },
+      {
+        "name": "Chaiyaphum",
+        "code": "TH-36"
+      },
+      {
+        "name": "Chanthaburi",
+        "code": "TH-22"
+      },
+      {
+        "name": "Chiang Mai",
+        "code": "TH-50"
+      },
+      {
+        "name": "Chiang Rai",
+        "code": "TH-57"
+      },
+      {
+        "name": "Chon Buri",
+        "code": "TH-20"
+      },
+      {
+        "name": "Chumphon",
+        "code": "TH-86"
+      },
+      {
+        "name": "Kalasin",
+        "code": "TH-46"
+      },
+      {
+        "name": "Kamphaeng Phet",
+        "code": "TH-62"
+      },
+      {
+        "name": "Kanchanaburi",
+        "code": "TH-71"
+      },
+      {
+        "name": "Khon Kaen",
+        "code": "TH-40"
+      },
+      {
+        "name": "Krabi",
+        "code": "TH-81"
+      },
+      {
+        "name": "Krung Thep Maha Nakhon",
+        "code": "TH-10"
+      },
+      {
+        "name": "Lampang",
+        "code": "TH-52"
+      },
+      {
+        "name": "Lamphun",
+        "code": "TH-51"
+      },
+      {
+        "name": "Loei",
+        "code": "TH-42"
+      },
+      {
+        "name": "Lop Buri",
+        "code": "TH-16"
+      },
+      {
+        "name": "Mae Hong Son",
+        "code": "TH-58"
+      },
+      {
+        "name": "Maha Sarakham",
+        "code": "TH-44"
+      },
+      {
+        "name": "Mukdahan",
+        "code": "TH-49"
+      },
+      {
+        "name": "Nakhon Nayok",
+        "code": "TH-26"
+      },
+      {
+        "name": "Nakhon Pathom",
+        "code": "TH-73"
+      },
+      {
+        "name": "Nakhon Phanom",
+        "code": "TH-48"
+      },
+      {
+        "name": "Nakhon Ratchasima",
+        "code": "TH-30"
+      },
+      {
+        "name": "Nakhon Sawan",
+        "code": "TH-60"
+      },
+      {
+        "name": "Nakhon Si Thammarat",
+        "code": "TH-80"
+      },
+      {
+        "name": "Nan",
+        "code": "TH-55"
+      },
+      {
+        "name": "Narathiwat",
+        "code": "TH-96"
+      },
+      {
+        "name": "Nong Bua Lam Phu",
+        "code": "TH-39"
+      },
+      {
+        "name": "Nong Khai",
+        "code": "TH-43"
+      },
+      {
+        "name": "Nonthaburi",
+        "code": "TH-12"
+      },
+      {
+        "name": "Pathum Thani",
+        "code": "TH-13"
+      },
+      {
+        "name": "Pattani",
+        "code": "TH-94"
+      },
+      {
+        "name": "Phangnga",
+        "code": "TH-82"
+      },
+      {
+        "name": "Phatthalung",
+        "code": "TH-93"
+      },
+      {
+        "name": "Phatthaya",
+        "code": "TH-S"
+      },
+      {
+        "name": "Phayao",
+        "code": "TH-56"
+      },
+      {
+        "name": "Phetchabun",
+        "code": "TH-67"
+      },
+      {
+        "name": "Phetchaburi",
+        "code": "TH-76"
+      },
+      {
+        "name": "Phichit",
+        "code": "TH-66"
+      },
+      {
+        "name": "Phitsanulok",
+        "code": "TH-65"
+      },
+      {
+        "name": "Phra Nakhon Si Ayutthaya",
+        "code": "TH-14"
+      },
+      {
+        "name": "Phrae",
+        "code": "TH-54"
+      },
+      {
+        "name": "Phuket",
+        "code": "TH-83"
+      },
+      {
+        "name": "Prachin Buri",
+        "code": "TH-25"
+      },
+      {
+        "name": "Prachuap Khiri Khan",
+        "code": "TH-77"
+      },
+      {
+        "name": "Ranong",
+        "code": "TH-85"
+      },
+      {
+        "name": "Ratchaburi",
+        "code": "TH-70"
+      },
+      {
+        "name": "Rayong",
+        "code": "TH-21"
+      },
+      {
+        "name": "Roi Et",
+        "code": "TH-45"
+      },
+      {
+        "name": "Sa Kaeo",
+        "code": "TH-27"
+      },
+      {
+        "name": "Sakon Nakhon",
+        "code": "TH-47"
+      },
+      {
+        "name": "Samut Prakan",
+        "code": "TH-11"
+      },
+      {
+        "name": "Samut Sakhon",
+        "code": "TH-74"
+      },
+      {
+        "name": "Samut Songkhram",
+        "code": "TH-75"
+      },
+      {
+        "name": "Saraburi",
+        "code": "TH-19"
+      },
+      {
+        "name": "Satun",
+        "code": "TH-91"
+      },
+      {
+        "name": "Si Sa Ket",
+        "code": "TH-33"
+      },
+      {
+        "name": "Sing Buri",
+        "code": "TH-17"
+      },
+      {
+        "name": "Songkhla",
+        "code": "TH-90"
+      },
+      {
+        "name": "Sukhothai",
+        "code": "TH-64"
+      },
+      {
+        "name": "Suphan Buri",
+        "code": "TH-72"
+      },
+      {
+        "name": "Surat Thani",
+        "code": "TH-84"
+      },
+      {
+        "name": "Surin",
+        "code": "TH-32"
+      },
+      {
+        "name": "Tak",
+        "code": "TH-63"
+      },
+      {
+        "name": "Trang",
+        "code": "TH-92"
+      },
+      {
+        "name": "Trat",
+        "code": "TH-23"
+      },
+      {
+        "name": "Ubon Ratchathani",
+        "code": "TH-34"
+      },
+      {
+        "name": "Udon Thani",
+        "code": "TH-41"
+      },
+      {
+        "name": "Uthai Thani",
+        "code": "TH-61"
+      },
+      {
+        "name": "Uttaradit",
+        "code": "TH-53"
+      },
+      {
+        "name": "Yala",
+        "code": "TH-95"
+      },
+      {
+        "name": "Yasothon",
+        "code": "TH-35"
+      }
+    ]
+  },
+  {
+    "countryCode": "TL",
+    "countryName": "Timor-Leste",
+    "states": [
+      {
+        "name": "Aileu",
+        "code": "TL-AL"
+      },
+      {
+        "name": "Ainaro",
+        "code": "TL-AN"
+      },
+      {
+        "name": "Baucau",
+        "code": "TL-BA"
+      },
+      {
+        "name": "Bobonaro",
+        "code": "TL-BO"
+      },
+      {
+        "name": "Cova Lima",
+        "code": "TL-CO"
+      },
+      {
+        "name": "Díli",
+        "code": "TL-DI"
+      },
+      {
+        "name": "Ermera",
+        "code": "TL-ER"
+      },
+      {
+        "name": "Lautem",
+        "code": "TL-LA"
+      },
+      {
+        "name": "Liquiça",
+        "code": "TL-LI"
+      },
+      {
+        "name": "Manatuto",
+        "code": "TL-MT"
+      },
+      {
+        "name": "Manufahi",
+        "code": "TL-MF"
+      },
+      {
+        "name": "Oecussi",
+        "code": "TL-OE"
+      },
+      {
+        "name": "Viqueque",
+        "code": "TL-VI"
+      }
+    ]
+  },
+  {
+    "countryCode": "TR",
+    "countryName": "Turkey",
+    "states": [
+      {
+        "name": "Adana",
+        "code": "TR-01"
+      },
+      {
+        "name": "Adıyaman",
+        "code": "TR-02"
+      },
+      {
+        "name": "Afyonkarahisar",
+        "code": "TR-03"
+      },
+      {
+        "name": "Aksaray",
+        "code": "TR-68"
+      },
+      {
+        "name": "Amasya",
+        "code": "TR-05"
+      },
+      {
+        "name": "Ankara",
+        "code": "TR-06"
+      },
+      {
+        "name": "Antalya",
+        "code": "TR-07"
+      },
+      {
+        "name": "Ardahan",
+        "code": "TR-75"
+      },
+      {
+        "name": "Artvin",
+        "code": "TR-08"
+      },
+      {
+        "name": "Aydın",
+        "code": "TR-09"
+      },
+      {
+        "name": "Ağrı",
+        "code": "TR-04"
+      },
+      {
+        "name": "Balıkesir",
+        "code": "TR-10"
+      },
+      {
+        "name": "Bartın",
+        "code": "TR-74"
+      },
+      {
+        "name": "Batman",
+        "code": "TR-72"
+      },
+      {
+        "name": "Bayburt",
+        "code": "TR-69"
+      },
+      {
+        "name": "Bilecik",
+        "code": "TR-11"
+      },
+      {
+        "name": "Bingöl",
+        "code": "TR-12"
+      },
+      {
+        "name": "Bitlis",
+        "code": "TR-13"
+      },
+      {
+        "name": "Bolu",
+        "code": "TR-14"
+      },
+      {
+        "name": "Burdur",
+        "code": "TR-15"
+      },
+      {
+        "name": "Bursa",
+        "code": "TR-16"
+      },
+      {
+        "name": "Denizli",
+        "code": "TR-20"
+      },
+      {
+        "name": "Diyarbakır",
+        "code": "TR-21"
+      },
+      {
+        "name": "Düzce",
+        "code": "TR-81"
+      },
+      {
+        "name": "Edirne",
+        "code": "TR-22"
+      },
+      {
+        "name": "Elazığ",
+        "code": "TR-23"
+      },
+      {
+        "name": "Erzincan",
+        "code": "TR-24"
+      },
+      {
+        "name": "Erzurum",
+        "code": "TR-25"
+      },
+      {
+        "name": "Eskişehir",
+        "code": "TR-26"
+      },
+      {
+        "name": "Gaziantep",
+        "code": "TR-27"
+      },
+      {
+        "name": "Giresun",
+        "code": "TR-28"
+      },
+      {
+        "name": "Gümüşhane",
+        "code": "TR-29"
+      },
+      {
+        "name": "Hakkâri",
+        "code": "TR-30"
+      },
+      {
+        "name": "Hatay",
+        "code": "TR-31"
+      },
+      {
+        "name": "Isparta",
+        "code": "TR-32"
+      },
+      {
+        "name": "Iğdır",
+        "code": "TR-76"
+      },
+      {
+        "name": "Kahramanmaraş",
+        "code": "TR-46"
+      },
+      {
+        "name": "Karabük",
+        "code": "TR-78"
+      },
+      {
+        "name": "Karaman",
+        "code": "TR-70"
+      },
+      {
+        "name": "Kars",
+        "code": "TR-36"
+      },
+      {
+        "name": "Kastamonu",
+        "code": "TR-37"
+      },
+      {
+        "name": "Kayseri",
+        "code": "TR-38"
+      },
+      {
+        "name": "Kilis",
+        "code": "TR-79"
+      },
+      {
+        "name": "Kocaeli",
+        "code": "TR-41"
+      },
+      {
+        "name": "Konya",
+        "code": "TR-42"
+      },
+      {
+        "name": "Kütahya",
+        "code": "TR-43"
+      },
+      {
+        "name": "Kırklareli",
+        "code": "TR-39"
+      },
+      {
+        "name": "Kırıkkale",
+        "code": "TR-71"
+      },
+      {
+        "name": "Kırşehir",
+        "code": "TR-40"
+      },
+      {
+        "name": "Malatya",
+        "code": "TR-44"
+      },
+      {
+        "name": "Manisa",
+        "code": "TR-45"
+      },
+      {
+        "name": "Mardin",
+        "code": "TR-47"
+      },
+      {
+        "name": "Mersin",
+        "code": "TR-33"
+      },
+      {
+        "name": "Muğla",
+        "code": "TR-48"
+      },
+      {
+        "name": "Muş",
+        "code": "TR-49"
+      },
+      {
+        "name": "Nevşehir",
+        "code": "TR-50"
+      },
+      {
+        "name": "Niğde",
+        "code": "TR-51"
+      },
+      {
+        "name": "Ordu",
+        "code": "TR-52"
+      },
+      {
+        "name": "Osmaniye",
+        "code": "TR-80"
+      },
+      {
+        "name": "Rize",
+        "code": "TR-53"
+      },
+      {
+        "name": "Sakarya",
+        "code": "TR-54"
+      },
+      {
+        "name": "Samsun",
+        "code": "TR-55"
+      },
+      {
+        "name": "Siirt",
+        "code": "TR-56"
+      },
+      {
+        "name": "Sinop",
+        "code": "TR-57"
+      },
+      {
+        "name": "Sivas",
+        "code": "TR-58"
+      },
+      {
+        "name": "Tekirdağ",
+        "code": "TR-59"
+      },
+      {
+        "name": "Tokat",
+        "code": "TR-60"
+      },
+      {
+        "name": "Trabzon",
+        "code": "TR-61"
+      },
+      {
+        "name": "Tunceli",
+        "code": "TR-62"
+      },
+      {
+        "name": "Uşak",
+        "code": "TR-64"
+      },
+      {
+        "name": "Van",
+        "code": "TR-65"
+      },
+      {
+        "name": "Yalova",
+        "code": "TR-77"
+      },
+      {
+        "name": "Yozgat",
+        "code": "TR-66"
+      },
+      {
+        "name": "Zonguldak",
+        "code": "TR-67"
+      },
+      {
+        "name": "Çanakkale",
+        "code": "TR-17"
+      },
+      {
+        "name": "Çankırı",
+        "code": "TR-18"
+      },
+      {
+        "name": "Çorum",
+        "code": "TR-19"
+      },
+      {
+        "name": "İstanbul",
+        "code": "TR-34"
+      },
+      {
+        "name": "İzmir",
+        "code": "TR-35"
+      },
+      {
+        "name": "Şanlıurfa",
+        "code": "TR-63"
+      },
+      {
+        "name": "Şırnak",
+        "code": "TR-73"
+      }
+    ]
+  },
+  {
+    "countryCode": "TM",
+    "countryName": "Turkmenistan",
+    "states": [
+      {
+        "name": "Ahal",
+        "code": "TM-A"
+      },
+      {
+        "name": "Aşgabat",
+        "code": "TM-S"
+      },
+      {
+        "name": "Balkan",
+        "code": "TM-B"
+      },
+      {
+        "name": "Daşoguz",
+        "code": "TM-D"
+      },
+      {
+        "name": "Lebap",
+        "code": "TM-L"
+      },
+      {
+        "name": "Mary",
+        "code": "TM-M"
+      }
+    ]
+  },
+  {
+    "countryCode": "AE",
+    "countryName": "United Arab Emirates",
+    "states": [
+      {
+        "name": "'Ajmān",
+        "code": "AE-AJ"
+      },
+      {
+        "name": "Abū Z̧aby",
+        "code": "AE-AZ"
+      },
+      {
+        "name": "Al Fujayrah",
+        "code": "AE-FU"
+      },
+      {
+        "name": "Ash Shāriqah",
+        "code": "AE-SH"
+      },
+      {
+        "name": "Dubayy",
+        "code": "AE-DU"
+      },
+      {
+        "name": "Ra's al Khaymah",
+        "code": "AE-RK"
+      },
+      {
+        "name": "Umm al Qaywayn",
+        "code": "AE-UQ"
+      }
+    ]
+  },
+  {
+    "countryCode": "UZ",
+    "countryName": "Uzbekistan",
+    "states": [
+      {
+        "name": "Andijon",
+        "code": "UZ-AN"
+      },
+      {
+        "name": "Buxoro",
+        "code": "UZ-BU"
+      },
+      {
+        "name": "Farg‘ona",
+        "code": "UZ-FA"
+      },
+      {
+        "name": "Jizzax",
+        "code": "UZ-JI"
+      },
+      {
+        "name": "Namangan",
+        "code": "UZ-NG"
+      },
+      {
+        "name": "Navoiy",
+        "code": "UZ-NW"
+      },
+      {
+        "name": "Qashqadaryo",
+        "code": "UZ-QA"
+      },
+      {
+        "name": "Qoraqalpog‘iston Respublikasi",
+        "code": "UZ-QR"
+      },
+      {
+        "name": "Samarqand",
+        "code": "UZ-SA"
+      },
+      {
+        "name": "Sirdaryo",
+        "code": "UZ-SI"
+      },
+      {
+        "name": "Surxondaryo",
+        "code": "UZ-SU"
+      },
+      {
+        "name": "Toshkent",
+        "code": "UZ-TO"
+      },
+      {
+        "name": "Toshkent",
+        "code": "UZ-TK"
+      },
+      {
+        "name": "Xorazm",
+        "code": "UZ-XO"
+      }
+    ]
+  },
+  {
+    "countryCode": "VN",
+    "countryName": "Vietnam",
+    "states": [
+      {
+        "name": "Hồ Chí Minh",
+        "code": "VN-SG"
+      },
+      {
+        "name": "Hà Nội",
+        "code": "VN-HN"
+      },
+      {
+        "name": "An Giang",
+        "code": "VN-44"
+      },
+      {
+        "name": "Bà Rịa–Vũng Tàu",
+        "code": "VN-43"
+      },
+      {
+        "name": "Bình Dương",
+        "code": "VN-57"
+      },
+      {
+        "name": "Bình Phước",
+        "code": "VN-58"
+      },
+      {
+        "name": "Bình Thuận",
+        "code": "VN-40"
+      },
+      {
+        "name": "Bình Định",
+        "code": "VN-31"
+      },
+      {
+        "name": "Bạc Liêu",
+        "code": "VN-55"
+      },
+      {
+        "name": "Bắc Giang",
+        "code": "VN-54"
+      },
+      {
+        "name": "Bắc Kạn",
+        "code": "VN-53"
+      },
+      {
+        "name": "Bắc Ninh",
+        "code": "VN-56"
+      },
+      {
+        "name": "Bến Tre",
+        "code": "VN-50"
+      },
+      {
+        "name": "Cao Bằng",
+        "code": "VN-04"
+      },
+      {
+        "name": "Cà Mau",
+        "code": "VN-59"
+      },
+      {
+        "name": "Cần Thơ",
+        "code": "VN-CT"
+      },
+      {
+        "name": "Gia Lai",
+        "code": "VN-30"
+      },
+      {
+        "name": "Hà Giang",
+        "code": "VN-03"
+      },
+      {
+        "name": "Hà Nam",
+        "code": "VN-63"
+      },
+      {
+        "name": "Hà Tây",
+        "code": "VN-15"
+      },
+      {
+        "name": "Hà Tĩnh",
+        "code": "VN-23"
+      },
+      {
+        "name": "Hòa Bình",
+        "code": "VN-14"
+      },
+      {
+        "name": "Hưng Yên",
+        "code": "VN-66"
+      },
+      {
+        "name": "Hải Dương",
+        "code": "VN-61"
+      },
+      {
+        "name": "Hải Phòng",
+        "code": "VN-HP"
+      },
+      {
+        "name": "Hậu Giang",
+        "code": "VN-73"
+      },
+      {
+        "name": "Khánh Hòa",
+        "code": "VN-34"
+      },
+      {
+        "name": "Kiên Giang",
+        "code": "VN-47"
+      },
+      {
+        "name": "Kon Tum",
+        "code": "VN-28"
+      },
+      {
+        "name": "Lai Châu",
+        "code": "VN-01"
+      },
+      {
+        "name": "Long An",
+        "code": "VN-41"
+      },
+      {
+        "name": "Lào Cai",
+        "code": "VN-02"
+      },
+      {
+        "name": "Lâm Đồng",
+        "code": "VN-35"
+      },
+      {
+        "name": "Lạng Sơn",
+        "code": "VN-09"
+      },
+      {
+        "name": "Nam Định",
+        "code": "VN-67"
+      },
+      {
+        "name": "Nghệ An",
+        "code": "VN-22"
+      },
+      {
+        "name": "Ninh Bình",
+        "code": "VN-18"
+      },
+      {
+        "name": "Ninh Thuận",
+        "code": "VN-36"
+      },
+      {
+        "name": "Phú Thọ",
+        "code": "VN-68"
+      },
+      {
+        "name": "Phú Yên",
+        "code": "VN-32"
+      },
+      {
+        "name": "Quảng Bình",
+        "code": "VN-24"
+      },
+      {
+        "name": "Quảng Nam",
+        "code": "VN-27"
+      },
+      {
+        "name": "Quảng Ngãi",
+        "code": "VN-29"
+      },
+      {
+        "name": "Quảng Ninh",
+        "code": "VN-13"
+      },
+      {
+        "name": "Quảng Trị",
+        "code": "VN-25"
+      },
+      {
+        "name": "Sóc Trăng",
+        "code": "VN-52"
+      },
+      {
+        "name": "Sơn La",
+        "code": "VN-05"
+      },
+      {
+        "name": "Thanh Hóa",
+        "code": "VN-21"
+      },
+      {
+        "name": "Thái Bình",
+        "code": "VN-20"
+      },
+      {
+        "name": "Thái Nguyên",
+        "code": "VN-69"
+      },
+      {
+        "name": "Thừa Thiên–Huế",
+        "code": "VN-26"
+      },
+      {
+        "name": "Tiền Giang",
+        "code": "VN-46"
+      },
+      {
+        "name": "Trà Vinh",
+        "code": "VN-51"
+      },
+      {
+        "name": "Tuyên Quang",
+        "code": "VN-07"
+      },
+      {
+        "name": "Tây Ninh",
+        "code": "VN-37"
+      },
+      {
+        "name": "Vĩnh Long",
+        "code": "VN-49"
+      },
+      {
+        "name": "Vĩnh Phúc",
+        "code": "VN-70"
+      },
+      {
+        "name": "Yên Bái",
+        "code": "VN-06"
+      },
+      {
+        "name": "Điện Biên",
+        "code": "VN-71"
+      },
+      {
+        "name": "Đà Nẵng",
+        "code": "VN-DN"
+      },
+      {
+        "name": "Đắk Lắk",
+        "code": "VN-33"
+      },
+      {
+        "name": "Đắk Nông",
+        "code": "VN-72"
+      },
+      {
+        "name": "Đồng Nai",
+        "code": "VN-39"
+      },
+      {
+        "name": "Đồng Tháp",
+        "code": "VN-45"
+      }
+    ]
+  },
+  {
+    "countryCode": "YE",
+    "countryName": "Yemen",
+    "states": [
+      {
+        "name": "'Adan",
+        "code": "YE-AD"
+      },
+      {
+        "name": "'Amrān",
+        "code": "YE-AM"
+      },
+      {
+        "name": "Abyān",
+        "code": "YE-AB"
+      },
+      {
+        "name": "Al Bayḑā'",
+        "code": "YE-BA"
+      },
+      {
+        "name": "Al Jawf",
+        "code": "YE-JA"
+      },
+      {
+        "name": "Al Mahrah",
+        "code": "YE-MR"
+      },
+      {
+        "name": "Al Maḩwīt",
+        "code": "YE-MW"
+      },
+      {
+        "name": "Al Ḩudaydah",
+        "code": "YE-HU"
+      },
+      {
+        "name": "Aḑ Ḑāli'",
+        "code": "YE-DA"
+      },
+      {
+        "name": "Dhamār",
+        "code": "YE-DH"
+      },
+      {
+        "name": "Ibb",
+        "code": "YE-IB"
+      },
+      {
+        "name": "Laḩij",
+        "code": "YE-LA"
+      },
+      {
+        "name": "Ma'rib",
+        "code": "YE-MA"
+      },
+      {
+        "name": "Raymah",
+        "code": "YE-RA"
+      },
+      {
+        "name": "Shabwah",
+        "code": "YE-SH"
+      },
+      {
+        "name": "Tā‘izz",
+        "code": "YE-TA"
+      },
+      {
+        "name": "Şan‘ā'",
+        "code": "YE-SA"
+      },
+      {
+        "name": "Şan‘ā'",
+        "code": "YE-SN"
+      },
+      {
+        "name": "Şā‘dah",
+        "code": "YE-SD"
+      },
+      {
+        "name": "Ḩajjah",
+        "code": "YE-HJ"
+      },
+      {
+        "name": "Ḩaḑramawt",
+        "code": "YE-HD"
+      }
+    ]
+  },
+  {
+    "countryCode": "HK",
+    "countryName": "Hong Kong",
+    "states": [
+      { "name": "Hong Kong Island", "code": "HONG-KONG" },
+      { "name": "Kowloon", "code": "KOWLOON" },
+      { "name": "New Territories", "code": "NEW-TERRITORIES" }
+    ]
+  },
+  {
+    "countryCode": "MO",
+    "countryName": "Macao",
+    "states": [{ "name": "Macao", "code": "MACAO" }]
+  }
+]

@@ -3,9 +3,10 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "assets": [
-        "resources/locales/**/*",
-        "resources/email/templates/*",
-        "database/seeders/firestore/data/*"
+      "resources/locales/**/*",
+      "resources/email/templates/*",
+      "resources/*.json",
+      "database/seeders/firestore/data/*"
     ]
   }
 }

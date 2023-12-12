@@ -206,7 +206,8 @@ export class CompanyInformationDto {
   @MaxLength(50)
   general_business_location_area: string;
 
-  @IsOptional()
+  @ValidateIf((o) => o.status === StatusOfInformation.SUBMITTED)
+  @IsNotEmpty()
   @IsInt()
   @Min(1)
   general_number_of_employees: number;

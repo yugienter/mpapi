@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Logger, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
+import * as fs from 'fs';
+import * as path from 'path';
 
 import { CompanyInformationDto } from '@/app/controllers/dto/company.dto';
 import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
@@ -72,5 +74,17 @@ export class CompaniesController implements Coded {
   async getCompanyInfo(@Param('companyId') companyId: number, @Req() request) {
     const userId = request.raw.user.uid;
     return this.companiesService.getCompanyInfo(companyId, userId);
+  }
+
+  @Get('get-countries-json')
+  async getJsonCountries(@Res() reply) {
+    const jsonPath = path.join(__dirname, '../../../resources', 'countries.json');
+    console.log(jsonPath);
+    if (fs.existsSync(jsonPath)) {
+      const jsonData = fs.readFileSync(jsonPath, 'utf8');
+      reply.send(JSON.parse(jsonData));
+    } else {
+      reply.status(404).send('File not found');
+    }
   }
 }
