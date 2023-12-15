@@ -6,19 +6,19 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, Not, Repository } from 'typeorm';
 
 import { CompanyInformationDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
 import { CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
 import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
+import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
 import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { CompanyInformation } from '@/app/models/company_information';
-import { CompanySummary } from '@/app/models/company_summaries';
+import { CompanySummary, SummaryStatus } from '@/app/models/company_summaries';
 import { FileAttachments } from '@/app/models/file_attachments';
 import { User } from '@/app/models/user';
 import { Service } from '@/app/utils/decorators';
-import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
 
 type SimplifiedCompany = Omit<Company, 'user'>;
 type SimplifiedCompanyInformation = Omit<CompanyInformation, 'company' | 'files' | 'financial_data'>;
@@ -169,7 +169,8 @@ export class CompaniesService {
       const result = new CompanyDetailResponse({
         ...savedCompany,
         ...companyInfo,
-        id: savedCompany.id,
+        companyId: savedCompany.id,
+        companyInformationId: companyInfo.id,
         files: updateFile,
         financial_data: companyInfoDto.financial_data,
       });
@@ -181,7 +182,11 @@ export class CompaniesService {
     }
   }
 
-  async updateCompanyInfo(companyId: number, companyInfoDto: CompanyInformationDto, userId: string): Promise<any> {
+  async updateCompanyInfo(
+    companyId: number,
+    companyInfoDto: CompanyInformationDto,
+    userId: string,
+  ): Promise<CompanyDetailResponse> {
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
       if (!user) {
@@ -233,7 +238,8 @@ export class CompaniesService {
       const result = new CompanyDetailResponse({
         ...savedCompany,
         ...companyInfo,
-        id: savedCompany.id,
+        companyId: savedCompany.id,
+        companyInformationId: companyInfo.id,
         files: updateFile,
         financial_data: companyInfoDto.financial_data,
       });
@@ -280,7 +286,8 @@ export class CompaniesService {
       const result = new CompanyDetailResponse({
         ...company,
         ...companyInfo,
-        id: companyId,
+        companyId: companyId,
+        companyInformationId: companyInfo.id,
       });
 
       return result;
@@ -302,7 +309,8 @@ export class CompaniesService {
       return new CompanyDetailResponse({
         ...company,
         ...companyInfo,
-        id: companyId,
+        companyId: companyId,
+        companyInformationId: companyInfo.id,
       });
     } catch (error) {
       this.logger.error(`[getCompanyInfoForAdmin] failed for companyId ${companyId}`, error.stack);
@@ -310,15 +318,41 @@ export class CompaniesService {
     }
   }
 
-  async getSummary(companyInformationId: number): Promise<CompanySummary> {
+  async getSummaryForAdmin(companyInformationId: number): Promise<CompanySummary | null> {
     try {
-      // TODO
-      // check user if call from user, no need if call from admin
-      return this.companySummaryRepository.findOne({
+      const summary = await this.companySummaryRepository.findOne({
         where: { companyInformation: { id: companyInformationId } },
       });
+
+      return summary;
     } catch (error) {
-      this.logger.error(`[getSummary] Failed to get summary: ${error.message}`);
+      this.logger.error(`[getSummaryForAdmin] Failed to get summary: ${error.message}`);
+      throw new InternalServerErrorException('Failed to get summary');
+    }
+  }
+
+  async getSummaryForUser(companyInformationId: number, userId: string): Promise<CompanySummary | null> {
+    try {
+      const summary = await this.companySummaryRepository.findOne({
+        where: {
+          companyInformation: { id: companyInformationId },
+          status: Not(SummaryStatus.DRAFT_FROM_ADMIN),
+        },
+        relations: ['companyInformation', 'companyInformation.company', 'companyInformation.company.user'],
+      });
+
+      if (!summary) {
+        return null;
+      }
+
+      if (summary.companyInformation.company.user.id !== userId || summary.status !== 'REQUEST') {
+        this.logger.error(`[getSummary] User with Id: ${userId} does not have permission to access this summary`);
+        throw new ForbiddenException('You do not have permission to access this summary');
+      }
+
+      return summary;
+    } catch (error) {
+      this.logger.error(`[getSummaryForUser] Failed to get summary: ${error.message}`);
       throw new InternalServerErrorException('Failed to get summary');
     }
   }

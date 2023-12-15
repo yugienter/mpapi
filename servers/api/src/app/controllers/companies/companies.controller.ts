@@ -8,6 +8,7 @@ import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.resp
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { Company, StatusOfInformation } from '@/app/models/company';
+import { CompanySummary } from '@/app/models/company_summaries';
 import { RolesEnum } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { UsersService } from '@/app/services/users/users.service';
@@ -74,6 +75,13 @@ export class CompaniesController implements Coded {
   async getCompanyInfo(@Param('companyId') companyId: number, @Req() request) {
     const userId = request.raw.user.uid;
     return this.companiesService.getCompanyInfo(companyId, userId);
+  }
+
+  @Get(':companyInformationId/summaries')
+  @Roles(RolesEnum.company)
+  getSummary(@Param('companyInformationId') companyInformationId: number, @Req() request): Promise<CompanySummary> {
+    const userId = request.raw.user.uid;
+    return this.companiesService.getSummaryForUser(companyInformationId, userId);
   }
 
   @Get('get-countries-json')

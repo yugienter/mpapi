@@ -7,12 +7,12 @@ import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.resp
 import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
+import { CompanySummary } from '@/app/models/company_summaries';
 import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
-import { CompanySummary } from '@/app/models/company_summaries';
 
 @MpplatformApiDefault()
 @Authorized()
@@ -85,7 +85,7 @@ export class AdminController implements Coded {
   @Get('/companies/:companyInformationId/summaries')
   @Roles(RolesEnum.admin)
   getSummary(@Param('companyInformationId') companyInformationId: number): Promise<CompanySummary> {
-    return this.companiesService.getSummary(companyInformationId);
+    return this.companiesService.getSummaryForAdmin(companyInformationId);
   }
 
   @Post('/companies/:companyInformationId/summaries')

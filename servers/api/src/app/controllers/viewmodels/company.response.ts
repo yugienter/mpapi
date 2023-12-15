@@ -1,7 +1,8 @@
 import _ from 'lodash';
 
 export interface ICompanyDetailResponse {
-  id: number;
+  companyId: number;
+  companyInformationId: number;
   name: string;
   position: string;
   phone_number: string;
@@ -49,7 +50,8 @@ export interface IFileAttachment {
 }
 
 export class CompanyDetailResponse {
-  id?: number;
+  companyId: number;
+  companyInformationId: number;
   name: string;
   position: string;
   phone_number: string;
@@ -82,7 +84,8 @@ export class CompanyDetailResponse {
   updated_at: Date;
 
   constructor(input: ICompanyDetailResponse) {
-    this.id = input.id;
+    this.companyId = input.companyId;
+    this.companyInformationId = input.companyInformationId;
     this.name = input.name;
     this.position = input.position;
     this.phone_number = input.phone_number;
