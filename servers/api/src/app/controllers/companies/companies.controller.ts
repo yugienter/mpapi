@@ -4,7 +4,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { CompanyInformationDto } from '@/app/controllers/dto/company.dto';
+import { CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
 import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
+import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { Company, StatusOfInformation } from '@/app/models/company';
@@ -79,9 +81,24 @@ export class CompaniesController implements Coded {
 
   @Get(':companyInformationId/summaries')
   @Roles(RolesEnum.company)
-  getSummary(@Param('companyInformationId') companyInformationId: number, @Req() request): Promise<CompanySummary> {
+  getSummary(
+    @Param('companyInformationId') companyInformationId: number,
+    @Req() request,
+  ): Promise<CompanySummaryResponse | null> {
     const userId = request.raw.user.uid;
     return this.companiesService.getSummaryForUser(companyInformationId, userId);
+  }
+
+  @Put(':companyInformationId/summaries/:summaryId')
+  @Roles(RolesEnum.company)
+  updateSummary(
+    @Param('companyInformationId') companyInformationId: number,
+    @Param('summaryId') summaryId: number,
+    @Body() updateSummaryDto: CompanySummaryDto,
+    @Req() request,
+  ): Promise<CompanySummaryResponse> {
+    const userId = request.raw.user.uid;
+    return this.companiesService.updateSummaryForUser(companyInformationId, summaryId, updateSummaryDto, userId);
   }
 
   @Get('get-countries-json')

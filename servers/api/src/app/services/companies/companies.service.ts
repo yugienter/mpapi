@@ -18,6 +18,7 @@ import { CompanyInformation } from '@/app/models/company_information';
 import { CompanySummary, SummaryStatus } from '@/app/models/company_summaries';
 import { FileAttachments } from '@/app/models/file_attachments';
 import { User } from '@/app/models/user';
+import { EmailProvider } from '@/app/providers/email.provider';
 import { Service } from '@/app/utils/decorators';
 
 type SimplifiedCompany = Omit<Company, 'user'>;
@@ -32,8 +33,10 @@ export interface CompanyDetail extends SimplifiedCompany, SimplifiedCompanyInfor
 @Injectable()
 export class CompaniesService {
   private readonly logger = new Logger(CompaniesService.name);
+  // private readonly emailProvider = EmailProvider,
 
   constructor(
+    private readonly emailProvider: EmailProvider,
     @InjectRepository(Company) private companiesRepository: Repository<Company>,
     @InjectRepository(CompanyInformation) private companyInformationRepository: Repository<CompanyInformation>,
     @InjectRepository(CompanyFinancialData) private financialDataRepository: Repository<CompanyFinancialData>,
@@ -318,6 +321,11 @@ export class CompaniesService {
     }
   }
 
+  /** SUMMARY */
+  /*  */
+  /*  */
+  /*  */
+  /*  */
   async getSummaryForAdmin(companyInformationId: number): Promise<CompanySummary | null> {
     try {
       const summary = await this.companySummaryRepository.findOne({
@@ -331,7 +339,7 @@ export class CompaniesService {
     }
   }
 
-  async getSummaryForUser(companyInformationId: number, userId: string): Promise<CompanySummary | null> {
+  async getSummaryForUser(companyInformationId: number, userId: string): Promise<CompanySummaryResponse | null> {
     try {
       const summary = await this.companySummaryRepository.findOne({
         where: {
@@ -345,15 +353,29 @@ export class CompaniesService {
         return null;
       }
 
-      if (summary.companyInformation.company.user.id !== userId || summary.status !== 'REQUEST') {
+      if (summary.companyInformation.company.user.id !== userId) {
         this.logger.error(`[getSummary] User with Id: ${userId} does not have permission to access this summary`);
         throw new ForbiddenException('You do not have permission to access this summary');
       }
 
-      return summary;
+      return new CompanySummaryResponse(summary);
     } catch (error) {
       this.logger.error(`[getSummaryForUser] Failed to get summary: ${error.message}`);
       throw new InternalServerErrorException('Failed to get summary');
+    }
+  }
+
+  private async sendSummaryRequestEmail(companyInformation: CompanyInformation): Promise<void> {
+    const userEmail = companyInformation.company.user.email;
+    const companyName = companyInformation.company.name;
+    try {
+      await this.emailProvider.sendSummaryRequestEmail('Review and Confirm Your Company Summary', userEmail, {
+        companyName,
+      });
+      this.logger.log(`Send summary request for user with email: ${userEmail}`);
+    } catch (error) {
+      this.logger.error(error);
+      this.logger.log(`[sendSummaryRequestEmail] Fail to send email for ${userEmail}`);
     }
   }
 
@@ -364,6 +386,7 @@ export class CompaniesService {
     try {
       const companyInformation = await this.companyInformationRepository.findOne({
         where: { id: companyInformationId },
+        relations: ['company', 'company.user'],
       });
       if (!companyInformation) {
         this.logger.error(`[createSummary] CompanyInformation with ID ${companyInformationId} not found`);
@@ -387,6 +410,11 @@ export class CompaniesService {
         companyInformation: companyInformation,
       });
       const summarySave = await this.companySummaryRepository.save(summary);
+
+      if (createSummaryDto.status === SummaryStatus.REQUEST) {
+        await this.sendSummaryRequestEmail(companyInformation);
+      }
+
       return new CompanySummaryResponse(summarySave);
     } catch (error) {
       this.logger.error(`[createSummary] Failed to create summary: ${error.message}`);
@@ -400,33 +428,73 @@ export class CompaniesService {
     updateSummaryDto: CompanySummaryDto,
   ): Promise<CompanySummaryResponse> {
     try {
+      if (updateSummaryDto.status === SummaryStatus.SUBMITTED || updateSummaryDto.status === SummaryStatus.POSTED) {
+        this.logger.error(
+          `[updateSummary] Admin can not SUBMITTED summary or POSTED summary with data - status: ${updateSummaryDto.status}`,
+        );
+        throw new ForbiddenException(
+          `Admin can not SUBMITTED summary or POSTED summary with data - status: ${updateSummaryDto.status}`,
+        );
+      }
+
       const summary = await this.companySummaryRepository.findOne({
         where: { id: summaryId, companyInformation: { id: companyInformationId } },
+        relations: ['companyInformation', 'companyInformation.company', 'companyInformation.company.user'],
       });
 
       if (!summary) {
-        this.logger.error(
-          `[updateSummary] Summary with ID ${summaryId} not found for CompanyInformation ID ${companyInformationId}`,
-        );
-        throw new NotFoundException(
-          `Summary with ID ${summaryId} not found for CompanyInformation ID ${companyInformationId}`,
-        );
+        this.logger.error(`[updateSummary] Summary with ID ${summaryId} not found`);
+        throw new NotFoundException(`Summary not found`);
       }
-
-      const companyInformation = await this.companyInformationRepository.findOne({
-        where: { id: companyInformationId },
-      });
-      if (!companyInformation) {
-        throw new NotFoundException(`CompanyInformation with ID ${companyInformationId} not found`);
-      }
-      summary.companyInformation = companyInformation;
 
       Object.assign(summary, updateSummaryDto);
       const summarySave = await this.companySummaryRepository.save(summary);
+
+      if (updateSummaryDto.status === SummaryStatus.REQUEST) {
+        await this.sendSummaryRequestEmail(summary.companyInformation);
+      }
+
       return new CompanySummaryResponse(summarySave);
     } catch (error) {
       this.logger.error(`[updateSummary] Failed to update summary: ${error.message}`);
       throw new InternalServerErrorException('Failed to update summary');
     }
+  }
+
+  async updateSummaryForUser(
+    companyInformationId: number,
+    summaryId: number,
+    updateSummaryDto: CompanySummaryDto,
+    userId: string,
+  ): Promise<CompanySummaryResponse> {
+    if (
+      updateSummaryDto.status === SummaryStatus.DRAFT_FROM_ADMIN ||
+      updateSummaryDto.status === SummaryStatus.POSTED ||
+      updateSummaryDto.status === SummaryStatus.REQUEST
+    ) {
+      this.logger.error(`[updateSummaryForUser] User can not use status of Admin - status: ${updateSummaryDto.status}`);
+      throw new ForbiddenException(`User can not use status of Admin - status: ${updateSummaryDto.status}`);
+    }
+
+    const summary = await this.companySummaryRepository.findOne({
+      where: { id: summaryId, companyInformation: { id: companyInformationId } },
+      relations: ['companyInformation', 'companyInformation.company', 'companyInformation.company.user'],
+    });
+
+    if (!summary) {
+      this.logger.error(`[updateSummaryForUser] Summary not found - summaryId: ${summaryId}`);
+      throw new NotFoundException(`Summary not found`);
+    }
+
+    if (summary.companyInformation.company.user.id !== userId) {
+      this.logger.error(
+        `[updateSummaryForUser] UserId ${userId} do not have permission to update summary with id: ${summaryId}`,
+      );
+      throw new ForbiddenException('You do not have permission to update this summary');
+    }
+
+    Object.assign(summary, updateSummaryDto);
+    const summarySave = await this.companySummaryRepository.save(summary);
+    return new CompanySummaryResponse(summarySave);
   }
 }
