@@ -18,6 +18,8 @@ import { CompanyInformation } from '@/app/models/company_information';
 import { CompanySummary, SummaryStatus } from '@/app/models/company_summaries';
 import { FileAttachments } from '@/app/models/file_attachments';
 import { User } from '@/app/models/user';
+import { ConfigProvider } from '@/app/providers/config.provider';
+import { DataAccessProvider } from '@/app/providers/data-access.provider';
 import { EmailProvider } from '@/app/providers/email.provider';
 import { Service } from '@/app/utils/decorators';
 
@@ -37,6 +39,8 @@ export class CompaniesService {
 
   constructor(
     private readonly emailProvider: EmailProvider,
+    private readonly configProvider: ConfigProvider,
+    private dataAccessProvider: DataAccessProvider,
     @InjectRepository(Company) private companiesRepository: Repository<Company>,
     @InjectRepository(CompanyInformation) private companyInformationRepository: Repository<CompanyInformation>,
     @InjectRepository(CompanyFinancialData) private financialDataRepository: Repository<CompanyFinancialData>,
@@ -365,14 +369,46 @@ export class CompaniesService {
     }
   }
 
-  private async sendSummaryRequestEmail(companyInformation: CompanyInformation): Promise<void> {
+  private async sendSummaryRequestEmail(
+    companyInformation: CompanyInformation,
+    summary: CompanySummary,
+  ): Promise<void> {
     const userEmail = companyInformation.company.user.email;
     const companyName = companyInformation.company.name;
+    const adminEmail = this.configProvider.config.adminEmail;
+    const baseUrl = this.configProvider.config.exchangeBaseUrl;
+    const companyInfoId = companyInformation.id;
+
+    const acceptLink = `${baseUrl}/company/${companyInfoId}?mode=view&tab=summary&action=approve-from-email`;
+    const editLink = `${baseUrl}/company/${companyInfoId}?mode=edit&tab=summary`;
+
     try {
-      await this.emailProvider.sendSummaryRequestEmail('Review and Confirm Your Company Summary', userEmail, {
+      const emailContext = {
         companyName,
-      });
+        country: this.dataAccessProvider.getCountryNameByCode(summary.country),
+        title: summary.title,
+        typeOfBusiness: summary.type_of_business,
+        content: summary.content,
+        userEmail,
+        acceptLink,
+        editLink,
+      };
+
       this.logger.log(`Send summary request for user with email: ${userEmail}`);
+      await this.emailProvider.sendSummaryRequestEmail(
+        'Review and Confirm Your Company Summary',
+        userEmail,
+        emailContext,
+        'user',
+      );
+
+      this.logger.log(`Send summary request for user with admin email: ${adminEmail}`);
+      await this.emailProvider.sendSummaryRequestEmail(
+        'Review and Confirm Company Summary',
+        adminEmail,
+        emailContext,
+        'admin',
+      );
     } catch (error) {
       this.logger.error(error);
       this.logger.log(`[sendSummaryRequestEmail] Fail to send email for ${userEmail}`);
@@ -412,7 +448,7 @@ export class CompaniesService {
       const summarySave = await this.companySummaryRepository.save(summary);
 
       if (createSummaryDto.status === SummaryStatus.REQUEST) {
-        await this.sendSummaryRequestEmail(companyInformation);
+        await this.sendSummaryRequestEmail(companyInformation, summarySave);
       }
 
       return new CompanySummaryResponse(summarySave);
@@ -451,7 +487,7 @@ export class CompaniesService {
       const summarySave = await this.companySummaryRepository.save(summary);
 
       if (updateSummaryDto.status === SummaryStatus.REQUEST) {
-        await this.sendSummaryRequestEmail(summary.companyInformation);
+        await this.sendSummaryRequestEmail(summary.companyInformation, summarySave);
       }
 
       return new CompanySummaryResponse(summarySave);

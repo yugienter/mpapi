@@ -1,3 +1,13 @@
 {
-  "cSpell.words": ["datetime", "EBITDA", "fastify", "Mpplatform", "sprintf", "typeorm", "uuidv", "viewmodels"]
+  "cSpell.words": [
+    "datetime",
+    "EBITDA",
+    "fastify",
+    "Mpplatform",
+    "Persistences",
+    "sprintf",
+    "typeorm",
+    "uuidv",
+    "viewmodels"
+  ]
 }

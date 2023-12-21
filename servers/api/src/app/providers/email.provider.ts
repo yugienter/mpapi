@@ -98,13 +98,18 @@ export class EmailProvider implements Coded {
     await this.sendMailWithSES(subject, sendTo, 'admin-registration-notification', params);
   }
 
-  async sendSummaryRequestEmail(subject: string, sendTo: string, params: EmailContext) {
-    const summaryUrlObj = new URL(this.configProvider.config.exchangeBaseUrl);
-    summaryUrlObj.pathname = `summary/action`;
-    summaryUrlObj.searchParams.set('summaryId', String(params.summaryId));
+  async sendSummaryRequestEmail(
+    subject: string,
+    sendTo: string,
+    params: EmailContext,
+    recipientType: 'user' | 'admin',
+  ) {
+    let templateName = 'summary-request';
 
-    const summaryUrl = summaryUrlObj.toString();
+    if (recipientType === 'admin') {
+      templateName = 'summary-request-admin';
+    }
 
-    await this.sendMailWithSES(subject, sendTo, 'summary-request', { ...params, actionLink: summaryUrl });
+    await this.sendMailWithSES(subject, sendTo, templateName, params);
   }
 }

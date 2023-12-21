@@ -23,6 +23,7 @@ import { CorsMiddleware } from '@/app/middlewares/cors.middleware';
 import { ALL_MODELS } from '@/app/models/index';
 import { AuthProvider } from '@/app/providers/auth.provider';
 import { ConfigProvider } from '@/app/providers/config.provider';
+import { DataAccessProvider } from '@/app/providers/data-access.provider';
 import { EmailProvider } from '@/app/providers/email.provider';
 import { I18nProvider } from '@/app/providers/i18n.provider';
 import { S3Provider } from '@/app/providers/s3.provider';
@@ -47,6 +48,7 @@ const publicControllers = [AuthController, SamplesController, PublicController];
 
 const providers = [
   AuthProvider,
+  DataAccessProvider,
   ConfigProvider,
   EmailProvider,
   StorageProvider,
@@ -55,7 +57,6 @@ const providers = [
   S3Provider,
 ];
 
-// ここに関してはproviders以外はcontrollerがimportされるとdocorator経由で入ってくる
 const services = [...mpplatformServices, ...mpplatformPersistences, ...providers];
 
 @Module({

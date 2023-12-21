@@ -1,7 +1,7 @@
 doctype html
 html
   head
-    title Your Company Summary Request
+    title Summary Request Sent to User
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     style.
       @media only screen and (max-width: 600px) {
@@ -16,10 +16,10 @@ html
           table(width="600" border="0" cellpadding="10" cellspacing="0" bgcolor="#ffffff" style="padding: 30px")
             tr
               td(align="center")
-                h1(style="font-size: 24px; margin-bottom: 20px;") Company Summary Review Request
+                h1(style="font-size: 24px; margin-bottom: 20px;") Summary Request Sent to User
             tr
               td(align="left")
-                p We have prepared a non-name summary of your company named #{companyName} to be posted on the platform for investors. The summary details are as follows:
+                p A summary request has been sent to the user for the following company: #{companyName} and email of user is #{userEmail}
                 p 
                   strong Country: 
                   | #{country}
@@ -33,15 +33,7 @@ html
                   strong Content: 
                   br
                   | #{content}
-                p Please check the summary, and if you are ok with it, please click "accept". If you would like to edit the contents, please click "edit" and make edits that you desire.
-            tr
-              td(align="center")
-                table(border="0" cellpadding="0" cellspacing="5" style="margin: 20px auto; text-align: center;")
-                  tr
-                    td(bgcolor="#a4c761" style="padding: 12px 24px; margin-right: 10px; width: 50px; text-align: center;")
-                      a(href=acceptLink style="font-size: 16px; color: #ffffff; text-decoration: none;") Accept
-                    td(bgcolor="#f4b400" style="padding: 12px 24px; margin-left: 10px; width: 50px")
-                      a(href=editLink style="font-size: 16px; color: #ffffff; text-decoration: none; text-align: center;") Edit
+                p This email is to notify you that the user has been requested to review and confirm this summary.
             tr
               td(align="left" style="font-size: 12px; font-style: italic;")
                 span * 

@@ -28,6 +28,9 @@ export declare class Config {
   /** Environment variable: AWS_REGION */
   readonly awsRegion: string;
 
+  /** Environment variable: ADMIN_EMAIL */
+  readonly adminEmail: string;
+
   /** Environment variable: EMAIL_USER */
   readonly emailUser: string;
   /** Environment variable: BCC_EMAIL_USER */
@@ -124,6 +127,7 @@ export class ConfigProvider {
       awsAccessKey: this.getOrShowError<string>('AWS_ACCESS_KEY', null),
       awsSecretKey: this.getOrShowError<string>('AWS_SECRET_KEY', null),
       awsRegion: this.getOrShowError<string>('AWS_REGION', null),
+      adminEmail: this.getOrShowError<string>('ADMIN_EMAIL', null),
 
       emailUser: this.getOrShowError<string>('EMAIL_USER', null),
       bccEmailUser: this.getOrShowError<string>('BCC_EMAIL_USER', null),
