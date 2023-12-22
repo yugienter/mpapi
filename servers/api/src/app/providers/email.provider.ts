@@ -112,4 +112,19 @@ export class EmailProvider implements Coded {
 
     await this.sendMailWithSES(subject, sendTo, templateName, params);
   }
+
+  async sendSummaryUpdateNotification(
+    subject: string,
+    sendTo: string,
+    params: EmailContext,
+    recipientType: 'user' | 'admin',
+  ) {
+    let templateName = 'summary-submit-notification';
+
+    if (recipientType === 'admin') {
+      templateName = 'summary-submit-notification-admin';
+    }
+
+    await this.sendMailWithSES(subject, sendTo, templateName, params);
+  }
 }

@@ -1,0 +1,44 @@
+doctype html
+html
+  head
+    title Your Company Summary Update
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    style.
+      @media only screen and (max-width: 600px) {
+        table {
+          width: 100% !important;
+        }
+      }
+  body(style="font-family: Arial, sans-serif; margin: 0; padding: 0;")
+    table(width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#f4f4f4")
+      tr
+        td(align="center" valign="top")
+          table(width="600" border="0" cellpadding="10" cellspacing="0" bgcolor="#ffffff" style="padding: 30px")
+            tr
+              td(align="center")
+                h1(style="font-size: 24px; margin-bottom: 20px;") Company Summary Update
+            tr
+              td(align="left")
+                p Thank you for submitting the summary of your company named #{companyName}. The submitted summary details are as follows:
+                p 
+                  strong Country: 
+                  | #{country}
+                p 
+                  strong Title: 
+                  | #{title}
+                p 
+                  strong Type of Business: 
+                  | #{typeOfBusiness}
+                p 
+                  strong Content: 
+                  br
+                  | #{content}
+            tr
+              td(align="left" style="font-size: 12px; font-style: italic;")
+                span * 
+                | This is an automated message. Please do not reply directly to this email.
+            tr
+              td(align="left")
+                p If you have any issues or questions, please 
+                  a(href="mailto:info@mp-asia.com" style="text-decoration: underline;") contact our support team
+                p Thank you!

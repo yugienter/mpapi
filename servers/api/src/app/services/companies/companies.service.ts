@@ -415,6 +415,39 @@ export class CompaniesService {
     }
   }
 
+  private async sendSummarySubmitEmail(userEmail: string, companyName: string, summary: CompanySummary): Promise<void> {
+    const adminEmail = this.configProvider.config.adminEmail;
+    try {
+      const emailContext = {
+        companyName,
+        country: this.dataAccessProvider.getCountryNameByCode(summary.country),
+        title: summary.title,
+        typeOfBusiness: summary.type_of_business,
+        content: summary.content,
+        userEmail,
+      };
+
+      this.logger.log(`Send summary submit email for user with email: ${userEmail}`);
+      await this.emailProvider.sendSummaryUpdateNotification(
+        'Summary Update Notification',
+        userEmail,
+        emailContext,
+        'user',
+      );
+
+      this.logger.log(`Send summary submit email for user with admin email: ${adminEmail}`);
+      await this.emailProvider.sendSummaryUpdateNotification(
+        'Summary Update Notification',
+        adminEmail,
+        emailContext,
+        'admin',
+      );
+    } catch (error) {
+      this.logger.error(error);
+      this.logger.log(`[sendSummarySubmitEmail] Fail to send email for ${userEmail}`);
+    }
+  }
+
   async createSummary(
     companyInformationId: number,
     createSummaryDto: CompanySummaryDto,
@@ -531,6 +564,14 @@ export class CompaniesService {
 
     Object.assign(summary, updateSummaryDto);
     const summarySave = await this.companySummaryRepository.save(summary);
+
+    if (updateSummaryDto.status === SummaryStatus.SUBMITTED) {
+      await this.sendSummarySubmitEmail(
+        summary.companyInformation.company.user.email,
+        summary.companyInformation.company.name,
+        summarySave,
+      );
+    }
     return new CompanySummaryResponse(summarySave);
   }
 }
