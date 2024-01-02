@@ -10,9 +10,9 @@ import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_sum
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { Company, StatusOfInformation } from '@/app/models/company';
-import { CompanySummary } from '@/app/models/company_summaries';
 import { RolesEnum } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
+import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
@@ -24,7 +24,11 @@ import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
 export class CompaniesController implements Coded {
   private readonly logger = new Logger(CompaniesController.name);
 
-  constructor(private readonly companiesService: CompaniesService, private readonly usersService: UsersService) {}
+  constructor(
+    private readonly companiesService: CompaniesService,
+    private readonly companySummariesService: CompanySummariesService,
+    private readonly usersService: UsersService,
+  ) {}
 
   get code(): string {
     return 'CCP';
@@ -86,7 +90,7 @@ export class CompaniesController implements Coded {
     @Req() request,
   ): Promise<CompanySummaryResponse | null> {
     const userId = request.raw.user.uid;
-    return this.companiesService.getSummaryForUser(companyInformationId, userId);
+    return this.companySummariesService.getSummaryForUser(companyInformationId, userId);
   }
 
   @Put(':companyInformationId/summaries/:summaryId')
@@ -98,7 +102,7 @@ export class CompaniesController implements Coded {
     @Req() request,
   ): Promise<CompanySummaryResponse> {
     const userId = request.raw.user.uid;
-    return this.companiesService.updateSummaryForUser(companyInformationId, summaryId, updateSummaryDto, userId);
+    return this.companySummariesService.updateSummaryForUser(companyInformationId, summaryId, updateSummaryDto, userId);
   }
 
   @Get('get-countries-json')

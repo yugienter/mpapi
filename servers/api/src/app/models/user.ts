@@ -48,6 +48,9 @@ export class User {
   @Column({ default: false, select: false })
   is_deleted: boolean;
 
+  @Column({ type: 'int', nullable: true })
+  role_order: number | null;
+
   @CreateDateColumn()
   created_at: Date;
 

@@ -3,13 +3,20 @@ import { ApiOperation } from '@nestjs/swagger';
 
 import { ManualCreateUserRequest } from '@/app/controllers/dto/auth.dto';
 import { CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
+import {
+  CreateSummaryTranslationDto,
+  UpdateSummaryTranslationDto,
+} from '@/app/controllers/dto/company_summary_translation.dto';
 import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
 import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
+import { CompanySummaryTranslationResponse } from '@/app/controllers/viewmodels/company_summary_translation.response';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { CompanySummary } from '@/app/models/company_summaries';
 import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
+import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
+import { CompanySummaryTranslationsService } from '@/app/services/companies/companies-summaries-translation.service';
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
@@ -21,7 +28,12 @@ import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
 export class AdminController implements Coded {
   private readonly logger = new Logger(AdminController.name);
 
-  constructor(private readonly companiesService: CompaniesService, private readonly usersService: UsersService) {}
+  constructor(
+    private readonly companiesService: CompaniesService,
+    private readonly companySummariesService: CompanySummariesService,
+    private readonly companySummaryTranslationsService: CompanySummaryTranslationsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   get code(): string {
     return 'CAD';
@@ -85,7 +97,7 @@ export class AdminController implements Coded {
   @Get('/companies/:companyInformationId/summaries')
   @Roles(RolesEnum.admin)
   getSummary(@Param('companyInformationId') companyInformationId: number): Promise<CompanySummary> {
-    return this.companiesService.getSummaryForAdmin(companyInformationId);
+    return this.companySummariesService.getSummaryForAdmin(companyInformationId);
   }
 
   @Post('/companies/:companyInformationId/summaries')
@@ -94,7 +106,7 @@ export class AdminController implements Coded {
     @Param('companyInformationId') companyInformationId: number,
     @Body() createSummaryDto: CompanySummaryDto,
   ): Promise<CompanySummaryResponse> {
-    return this.companiesService.createSummary(companyInformationId, createSummaryDto);
+    return this.companySummariesService.createSummary(companyInformationId, createSummaryDto);
   }
 
   @Put('/companies/:companyInformationId/summaries/:summaryId')
@@ -104,6 +116,40 @@ export class AdminController implements Coded {
     @Param('summaryId') summaryId: number,
     @Body() updateSummaryDto: CompanySummaryDto,
   ): Promise<CompanySummaryResponse> {
-    return this.companiesService.updateSummary(companyInformationId, summaryId, updateSummaryDto);
+    return this.companySummariesService.updateSummary(companyInformationId, summaryId, updateSummaryDto);
+  }
+
+  @Post('/companies/:companySummaryId/summaries/translations')
+  @Roles(RolesEnum.admin)
+  createSummaryTranslation(
+    @Param('companySummaryId') companySummaryId: number,
+    @Body() createSummaryTranslationDto: CreateSummaryTranslationDto,
+  ): Promise<CompanySummaryTranslationResponse> {
+    return this.companySummaryTranslationsService.createSummaryTranslation(
+      companySummaryId,
+      createSummaryTranslationDto,
+    );
+  }
+
+  @Put('/companies/:companySummaryId/summaries/translations/:translationId')
+  @Roles(RolesEnum.admin)
+  updateSummaryTranslation(
+    @Param('companySummaryId') companySummaryId: number,
+    @Param('translationId') translationId: number,
+    @Body() updateSummaryTranslationDto: UpdateSummaryTranslationDto,
+  ): Promise<CompanySummaryTranslationResponse> {
+    return this.companySummaryTranslationsService.updateSummaryTranslation(
+      companySummaryId,
+      translationId,
+      updateSummaryTranslationDto,
+    );
+  }
+
+  @Get('/companies/:companySummaryId/summaries/translations')
+  @Roles(RolesEnum.admin)
+  getSummaryTranslations(
+    @Param('companySummaryId') companySummaryId: number,
+  ): Promise<CompanySummaryTranslationResponse[]> {
+    return this.companySummaryTranslationsService.getSummaryTranslations(companySummaryId);
   }
 }

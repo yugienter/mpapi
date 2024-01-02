@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getAuth as getAuthClient, signInWithEmailAndPassword } from 'firebase/auth';
 import { UserRecord } from 'firebase-admin/auth';
 import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
@@ -9,15 +8,13 @@ import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { CodedInvalidArgumentException } from '@/app/exceptions/errors/coded-invalid-argument.exception';
 import { CodedUnauthorizedException } from '@/app/exceptions/errors/coded-unauthorized.exception';
 import { ErrorInfo } from '@/app/exceptions/errors/error-info';
-import { Company } from '@/app/models/company';
-import { TypeOfBusinessEnum } from '@/app/models/company_information';
 import { EmailVerificationToken, TokenActionEnum } from '@/app/models/email_verification_tokens';
 import { ModifiedUser, RolesEnum, StatusEnum, User } from '@/app/models/user';
 import { UserProfile } from '@/app/models/user-profile';
 import { FirebaseInfo } from '@/app/modules/firebase.module';
 import { UsersPersistence } from '@/app/persistence/users.persistence';
 import { ConfigProvider } from '@/app/providers/config.provider';
-import { EmailProvider, UserTypeAction } from '@/app/providers/email.provider';
+import { EmailProvider } from '@/app/providers/email.provider';
 import { I18nProvider } from '@/app/providers/i18n.provider';
 import { SlackProvider } from '@/app/providers/slack.provider';
 import { StorageProvider } from '@/app/providers/storage.provider';
@@ -28,11 +25,6 @@ import { convertToMilliseconds } from '@/app/utils/utils';
 interface OTPs {
   setEmailVerified: boolean;
   userId: string | null;
-}
-
-interface WillingToDetails {
-  willingTo: string;
-  willingToText: string;
 }
 
 interface PayloadGeneratorToken {
@@ -288,11 +280,22 @@ export class UsersService implements Coded {
       this.logger.debug(`user: ${uid}`);
 
       const now = new Date();
+
+      const lastUserWithRole = await t
+        .getRepository(User)
+        .createQueryBuilder('user')
+        .where('user.role = :role', { role: data.role })
+        .orderBy('user.role_order', 'DESC')
+        .getOne();
+
+      const roleOrder = lastUserWithRole ? lastUserWithRole.role_order + 1 : 1;
+
       const userData = {
         id: uid,
         email: data.email ?? null,
         name: data.name,
         role: data.role,
+        role_order: roleOrder,
         status: data.emailVerified === true ? StatusEnum.active : StatusEnum.inActive,
         created_at: now,
         updated_at: now,
@@ -529,6 +532,7 @@ export class UsersService implements Coded {
         name: user.name,
         email: user.email,
         status: user.status,
+        role_order: user.role_order,
         created_at: user.created_at,
         updated_at: user.updated_at,
         companies: user.companies.map((company) => ({
