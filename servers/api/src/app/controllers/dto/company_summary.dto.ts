@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
 import { registerDecorator, ValidationArguments, ValidationOptions } from 'class-validator';
 
 import { TypeOfBusinessEnum } from '@/app/models/company_information';
@@ -41,4 +41,9 @@ export class CompanySummaryDto {
   @IsNotEmpty()
   @IsAllowedStatus({ message: 'Invalid status value' })
   status: SummaryStatus;
+}
+
+export class AddSummaryToMasterDto {
+  @IsBoolean()
+  is_public: boolean;
 }

@@ -9,6 +9,8 @@ export class CompanySummaryResponse {
   type_of_business: TypeOfBusinessEnum;
   status: SummaryStatus;
   companyInformationId: number;
+  is_public: boolean;
+  updated_at: Date;
 
   constructor(summary: CompanySummary) {
     this.id = summary.id;
@@ -18,5 +20,7 @@ export class CompanySummaryResponse {
     this.type_of_business = summary.type_of_business;
     this.status = summary.status;
     this.companyInformationId = summary.companyInformation?.id;
+    this.is_public = summary.is_public;
+    this.updated_at = summary.updated_at;
   }
 }

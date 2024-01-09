@@ -1,4 +1,12 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 import { CompanyInformation, TypeOfBusinessEnum } from '@/app/models/company_information';
 
@@ -29,6 +37,24 @@ export class CompanySummary {
 
   @Column()
   status: SummaryStatus;
+
+  @Column({ type: 'boolean', default: false })
+  is_public: boolean;
+
+  @Column({ type: 'int', nullable: true })
+  version: number;
+
+  @Column({ type: 'int', nullable: true })
+  original_version_id: number;
+
+  @Column({ type: 'json', nullable: true })
+  changes_json: any;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @ManyToOne(() => CompanyInformation)
   @JoinColumn({ name: 'company_information_id' })

@@ -2,7 +2,7 @@ import { Body, Controller, Get, Logger, Param, Post, Put, UseGuards } from '@nes
 import { ApiOperation } from '@nestjs/swagger';
 
 import { ManualCreateUserRequest } from '@/app/controllers/dto/auth.dto';
-import { CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
+import { AddSummaryToMasterDto, CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
 import {
   CreateSummaryTranslationDto,
   UpdateSummaryTranslationDto,
@@ -119,6 +119,15 @@ export class AdminController implements Coded {
     return this.companySummariesService.updateSummary(companyInformationId, summaryId, updateSummaryDto);
   }
 
+  @Put('/companies/:companySummaryId/summaries/add-to-master')
+  @Roles(RolesEnum.admin)
+  addSummaryToMaster(
+    @Param('companySummaryId') companySummaryId: number,
+    @Body() addToMasterDto: AddSummaryToMasterDto,
+  ): Promise<CompanySummaryResponse> {
+    return this.companySummariesService.addSummaryToMaster(companySummaryId, addToMasterDto);
+  }
+
   @Post('/companies/:companySummaryId/summaries/translations')
   @Roles(RolesEnum.admin)
   createSummaryTranslation(
@@ -151,5 +160,11 @@ export class AdminController implements Coded {
     @Param('companySummaryId') companySummaryId: number,
   ): Promise<CompanySummaryTranslationResponse[]> {
     return this.companySummaryTranslationsService.getSummaryTranslations(companySummaryId);
+  }
+
+  @Get('/companies/summaries/latest-posted')
+  @Roles(RolesEnum.admin)
+  getLatestPostedSummaries() {
+    return this.companySummariesService.getLatestPostedSummaries();
   }
 }

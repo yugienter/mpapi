@@ -1,4 +1,12 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 import { CompanySummary } from '@/app/models/company_summaries';
 import { LanguageEnum } from '@/app/models/enum';
@@ -16,6 +24,12 @@ export class CompanySummaryTranslation {
 
   @Column('text')
   content_translated: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @ManyToOne(() => CompanySummary)
   @JoinColumn({ name: 'company_summary_id' })
