@@ -320,8 +320,17 @@ export class CompanySummariesService {
       return this.companySummaryRepository
         .createQueryBuilder('summary')
         .where('summary.status = :status', { status: SummaryStatus.POSTED })
-        .groupBy('summary.original_version_id')
-        .orderBy('summary.version', 'DESC')
+        .innerJoin(
+          (subQuery) => {
+            return subQuery
+              .select(['subSummary.company_information_id', 'MAX(subSummary.version) as max_version'])
+              .from(CompanySummary, 'subSummary')
+              .where('subSummary.status = :status', { status: SummaryStatus.POSTED })
+              .groupBy('subSummary.company_information_id');
+          },
+          'latestSummary',
+          'summary.company_information_id = latestSummary.company_information_id AND summary.version = latestSummary.max_version',
+        )
         .getMany();
     } catch (error) {
       this.logger.error(`Failed to get latest posted summaries: ${error.message}`);
