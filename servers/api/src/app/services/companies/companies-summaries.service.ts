@@ -38,6 +38,7 @@ export class CompanySummariesService {
           status: Not(SummaryStatus.DRAFT_FROM_ADMIN),
         },
         relations: ['companyInformation', 'companyInformation.company', 'companyInformation.company.user'],
+        order: { version: 'DESC' },
       });
 
       if (!summary) {
@@ -160,11 +161,7 @@ export class CompanySummariesService {
       throw new NotFoundException(`Summary not found`);
     }
 
-    if (
-      summary.status === SummaryStatus.DRAFT_FROM_ADMIN ||
-      summary.status === SummaryStatus.POSTED ||
-      summary.status === SummaryStatus.REQUEST
-    ) {
+    if (summary.status === SummaryStatus.DRAFT_FROM_ADMIN || summary.status === SummaryStatus.POSTED) {
       throw new ForbiddenException(
         `User can not update summary because it still in Admin side or posted to investor side`,
       );
