@@ -136,6 +136,22 @@ export class CompanySummariesService {
     }
   }
 
+  private async findRelatedPostedSummary(
+    companyInformationId: number,
+    excludeSummaryId?: number,
+  ): Promise<CompanySummary | null> {
+    const query = this.companySummaryRepository
+      .createQueryBuilder('summary')
+      .where('summary.companyInformation.id = :companyInformationId', { companyInformationId })
+      .andWhere('summary.status = :status', { status: SummaryStatus.POSTED });
+
+    if (excludeSummaryId) {
+      query.andWhere('summary.id != :excludeSummaryId', { excludeSummaryId });
+    }
+
+    return query.orderBy('summary.version', 'DESC').getOne();
+  }
+
   async updateSummaryForUser(
     companyInformationId: number,
     summaryId: number,
@@ -221,7 +237,7 @@ export class CompanySummariesService {
         await this.sendSummaryRequestEmail(companyInformation, summarySave);
       }
 
-      return new CompanySummaryResponse(summarySave);
+      return new CompanySummaryResponse(summarySave, postedSummary?.id);
     } catch (error) {
       this.logger.error(`Failed to create summary: ${error.message}`);
       throw new InternalServerErrorException('Failed to create summary');
@@ -266,21 +282,29 @@ export class CompanySummariesService {
         await this.sendSummaryRequestEmail(summary.companyInformation, summarySave);
       }
 
-      return new CompanySummaryResponse(summarySave);
+      const relatedPostedSummary = await this.findRelatedPostedSummary(companyInformationId, summaryId);
+
+      return new CompanySummaryResponse(summarySave, relatedPostedSummary?.id);
     } catch (error) {
       this.logger.error(`Failed to update summary: ${error.message}`);
       throw new InternalServerErrorException('Failed to update summary');
     }
   }
 
-  async getSummaryForAdmin(companyInformationId: number): Promise<CompanySummary | null> {
+  async getSummaryForAdmin(companyInformationId: number): Promise<CompanySummaryResponse | null> {
     try {
       const summary = await this.companySummaryRepository.findOne({
         where: { companyInformation: { id: companyInformationId } },
         order: { version: 'DESC' },
       });
 
-      return summary;
+      if (!summary) {
+        return null;
+      }
+
+      const relatedPostedSummary = await this.findRelatedPostedSummary(companyInformationId, summary.id);
+
+      return new CompanySummaryResponse(summary, relatedPostedSummary?.id);
     } catch (error) {
       this.logger.error(`[getSummaryForAdmin] Failed to get summary: ${error.message}`);
       throw new InternalServerErrorException('Failed to get summary');
@@ -292,7 +316,10 @@ export class CompanySummariesService {
     { is_public }: AddSummaryToMasterDto,
   ): Promise<CompanySummaryResponse> {
     this.logger.debug(`[addSummaryToMaster] summaryId: ${companySummaryId}`);
-    const summary = await this.companySummaryRepository.findOne({ where: { id: companySummaryId } });
+    const summary = await this.companySummaryRepository.findOne({
+      where: { id: companySummaryId },
+      relations: ['companyInformation'],
+    });
     if (!summary) {
       this.logger.error(`Summary not found`);
       throw new NotFoundException('Summary not found');
@@ -300,6 +327,26 @@ export class CompanySummariesService {
 
     if (summary.status === SummaryStatus.SUBMITTED) {
       summary.status = SummaryStatus.POSTED;
+
+      const existingSummary = await this.companySummaryRepository.findOne({
+        where: {
+          companyInformation: { id: summary.companyInformation.id },
+          status: SummaryStatus.POSTED,
+        },
+        order: { card_order: 'DESC' },
+      });
+
+      if (existingSummary) {
+        summary.card_order = existingSummary.card_order;
+        summary.added_to_master_at = existingSummary.added_to_master_at;
+      } else {
+        const highestOrder = await this.companySummaryRepository
+          .createQueryBuilder('summary')
+          .select('MAX(summary.card_order)', 'max')
+          .getRawOne();
+        summary.card_order = highestOrder.max !== null ? highestOrder.max + 1 : 1;
+        summary.added_to_master_at = new Date();
+      }
     } else if (summary.status !== SummaryStatus.POSTED) {
       this.logger.error(`Admin can not POSTED summary have not SUBMITTED`);
       throw new ForbiddenException(`Admin can not POSTED summary have not SUBMITTED`);
@@ -328,6 +375,7 @@ export class CompanySummariesService {
           'latestSummary',
           'summary.company_information_id = latestSummary.company_information_id AND summary.version = latestSummary.max_version',
         )
+        .orderBy('summary.card_order', 'ASC')
         .getMany();
     } catch (error) {
       this.logger.error(`Failed to get latest posted summaries: ${error.message}`);

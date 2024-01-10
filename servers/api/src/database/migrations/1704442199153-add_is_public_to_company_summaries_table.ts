@@ -38,7 +38,22 @@ export class AddIsPublicToCompanySummaries1704442199153 implements MigrationInte
         isNullable: true,
       }),
     );
-
+    await queryRunner.addColumn(
+      this.tableName,
+      new TableColumn({
+        name: 'card_order',
+        type: 'int',
+        isNullable: true,
+      }),
+    );
+    await queryRunner.addColumn(
+      this.tableName,
+      new TableColumn({
+        name: 'added_to_master_at',
+        type: 'timestamp',
+        isNullable: true,
+      }),
+    );
     await queryRunner.addColumn(
       'company_summaries_translations',
       new TableColumn({
@@ -48,7 +63,6 @@ export class AddIsPublicToCompanySummaries1704442199153 implements MigrationInte
         default: 'CURRENT_TIMESTAMP',
       }),
     );
-
     await queryRunner.addColumn(
       'company_summaries_translations',
       new TableColumn({
@@ -65,5 +79,9 @@ export class AddIsPublicToCompanySummaries1704442199153 implements MigrationInte
     await queryRunner.dropColumn(this.tableName, 'version');
     await queryRunner.dropColumn(this.tableName, 'original_version_id');
     await queryRunner.dropColumn(this.tableName, 'changes_json');
+    await queryRunner.dropColumn(this.tableName, 'card_order');
+    await queryRunner.dropColumn(this.tableName, 'added_to_master_at');
+    await queryRunner.dropColumn('company_summaries_translations', 'created_at');
+    await queryRunner.dropColumn('company_summaries_translations', 'updated_at');
   }
 }

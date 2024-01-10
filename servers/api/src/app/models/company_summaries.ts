@@ -50,6 +50,12 @@ export class CompanySummary {
   @Column({ type: 'json', nullable: true })
   changes_json: any;
 
+  @Column({ type: 'int', nullable: true })
+  card_order: number | null;
+
+  @CreateDateColumn({ nullable: true })
+  added_to_master_at: Date | null;
+
   @CreateDateColumn()
   created_at: Date;
 

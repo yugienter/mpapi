@@ -96,7 +96,7 @@ export class AdminController implements Coded {
 
   @Get('/companies/:companyInformationId/summaries')
   @Roles(RolesEnum.admin)
-  getSummary(@Param('companyInformationId') companyInformationId: number): Promise<CompanySummary> {
+  getSummary(@Param('companyInformationId') companyInformationId: number): Promise<CompanySummaryResponse | null> {
     return this.companySummariesService.getSummaryForAdmin(companyInformationId);
   }
 
