@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CompanyInformationDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
-import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
+import { CompanyDetailResponse, ICompanyInfoWithUserResponse } from '@/app/controllers/viewmodels/company.response';
+import { UserInfo } from '@/app/controllers/viewmodels/user.response';
 import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { CompanyInformation } from '@/app/models/company_information';
@@ -286,21 +287,25 @@ export class CompaniesService {
     }
   }
 
-  async getCompanyInfoForAdmin(companyId: number): Promise<CompanyDetailResponse> {
+  async getCompanyInfoForAdmin(companyId: number): Promise<ICompanyInfoWithUserResponse> {
     try {
-      const company = await this.companiesRepository.findOne({ where: { id: companyId } });
+      const company = await this.companiesRepository.findOne({ where: { id: companyId }, relations: ['user'] });
       if (!company) {
         throw new NotFoundException(`Company with ID ${companyId} not found`);
       }
 
       const companyInfo = await this.getCompanyInformation(companyId);
 
-      return new CompanyDetailResponse({
+      const companyResult = new CompanyDetailResponse({
         ...company,
         ...companyInfo,
         companyId: companyId,
         companyInformationId: companyInfo.id,
       });
+
+      const user = new UserInfo(company.user);
+
+      return { user, company: companyResult };
     } catch (error) {
       this.logger.error(`[getCompanyInfoForAdmin] failed for companyId ${companyId}`, error.stack);
       throw new Error(`[getCompanyInfoForAdmin] error : ${error.message}`);

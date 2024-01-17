@@ -18,6 +18,36 @@ export enum SummaryStatus {
   POSTED = 'POSTED',
 }
 
+export enum YearsEnum {
+  UNDER_1 = 'under 1',
+  ONE_TO_FIVE = '1-5',
+  FIVE_TO_TEN = '5-10',
+  TEN_TO_TWENTY_FIVE = '10-25',
+  TWENTY_FIVE_TO_FIFTY = '25-50',
+  OVER_FIFTY = 'over 50',
+}
+
+export enum NumberOfEmployeesEnum {
+  ZERO_TO_TWENTY_FIVE = '0-25',
+  TWENTY_FIVE_TO_FIFTY = '25-50',
+  FIFTY_TO_ONE_HUNDRED = '50-100',
+  ONE_HUNDRED_TO_TWO_FIFTY = '100-250',
+  TWO_FIFTY_TO_FIVE_HUNDRED = '250-500',
+  OVER_FIVE_HUNDRED = '500+',
+}
+
+export enum AnnualRevenueEnum {
+  NEGATIVE = 'negative',
+  ZERO_TO_FIVE_M_USD = '0-5',
+  FIVE_TO_TEN_M_USD = '5-10',
+  TEN_TO_TWENTY_FIVE_M_USD = '10-25',
+  TWENTY_FIVE_TO_FIFTY_M_USD = '25-50',
+  FIFTY_TO_ONE_HUNDRED_M_USD = '50-100',
+  ONE_HUNDRED_TO_TWO_FIFTY_M_USD = '100-250',
+  TWO_FIFTY_TO_FIVE_HUNDRED_M_USD = '205-500',
+  OVER_FIVE_HUNDRED_M_USD = '500+',
+}
+
 @Entity('company_summaries')
 export class CompanySummary {
   @PrimaryGeneratedColumn()
@@ -25,6 +55,9 @@ export class CompanySummary {
 
   @Column({ length: 50 })
   country: string;
+
+  @Column({ length: 50 })
+  area: string;
 
   @Column()
   title: string;
@@ -34,6 +67,15 @@ export class CompanySummary {
 
   @Column()
   type_of_business: TypeOfBusinessEnum;
+
+  @Column({ type: 'enum', enum: YearsEnum })
+  years: YearsEnum;
+
+  @Column({ type: 'enum', enum: NumberOfEmployeesEnum })
+  number_of_employees: NumberOfEmployeesEnum;
+
+  @Column({ type: 'enum', enum: AnnualRevenueEnum })
+  annual_revenue: AnnualRevenueEnum;
 
   @Column()
   status: SummaryStatus;

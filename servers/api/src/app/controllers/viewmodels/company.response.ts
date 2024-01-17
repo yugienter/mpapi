@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { UserInfo } from './user.response';
 
 export interface ICompanyDetailResponse {
   companyId: number;
@@ -128,4 +129,9 @@ export class CompanyDetailResponse {
     this.created_at = input.created_at;
     this.updated_at = input.updated_at;
   }
+}
+
+export interface ICompanyInfoWithUserResponse {
+  user: UserInfo;
+  company: CompanyDetailResponse;
 }

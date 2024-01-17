@@ -7,12 +7,12 @@ import {
   CreateSummaryTranslationDto,
   UpdateSummaryTranslationDto,
 } from '@/app/controllers/dto/company_summary_translation.dto';
-import { CompanyDetailResponse } from '@/app/controllers/viewmodels/company.response';
+import { ICompanyInfoWithUserResponse } from '@/app/controllers/viewmodels/company.response';
 import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
 import { CompanySummaryTranslationResponse } from '@/app/controllers/viewmodels/company_summary_translation.response';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
-import { CompanySummary } from '@/app/models/company_summaries';
+import { AnnualRevenueEnum, NumberOfEmployeesEnum, YearsEnum } from '@/app/models/company_summaries';
 import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
@@ -90,7 +90,7 @@ export class AdminController implements Coded {
 
   @Get('/companies/:companyId/information')
   @Roles(RolesEnum.admin)
-  async getCompanyInformation(@Param('companyId') companyId: number): Promise<CompanyDetailResponse> {
+  async getCompanyInformation(@Param('companyId') companyId: number): Promise<ICompanyInfoWithUserResponse> {
     return this.companiesService.getCompanyInfoForAdmin(companyId);
   }
 
@@ -98,6 +98,12 @@ export class AdminController implements Coded {
   @Roles(RolesEnum.admin)
   getSummary(@Param('companyInformationId') companyInformationId: number): Promise<CompanySummaryResponse | null> {
     return this.companySummariesService.getSummaryForAdmin(companyInformationId);
+  }
+
+  @Get('/companies/summaries/:summaryId/posted')
+  @Roles(RolesEnum.admin)
+  getSummaryPostedById(@Param('summaryId') summaryId: number): Promise<any> {
+    return this.companySummariesService.getSummaryPostedByIdForAdmin(summaryId);
   }
 
   @Post('/companies/:companyInformationId/summaries')

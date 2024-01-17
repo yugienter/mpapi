@@ -10,6 +10,7 @@ import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_sum
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { Company, StatusOfInformation } from '@/app/models/company';
+import { AnnualRevenueEnum, NumberOfEmployeesEnum, YearsEnum } from '@/app/models/company_summaries';
 import { RolesEnum } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
@@ -108,12 +109,21 @@ export class CompaniesController implements Coded {
   @Get('get-countries-json')
   async getJsonCountries(@Res() reply) {
     const jsonPath = path.join(__dirname, '../../../resources', 'countries.json');
-    console.log(jsonPath);
     if (fs.existsSync(jsonPath)) {
       const jsonData = fs.readFileSync(jsonPath, 'utf8');
       reply.send(JSON.parse(jsonData));
     } else {
       reply.status(404).send('File not found');
     }
+  }
+
+  @Get('/get-summary-enums')
+  @Roles(RolesEnum.company, RolesEnum.admin)
+  getAllEnums() {
+    return {
+      years: YearsEnum,
+      numberOfEmployees: NumberOfEmployeesEnum,
+      annualRevenue: AnnualRevenueEnum,
+    };
   }
 }

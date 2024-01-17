@@ -382,4 +382,23 @@ export class CompanySummariesService {
       throw new InternalServerErrorException('Failed to retrieve summaries');
     }
   }
+
+  async getSummaryPostedByIdForAdmin(summaryId: number) {
+    this.logger.debug('[getSummaryPostedByIdForAdmin]');
+    try {
+      const summary = await this.companySummaryRepository.findOne({
+        where: { id: summaryId, status: SummaryStatus.POSTED },
+        relations: ['companyInformation'],
+      });
+      if (!summary) {
+        this.logger.error(`Summary Posted with ID ${summaryId} not found`);
+        throw new NotFoundException(`Summary Posted not found`);
+      }
+      console.log(summary);
+      return new CompanySummaryResponse(summary);
+    } catch (error) {
+      this.logger.error(`Failed to get posted summaries: ${error.message}`);
+      throw new InternalServerErrorException('Failed to retrieve summaries');
+    }
+  }
 }

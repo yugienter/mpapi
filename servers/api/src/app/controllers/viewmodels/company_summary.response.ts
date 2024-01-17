@@ -1,12 +1,22 @@
 import { TypeOfBusinessEnum } from '@/app/models/company_information';
-import { CompanySummary, SummaryStatus } from '@/app/models/company_summaries';
+import {
+  AnnualRevenueEnum,
+  CompanySummary,
+  NumberOfEmployeesEnum,
+  SummaryStatus,
+  YearsEnum,
+} from '@/app/models/company_summaries';
 
 export class CompanySummaryResponse {
   id: number;
   country: string;
+  area: string;
   title: string;
   content: string;
   type_of_business: TypeOfBusinessEnum;
+  years: YearsEnum;
+  number_of_employees: NumberOfEmployeesEnum;
+  annual_revenue: AnnualRevenueEnum;
   status: SummaryStatus;
   companyInformationId: number;
   is_public: boolean;
@@ -19,9 +29,13 @@ export class CompanySummaryResponse {
   constructor(summary: CompanySummary, relatedPostedSummary: number = null) {
     this.id = summary.id;
     this.country = summary.country;
+    this.area = summary.area;
     this.title = summary.title;
     this.content = summary.content;
     this.type_of_business = summary.type_of_business;
+    this.years = summary.years;
+    this.number_of_employees = summary.number_of_employees;
+    this.annual_revenue = summary.annual_revenue;
     this.status = summary.status;
     this.companyInformationId = summary.companyInformation?.id;
     this.is_public = summary.is_public;
