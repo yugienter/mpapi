@@ -68,14 +68,14 @@ export class CompanySummary {
   @Column()
   type_of_business: TypeOfBusinessEnum;
 
-  @Column({ type: 'enum', enum: YearsEnum })
-  years: YearsEnum;
+  @Column()
+  years: string;
 
-  @Column({ type: 'enum', enum: NumberOfEmployeesEnum })
-  number_of_employees: NumberOfEmployeesEnum;
+  @Column()
+  number_of_employees: string;
 
-  @Column({ type: 'enum', enum: AnnualRevenueEnum })
-  annual_revenue: AnnualRevenueEnum;
+  @Column()
+  annual_revenue: string;
 
   @Column()
   status: SummaryStatus;

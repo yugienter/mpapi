@@ -21,6 +21,24 @@ export function IsAllowedStatus(validationOptions?: ValidationOptions) {
   };
 }
 
+export function IsEnumKey(enumObj: object, validationOptions?: ValidationOptions) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      name: 'isEnumKey',
+      target: object.constructor,
+      propertyName: propertyName,
+      constraints: [enumObj],
+      options: validationOptions,
+      validator: {
+        validate(value: any, args: ValidationArguments) {
+          const [enumObj] = args.constraints;
+          return Object.keys(enumObj).includes(value);
+        },
+      },
+    });
+  };
+}
+
 export class CompanySummaryDto {
   @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
   @IsString()
@@ -43,16 +61,16 @@ export class CompanySummaryDto {
   type_of_business: TypeOfBusinessEnum;
 
   @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
-  @IsEnum(YearsEnum)
-  years: YearsEnum;
+  @IsEnumKey(YearsEnum)
+  years: string;
 
   @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
-  @IsEnum(NumberOfEmployeesEnum)
-  number_of_employees: NumberOfEmployeesEnum;
+  @IsEnumKey(NumberOfEmployeesEnum)
+  number_of_employees: string;
 
   @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
-  @IsEnum(AnnualRevenueEnum)
-  annual_revenue: AnnualRevenueEnum;
+  @IsEnumKey(AnnualRevenueEnum)
+  annual_revenue: string;
 
   @IsNotEmpty()
   @IsAllowedStatus({ message: 'Invalid status value' })

@@ -1,11 +1,5 @@
 import { TypeOfBusinessEnum } from '@/app/models/company_information';
-import {
-  AnnualRevenueEnum,
-  CompanySummary,
-  NumberOfEmployeesEnum,
-  SummaryStatus,
-  YearsEnum,
-} from '@/app/models/company_summaries';
+import { CompanySummary, SummaryStatus } from '@/app/models/company_summaries';
 
 export class CompanySummaryResponse {
   id: number;
@@ -14,9 +8,9 @@ export class CompanySummaryResponse {
   title: string;
   content: string;
   type_of_business: TypeOfBusinessEnum;
-  years: YearsEnum;
-  number_of_employees: NumberOfEmployeesEnum;
-  annual_revenue: AnnualRevenueEnum;
+  years: string;
+  number_of_employees: string;
+  annual_revenue: string;
   status: SummaryStatus;
   companyInformationId: number;
   is_public: boolean;
