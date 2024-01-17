@@ -394,7 +394,6 @@ export class CompanySummariesService {
         this.logger.error(`Summary Posted with ID ${summaryId} not found`);
         throw new NotFoundException(`Summary Posted not found`);
       }
-      console.log(summary);
       return new CompanySummaryResponse(summary);
     } catch (error) {
       this.logger.error(`Failed to get posted summaries: ${error.message}`);
