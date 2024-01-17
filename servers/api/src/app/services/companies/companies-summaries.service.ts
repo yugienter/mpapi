@@ -11,7 +11,13 @@ import { Not, Repository } from 'typeorm';
 import { AddSummaryToMasterDto, CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
 import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
 import { CompanyInformation } from '@/app/models/company_information';
-import { CompanySummary, SummaryStatus } from '@/app/models/company_summaries';
+import {
+  AnnualRevenueEnum,
+  CompanySummary,
+  NumberOfEmployeesEnum,
+  SummaryStatus,
+  YearsEnum,
+} from '@/app/models/company_summaries';
 import { ConfigProvider } from '@/app/providers/config.provider';
 import { DataAccessProvider } from '@/app/providers/data-access.provider';
 import { EmailProvider } from '@/app/providers/email.provider';
@@ -74,9 +80,16 @@ export class CompanySummariesService {
       const emailContext = {
         companyName,
         country: this.dataAccessProvider.getCountryNameByCode(summary.country),
+        area: this.dataAccessProvider.getStateNameByCountryAndStateCode(summary.country, summary.area),
         title: summary.title,
         typeOfBusiness: summary.type_of_business,
         content: summary.content,
+        annualRevenue: this.dataAccessProvider.getEnumValueByKey(AnnualRevenueEnum, summary.annual_revenue),
+        numberOfEmployees: this.dataAccessProvider.getEnumValueByKey(
+          NumberOfEmployeesEnum,
+          summary.number_of_employees,
+        ),
+        years: this.dataAccessProvider.getEnumValueByKey(YearsEnum, summary.years),
         userEmail,
         acceptLink,
         editLink,
@@ -109,9 +122,16 @@ export class CompanySummariesService {
       const emailContext = {
         companyName,
         country: this.dataAccessProvider.getCountryNameByCode(summary.country),
+        area: this.dataAccessProvider.getStateNameByCountryAndStateCode(summary.country, summary.area),
         title: summary.title,
         typeOfBusiness: summary.type_of_business,
         content: summary.content,
+        annualRevenue: this.dataAccessProvider.getEnumValueByKey(AnnualRevenueEnum, summary.annual_revenue),
+        numberOfEmployees: this.dataAccessProvider.getEnumValueByKey(
+          NumberOfEmployeesEnum,
+          summary.number_of_employees,
+        ),
+        years: this.dataAccessProvider.getEnumValueByKey(YearsEnum, summary.years),
         userEmail,
       };
 

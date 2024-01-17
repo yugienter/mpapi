@@ -30,4 +30,21 @@ export class DataAccessProvider {
     const country = this.countries.find((c) => c.countryCode === code);
     return country ? country.countryName : 'Unknown';
   }
+
+  public getStateNameByCountryAndStateCode(countryCode: string, stateCode: string): string {
+    const country = this.countries.find((c) => c.countryCode === countryCode);
+    if (country) {
+      const state = country.states.find((s) => s.code === stateCode);
+      return state ? state.name : 'Unknown State';
+    }
+    return 'Unknown Country';
+  }
+
+  public getEnumValueByKey<T>(enumObj: T, keyStr: string): string {
+    const enumKeys = Object.keys(enumObj) as Array<keyof T>;
+    if (enumKeys.includes(keyStr as keyof T)) {
+      return enumObj[keyStr as keyof T] as unknown as string;
+    }
+    return 'Unknown';
+  }
 }
