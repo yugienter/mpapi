@@ -8,6 +8,7 @@ import { UserInfo } from '@/app/controllers/viewmodels/user.response';
 import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { CompanyInformation } from '@/app/models/company_information';
+import { CompanySummary, SummaryStatus } from '@/app/models/company_summaries';
 import { FileAttachments } from '@/app/models/file_attachments';
 import { User } from '@/app/models/user';
 import { Service } from '@/app/utils/decorators';
@@ -31,6 +32,7 @@ export class CompaniesService {
     @InjectRepository(CompanyFinancialData) private financialDataRepository: Repository<CompanyFinancialData>,
     @InjectRepository(FileAttachments) private filesRepository: Repository<FileAttachments>,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(CompanySummary) private companySummaryRepository: Repository<CompanySummary>,
   ) {}
 
   private async handleFinancialData(
@@ -296,6 +298,15 @@ export class CompaniesService {
 
       const companyInfo = await this.getCompanyInformation(companyId);
 
+      const latestSummary = await this.companySummaryRepository
+        .createQueryBuilder('summary')
+        .where('summary.company_information_id = :companyInfoId', { companyInfoId: companyInfo.id })
+        .andWhere('summary.status = :status', { status: SummaryStatus.POSTED })
+        .orderBy('summary.version', 'DESC')
+        .getOne();
+
+      const summaryPostedId = latestSummary ? latestSummary.id : null;
+
       const companyResult = new CompanyDetailResponse({
         ...company,
         ...companyInfo,
@@ -305,7 +316,7 @@ export class CompaniesService {
 
       const user = new UserInfo(company.user);
 
-      return { user, company: companyResult };
+      return { user, company: companyResult, summaryPostedId };
     } catch (error) {
       this.logger.error(`[getCompanyInfoForAdmin] failed for companyId ${companyId}`, error.stack);
       throw new Error(`[getCompanyInfoForAdmin] error : ${error.message}`);

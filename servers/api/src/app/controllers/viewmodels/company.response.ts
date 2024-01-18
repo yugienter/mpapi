@@ -134,4 +134,5 @@ export class CompanyDetailResponse {
 export interface ICompanyInfoWithUserResponse {
   user: UserInfo;
   company: CompanyDetailResponse;
+  summaryPostedId: number | null;
 }
