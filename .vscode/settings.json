@@ -3,9 +3,11 @@
     "datetime",
     "EBITDA",
     "fastify",
+    "FINTECH",
     "Mpplatform",
     "Persistences",
     "sprintf",
+    "Subquery",
     "typeorm",
     "uuidv",
     "viewmodels"

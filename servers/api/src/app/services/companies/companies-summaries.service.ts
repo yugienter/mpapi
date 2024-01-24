@@ -9,7 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 
 import { AddSummaryToMasterDto, CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
-import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
+import { SearchSummaryDto } from '@/app/controllers/dto/company_summary_search.dto';
+import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmodels/company_summary.response';
 import { CompanyInformation } from '@/app/models/company_information';
 import {
   AnnualRevenueEnum,
@@ -418,6 +419,105 @@ export class CompanySummariesService {
     } catch (error) {
       this.logger.error(`Failed to get posted summaries: ${error.message}`);
       throw new InternalServerErrorException('Failed to retrieve summaries');
+    }
+  }
+
+  async getUniqueSummaryValues(): Promise<SummaryOptions> {
+    const latestVersionSubquery = this.companySummaryRepository
+      .createQueryBuilder('subSummary')
+      .select(['companyInformation.id AS companyInformationId', 'MAX(subSummary.version) AS maxVersion'])
+      .innerJoin('subSummary.companyInformation', 'companyInformation')
+      .where('subSummary.status = :status', { status: SummaryStatus.POSTED })
+      .groupBy('companyInformation.id');
+
+    const query = this.companySummaryRepository
+      .createQueryBuilder('summary')
+      .innerJoin(
+        '(' + latestVersionSubquery.getQuery() + ')',
+        'latestSummary',
+        'summary.companyInformation.id = latestSummary.companyInformationId AND summary.version = latestSummary.maxVersion',
+      )
+      .setParameters(latestVersionSubquery.getParameters());
+
+    const countries = await query.select('DISTINCT summary.country', 'country').getRawMany();
+    const areas = await query.select('DISTINCT summary.area', 'area').getRawMany();
+    const typesOfBusiness = await query.select('DISTINCT summary.type_of_business', 'typeOfBusiness').getRawMany();
+
+    return {
+      countries: countries.map((item) => item.country),
+      areas: areas.map((item) => item.area),
+      type_of_business: typesOfBusiness.map((item) => item.typeOfBusiness),
+    };
+  }
+
+  async searchSummaries(searchSummaryDto: SearchSummaryDto): Promise<CompanySummaryResponse[]> {
+    const { type_of_business, years, country, area, number_of_employees, annual_revenue, keyword } = searchSummaryDto;
+
+    const latestVersionSubquery = this.companySummaryRepository
+      .createQueryBuilder('subSummary')
+      .select(['subSummary.company_information_id AS companyInformationId', 'MAX(subSummary.version) AS maxVersion'])
+      .where('subSummary.status = :status', { status: SummaryStatus.POSTED })
+      .groupBy('subSummary.company_information_id');
+
+    const query = this.companySummaryRepository
+      .createQueryBuilder('summary')
+      .innerJoin(
+        '(' + latestVersionSubquery.getQuery() + ')',
+        'latestSummary',
+        'summary.company_information_id = latestSummary.companyInformationId AND summary.version = latestSummary.maxVersion',
+      )
+      .setParameters(latestVersionSubquery.getParameters())
+      .where('summary.status = :status', { status: SummaryStatus.POSTED })
+      .orderBy('summary.card_order', 'ASC');
+
+    const searchConditions = [];
+    const parameters = {};
+
+    if (type_of_business && type_of_business.length) {
+      searchConditions.push('summary.type_of_business IN (:...typeOfBusiness)');
+      parameters['typeOfBusiness'] = type_of_business;
+    }
+
+    if (years && years.length) {
+      searchConditions.push('summary.years IN (:...years)');
+      parameters['years'] = years;
+    }
+
+    if (country && country.length) {
+      searchConditions.push('summary.country IN (:...country)');
+      parameters['country'] = country;
+    }
+
+    if (area && area.length) {
+      searchConditions.push('summary.area IN (:...area)');
+      parameters['area'] = area;
+    }
+
+    if (number_of_employees && number_of_employees.length) {
+      searchConditions.push('summary.number_of_employees IN (:...numberOfEmployees)');
+      parameters['numberOfEmployees'] = number_of_employees;
+    }
+
+    if (annual_revenue && annual_revenue.length) {
+      searchConditions.push('summary.annual_revenue IN (:...annualRevenue)');
+      parameters['annualRevenue'] = annual_revenue;
+    }
+
+    if (keyword) {
+      searchConditions.push('(summary.title LIKE :keyword OR summary.content LIKE :keyword)');
+      parameters['keyword'] = `%${keyword}%`;
+    }
+
+    if (searchConditions.length > 0) {
+      query.andWhere(searchConditions.join(' AND '), parameters);
+    }
+
+    try {
+      const summaries = await query.getMany();
+      return summaries.map((summary) => new CompanySummaryResponse(summary));
+    } catch (error) {
+      this.logger.error(`[searchSummaries] Failed to search summaries: ${error.message}`);
+      throw new InternalServerErrorException('Failed to search summaries');
     }
   }
 }

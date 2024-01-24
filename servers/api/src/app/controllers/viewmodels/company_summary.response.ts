@@ -17,6 +17,7 @@ export class CompanySummaryResponse {
   card_order: number;
   added_to_master_at: Date | null;
   related_posted_summary: number | null;
+  version: number;
   created_at: Date;
   updated_at: Date;
 
@@ -36,7 +37,14 @@ export class CompanySummaryResponse {
     this.card_order = summary.card_order;
     this.related_posted_summary = relatedPostedSummary;
     this.added_to_master_at = summary.added_to_master_at;
+    this.version = summary.version;
     this.created_at = summary.created_at;
     this.updated_at = summary.updated_at;
   }
+}
+
+export interface SummaryOptions {
+  countries: string[];
+  areas: string[];
+  type_of_business: string[];
 }

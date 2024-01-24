@@ -1,18 +1,18 @@
-import { Body, Controller, Get, Logger, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 import { ManualCreateUserRequest } from '@/app/controllers/dto/auth.dto';
 import { AddSummaryToMasterDto, CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
+import { SearchSummaryDto } from '@/app/controllers/dto/company_summary_search.dto';
 import {
   CreateSummaryTranslationDto,
   UpdateSummaryTranslationDto,
 } from '@/app/controllers/dto/company_summary_translation.dto';
 import { ICompanyInfoWithUserResponse } from '@/app/controllers/viewmodels/company.response';
-import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_summary.response';
+import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmodels/company_summary.response';
 import { CompanySummaryTranslationResponse } from '@/app/controllers/viewmodels/company_summary_translation.response';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
-import { AnnualRevenueEnum, NumberOfEmployeesEnum, YearsEnum } from '@/app/models/company_summaries';
 import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
@@ -172,5 +172,31 @@ export class AdminController implements Coded {
   @Roles(RolesEnum.admin)
   getLatestPostedSummaries() {
     return this.companySummariesService.getLatestPostedSummaries();
+  }
+
+  @Get('/summaries/unique-values')
+  @Roles(RolesEnum.admin)
+  async getUniqueSummaryValues(): Promise<SummaryOptions> {
+    return this.companySummariesService.getUniqueSummaryValues();
+  }
+
+  @Get('/companies/summaries/search')
+  @Roles(RolesEnum.admin)
+  searchSummaries(@Query() query): Promise<CompanySummaryResponse[]> {
+    function toArray(value: string | string[]): string[] {
+      return Array.isArray(value) ? value : [value].filter(Boolean);
+    }
+
+    const searchSummaryDto = new SearchSummaryDto({
+      type_of_business: toArray(query.type_of_business),
+      years: toArray(query.years),
+      country: toArray(query.country),
+      area: toArray(query.area),
+      number_of_employees: toArray(query.number_of_employees),
+      annual_revenue: toArray(query.annual_revenue),
+      keyword: query.keyword,
+    });
+
+    return this.companySummariesService.searchSummaries(searchSummaryDto);
   }
 }
