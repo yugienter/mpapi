@@ -2,7 +2,11 @@ import { Body, Controller, Get, Logger, Param, Post, Put, Query, UseGuards } fro
 import { ApiOperation } from '@nestjs/swagger';
 
 import { ManualCreateUserRequest } from '@/app/controllers/dto/auth.dto';
-import { AddSummaryToMasterDto, CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
+import {
+  AddSummaryToMasterDto,
+  CompanySummaryDto,
+  UpdateSummaryMasterDto,
+} from '@/app/controllers/dto/company_summary.dto';
 import { SearchSummaryDto } from '@/app/controllers/dto/company_summary_search.dto';
 import {
   CreateSummaryTranslationDto,
@@ -123,6 +127,15 @@ export class AdminController implements Coded {
     @Body() updateSummaryDto: CompanySummaryDto,
   ): Promise<CompanySummaryResponse> {
     return this.companySummariesService.updateSummary(companyInformationId, summaryId, updateSummaryDto);
+  }
+
+  @Put('/companies/summaries/:summaryId/posted')
+  @Roles(RolesEnum.admin)
+  updateSummaryMaster(
+    @Param('summaryId') summaryId: number,
+    @Body() updateSummaryDto: UpdateSummaryMasterDto,
+  ): Promise<CompanySummaryResponse> {
+    return this.companySummariesService.updateSummaryMaster(summaryId, updateSummaryDto);
   }
 
   @Put('/companies/:companySummaryId/summaries/add-to-master')

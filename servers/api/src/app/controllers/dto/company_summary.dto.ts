@@ -77,6 +77,44 @@ export class CompanySummaryDto {
   status: SummaryStatus;
 }
 
+export class UpdateSummaryMasterDto {
+  @IsNotEmpty()
+  @IsString()
+  country: string;
+
+  @IsNotEmpty()
+  @IsString()
+  area: string;
+
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+
+  @IsNotEmpty()
+  @IsString()
+  content: string;
+
+  @IsNotEmpty()
+  @IsEnum(TypeOfBusinessEnum)
+  type_of_business: TypeOfBusinessEnum;
+
+  @IsNotEmpty()
+  @IsEnumKey(YearsEnum)
+  years: string;
+
+  @IsNotEmpty()
+  @IsEnumKey(NumberOfEmployeesEnum)
+  number_of_employees: string;
+
+  @IsNotEmpty()
+  @IsEnumKey(AnnualRevenueEnum)
+  annual_revenue: string;
+
+  @IsNotEmpty()
+  @IsEnum(SummaryStatus)
+  status: SummaryStatus.POSTED;
+}
+
 export class AddSummaryToMasterDto {
   @IsBoolean()
   is_public: boolean;

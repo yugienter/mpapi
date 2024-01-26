@@ -8,7 +8,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 
-import { AddSummaryToMasterDto, CompanySummaryDto } from '@/app/controllers/dto/company_summary.dto';
+import {
+  AddSummaryToMasterDto,
+  CompanySummaryDto,
+  UpdateSummaryMasterDto,
+} from '@/app/controllers/dto/company_summary.dto';
 import { SearchSummaryDto } from '@/app/controllers/dto/company_summary_search.dto';
 import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmodels/company_summary.response';
 import { CompanyInformation } from '@/app/models/company_information';
@@ -306,6 +310,46 @@ export class CompanySummariesService {
       const relatedPostedSummary = await this.findRelatedPostedSummary(companyInformationId, summaryId);
 
       return new CompanySummaryResponse(summarySave, relatedPostedSummary?.id);
+    } catch (error) {
+      this.logger.error(`Failed to update summary: ${error.message}`);
+      throw new InternalServerErrorException('Failed to update summary');
+    }
+  }
+
+  async updateSummaryMaster(
+    summaryId: number,
+    updateSummaryDto: UpdateSummaryMasterDto,
+  ): Promise<CompanySummaryResponse> {
+    this.logger.debug(`[updateSummaryMaster]`);
+    try {
+      if (updateSummaryDto.status !== SummaryStatus.POSTED) {
+        this.logger.error(
+          `Admin can not edit summary with status not POSTED in this action - status: ${updateSummaryDto.status}`,
+        );
+        throw new ForbiddenException(
+          `Admin can not edit summary with status not POSTED in this action - status: ${updateSummaryDto.status}`,
+        );
+      }
+
+      const summary = await this.companySummaryRepository.findOne({
+        where: { id: summaryId },
+        relations: ['companyInformation', 'companyInformation.company', 'companyInformation.company.user'],
+      });
+
+      if (!summary) {
+        this.logger.error(`Summary with ID ${summaryId} not found`);
+        throw new NotFoundException(`Summary not found`);
+      }
+
+      if (summary.status !== SummaryStatus.POSTED) {
+        this.logger.error('Can not edit summary Master with status not POSTED');
+        throw new ForbiddenException('Can not edit summary Master with status not POSTED');
+      }
+
+      Object.assign(summary, updateSummaryDto);
+      const summarySave = await this.companySummaryRepository.save(summary);
+
+      return new CompanySummaryResponse(summarySave);
     } catch (error) {
       this.logger.error(`Failed to update summary: ${error.message}`);
       throw new InternalServerErrorException('Failed to update summary');
