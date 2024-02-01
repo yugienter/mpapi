@@ -3,7 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CompanyInformationDto, CreateUpdateAdminNoteDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
-import { CompanyDetailResponse, ICompanyInfoWithUserResponse } from '@/app/controllers/viewmodels/company.response';
+import {
+  AdminNoteResponse,
+  CompanyDetailResponse,
+  IAdminNoteResponse,
+  ICompanyInfoWithUserResponse,
+} from '@/app/controllers/viewmodels/company.response';
 import { UserInfo } from '@/app/controllers/viewmodels/user.response';
 import { AdminCompanyInformationNote } from '@/app/models/admin_company_information_notes';
 import { Company, StatusOfInformation } from '@/app/models/company';
@@ -325,7 +330,7 @@ export class CompaniesService {
     }
   }
 
-  async getAdminNoteByCompanyInformationId(companyInformationId: number): Promise<AdminCompanyInformationNote> {
+  async getAdminNoteByCompanyInformationId(companyInformationId: number): Promise<IAdminNoteResponse> {
     const note = await this.adminNoteRepository.findOne({
       where: { companyInformation: { id: companyInformationId } },
       relations: ['companyInformation'],
@@ -335,13 +340,13 @@ export class CompaniesService {
       return null;
     }
 
-    return note;
+    return AdminNoteResponse.response(note);
   }
 
   async createAdminNote(
     companyInformationId: number,
     createAdminNoteDto: CreateUpdateAdminNoteDto,
-  ): Promise<AdminCompanyInformationNote> {
+  ): Promise<IAdminNoteResponse> {
     const companyInformation = await this.companyInformationRepository.findOne({ where: { id: companyInformationId } });
 
     if (!companyInformation) {
@@ -353,13 +358,14 @@ export class CompaniesService {
     adminNote.note = createAdminNoteDto.note;
     adminNote.companyInformation = companyInformation;
 
-    return this.adminNoteRepository.save(adminNote);
+    const newNote = await this.adminNoteRepository.save(adminNote);
+    return AdminNoteResponse.response(newNote);
   }
 
   async updateAdminNote(
     adminNoteId: number,
     updateAdminNoteDto: CreateUpdateAdminNoteDto,
-  ): Promise<AdminCompanyInformationNote> {
+  ): Promise<IAdminNoteResponse> {
     const adminNote = await this.adminNoteRepository.findOne({ where: { id: adminNoteId } });
 
     if (!adminNote) {
@@ -368,6 +374,7 @@ export class CompaniesService {
     }
 
     adminNote.note = updateAdminNoteDto.note;
-    return this.adminNoteRepository.save(adminNote);
+    const saveNote = await this.adminNoteRepository.save(adminNote);
+    return AdminNoteResponse.response(saveNote);
   }
 }

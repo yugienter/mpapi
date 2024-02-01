@@ -1,4 +1,7 @@
 import _ from 'lodash';
+
+import { AdminCompanyInformationNote } from '@/app/models/admin_company_information_notes';
+
 import { UserInfo } from './user.response';
 
 export interface ICompanyDetailResponse {
@@ -135,4 +138,24 @@ export interface ICompanyInfoWithUserResponse {
   user: UserInfo;
   company: CompanyDetailResponse;
   summaryPostedId: number | null;
+}
+
+export class AdminNoteResponse {
+  static response(adminNote: AdminCompanyInformationNote): IAdminNoteResponse {
+    return {
+      id: adminNote.id,
+      note: adminNote.note,
+      created_at: adminNote.created_at,
+      updated_at: adminNote.updated_at,
+      companyInformationId: adminNote.companyInformation?.id,
+    };
+  }
+}
+
+export interface IAdminNoteResponse {
+  id: number;
+  note: string;
+  created_at: Date;
+  updated_at: Date;
+  companyInformationId: number;
 }

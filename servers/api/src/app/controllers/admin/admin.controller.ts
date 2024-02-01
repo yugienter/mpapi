@@ -13,12 +13,11 @@ import {
   CreateSummaryTranslationDto,
   UpdateSummaryTranslationDto,
 } from '@/app/controllers/dto/company_summary_translation.dto';
-import { ICompanyInfoWithUserResponse } from '@/app/controllers/viewmodels/company.response';
+import { IAdminNoteResponse, ICompanyInfoWithUserResponse } from '@/app/controllers/viewmodels/company.response';
 import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmodels/company_summary.response';
 import { CompanySummaryTranslationResponse } from '@/app/controllers/viewmodels/company_summary_translation.response';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
-import { AdminCompanyInformationNote } from '@/app/models/admin_company_information_notes';
 import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
@@ -217,9 +216,7 @@ export class AdminController implements Coded {
 
   @Get('/companies/information/:companyInformationId/admin-notes')
   @Roles(RolesEnum.admin)
-  async getAdminNote(
-    @Param('companyInformationId') companyInformationId: number,
-  ): Promise<AdminCompanyInformationNote> {
+  async getAdminNote(@Param('companyInformationId') companyInformationId: number): Promise<IAdminNoteResponse> {
     return this.companiesService.getAdminNoteByCompanyInformationId(companyInformationId);
   }
 
@@ -228,16 +225,16 @@ export class AdminController implements Coded {
   async createAdminNote(
     @Param('companyInformationId') companyInformationId: number,
     @Body() createAdminNoteDto: CreateUpdateAdminNoteDto,
-  ): Promise<AdminCompanyInformationNote> {
+  ): Promise<IAdminNoteResponse> {
     return this.companiesService.createAdminNote(companyInformationId, createAdminNoteDto);
   }
 
-  @Post('/companies/admin-notes/:adminNoteId')
+  @Put('/companies/admin-notes/:adminNoteId')
   @Roles(RolesEnum.admin)
   async updateAdminNote(
     @Param('adminNoteId', ParseIntPipe) adminNoteId: number,
     @Body() updateAdminNoteDto: CreateUpdateAdminNoteDto,
-  ): Promise<AdminCompanyInformationNote> {
+  ): Promise<IAdminNoteResponse> {
     return this.companiesService.updateAdminNote(adminNoteId, updateAdminNoteDto);
   }
 }
