@@ -27,6 +27,7 @@ import { ConfigProvider } from '@/app/providers/config.provider';
 import { DataAccessProvider } from '@/app/providers/data-access.provider';
 import { EmailProvider } from '@/app/providers/email.provider';
 import { Service } from '@/app/utils/decorators';
+import { AdminCompanyInformationNote } from '@/app/models/admin_company_information_notes';
 
 @Service()
 @Injectable()
@@ -227,7 +228,7 @@ export class CompanySummariesService {
     return new CompanySummaryResponse(summarySave);
   }
 
-  // Admin
+  /** Admin */
   async createSummary(
     companyInformationId: number,
     createSummaryDto: CompanySummaryDto,
@@ -440,7 +441,7 @@ export class CompanySummariesService {
           'latestSummary',
           'summary.company_information_id = latestSummary.company_information_id AND summary.version = latestSummary.max_version',
         )
-        .orderBy('summary.card_order', 'ASC')
+        .orderBy('summary.card_order', 'DESC')
         .getMany();
     } catch (error) {
       this.logger.error(`Failed to get latest posted summaries: ${error.message}`);
@@ -512,7 +513,79 @@ export class CompanySummariesService {
       )
       .setParameters(latestVersionSubquery.getParameters())
       .where('summary.status = :status', { status: SummaryStatus.POSTED })
-      .orderBy('summary.card_order', 'ASC');
+      .orderBy('summary.card_order', 'DESC');
+
+    const searchConditions = [];
+    const parameters = {};
+
+    if (type_of_business && type_of_business.length) {
+      searchConditions.push('summary.type_of_business IN (:...typeOfBusiness)');
+      parameters['typeOfBusiness'] = type_of_business;
+    }
+
+    if (years && years.length) {
+      searchConditions.push('summary.years IN (:...years)');
+      parameters['years'] = years;
+    }
+
+    if (country && country.length) {
+      searchConditions.push('summary.country IN (:...country)');
+      parameters['country'] = country;
+    }
+
+    if (area && area.length) {
+      searchConditions.push('summary.area IN (:...area)');
+      parameters['area'] = area;
+    }
+
+    if (number_of_employees && number_of_employees.length) {
+      searchConditions.push('summary.number_of_employees IN (:...numberOfEmployees)');
+      parameters['numberOfEmployees'] = number_of_employees;
+    }
+
+    if (annual_revenue && annual_revenue.length) {
+      searchConditions.push('summary.annual_revenue IN (:...annualRevenue)');
+      parameters['annualRevenue'] = annual_revenue;
+    }
+
+    if (keyword) {
+      searchConditions.push('(summary.title LIKE :keyword OR summary.content LIKE :keyword)');
+      parameters['keyword'] = `%${keyword}%`;
+    }
+
+    if (searchConditions.length > 0) {
+      query.andWhere(searchConditions.join(' AND '), parameters);
+    }
+
+    try {
+      const summaries = await query.getMany();
+      return summaries.map((summary) => new CompanySummaryResponse(summary));
+    } catch (error) {
+      this.logger.error(`[searchSummaries] Failed to search summaries: ${error.message}`);
+      throw new InternalServerErrorException('Failed to search summaries');
+    }
+  }
+
+  /** Investor */
+  async searchSummariesForInvestor(searchSummaryDto: SearchSummaryDto): Promise<CompanySummaryResponse[]> {
+    const { type_of_business, years, country, area, number_of_employees, annual_revenue, keyword } = searchSummaryDto;
+
+    const latestVersionSubquery = this.companySummaryRepository
+      .createQueryBuilder('subSummary')
+      .select(['subSummary.company_information_id AS companyInformationId', 'MAX(subSummary.version) AS maxVersion'])
+      .where('subSummary.status = :status', { status: SummaryStatus.POSTED })
+      .groupBy('subSummary.company_information_id');
+
+    const query = this.companySummaryRepository
+      .createQueryBuilder('summary')
+      .innerJoin(
+        '(' + latestVersionSubquery.getQuery() + ')',
+        'latestSummary',
+        'summary.company_information_id = latestSummary.companyInformationId AND summary.version = latestSummary.maxVersion',
+      )
+      .setParameters(latestVersionSubquery.getParameters())
+      .where('summary.status = :status', { status: SummaryStatus.POSTED })
+      .orderBy('summary.card_order', 'DESC');
 
     const searchConditions = [];
     const parameters = {};

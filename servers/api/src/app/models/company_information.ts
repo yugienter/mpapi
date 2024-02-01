@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
+import { AdminCompanyInformationNote } from '@/app/models/admin_company_information_notes';
 import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { FileAttachments } from '@/app/models/file_attachments';
@@ -131,4 +132,7 @@ export class CompanyInformation {
 
   @OneToMany(() => FileAttachments, (file) => file.company_information)
   files: FileAttachments[];
+
+  @OneToOne(() => AdminCompanyInformationNote, (note) => note.companyInformation)
+  adminNote: AdminCompanyInformationNote;
 }

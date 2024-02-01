@@ -310,3 +310,8 @@ export class CompanyInformationDto {
   @IsInt({ each: true })
   files?: number[];
 }
+
+export class CreateUpdateAdminNoteDto {
+  @IsNotEmpty()
+  note: string;
+}

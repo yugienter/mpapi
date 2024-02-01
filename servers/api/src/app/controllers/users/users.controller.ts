@@ -40,7 +40,7 @@ export class UsersController implements Coded {
     tags: ['user'],
   })
   @Get('me')
-  @Roles(RolesEnum.company, RolesEnum.admin)
+  @Roles(RolesEnum.company, RolesEnum.admin, RolesEnum.investor)
   async getMe(@Req() request): Promise<{ user: ModifiedUser }> {
     const requesterId: string = request.raw.user.uid;
     const role: RolesEnum = request.raw.user.roles[0];

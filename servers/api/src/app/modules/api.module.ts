@@ -11,6 +11,7 @@ import { AuthController } from '@/app/controllers/auth.controller';
 import { CompaniesController } from '@/app/controllers/companies/companies.controller';
 import { FilesController } from '@/app/controllers/files/files.controller';
 import { HealthController } from '@/app/controllers/health.controller';
+import { InvestorController } from '@/app/controllers/investor/investor.controller';
 import { MastersController } from '@/app/controllers/masters.controller';
 import { PublicController } from '@/app/controllers/public.controller';
 import { SamplesController } from '@/app/controllers/samples.controller';
@@ -42,9 +43,10 @@ const allControllers = [
   FilesController,
   AdminController,
   MastersController,
+  InvestorController,
 ];
 
-const publicControllers = [AuthController, SamplesController, PublicController];
+const publicControllers = [AuthController, SamplesController, PublicController, InvestorController];
 
 const providers = [
   AuthProvider,

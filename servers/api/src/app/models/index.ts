@@ -1,3 +1,4 @@
+import { AdminCompanyInformationNote } from '@/app/models/admin_company_information_notes';
 import { Company } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { CompanyInformation } from '@/app/models/company_information';
@@ -18,4 +19,5 @@ export const ALL_MODELS = [
   CompanySummaryTranslation,
   EmailVerificationToken,
   FileAttachments,
+  AdminCompanyInformationNote,
 ];

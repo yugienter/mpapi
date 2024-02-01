@@ -2,9 +2,10 @@ import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nest
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CompanyInformationDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
+import { CompanyInformationDto, CreateUpdateAdminNoteDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
 import { CompanyDetailResponse, ICompanyInfoWithUserResponse } from '@/app/controllers/viewmodels/company.response';
 import { UserInfo } from '@/app/controllers/viewmodels/user.response';
+import { AdminCompanyInformationNote } from '@/app/models/admin_company_information_notes';
 import { Company, StatusOfInformation } from '@/app/models/company';
 import { CompanyFinancialData } from '@/app/models/company_financial_data';
 import { CompanyInformation } from '@/app/models/company_information';
@@ -33,6 +34,7 @@ export class CompaniesService {
     @InjectRepository(FileAttachments) private filesRepository: Repository<FileAttachments>,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(CompanySummary) private companySummaryRepository: Repository<CompanySummary>,
+    @InjectRepository(AdminCompanyInformationNote) private adminNoteRepository: Repository<AdminCompanyInformationNote>,
   ) {}
 
   private async handleFinancialData(
@@ -321,5 +323,51 @@ export class CompaniesService {
       this.logger.error(`[getCompanyInfoForAdmin] failed for companyId ${companyId}`, error.stack);
       throw new Error(`[getCompanyInfoForAdmin] error : ${error.message}`);
     }
+  }
+
+  async getAdminNoteByCompanyInformationId(companyInformationId: number): Promise<AdminCompanyInformationNote> {
+    const note = await this.adminNoteRepository.findOne({
+      where: { companyInformation: { id: companyInformationId } },
+      relations: ['companyInformation'],
+    });
+
+    if (!note) {
+      return null;
+    }
+
+    return note;
+  }
+
+  async createAdminNote(
+    companyInformationId: number,
+    createAdminNoteDto: CreateUpdateAdminNoteDto,
+  ): Promise<AdminCompanyInformationNote> {
+    const companyInformation = await this.companyInformationRepository.findOne({ where: { id: companyInformationId } });
+
+    if (!companyInformation) {
+      this.logger.error(`[createAdminNote] CompanyInformation with ID ${companyInformationId} not found`);
+      throw new NotFoundException(`CompanyInformation with ID ${companyInformationId} not found`);
+    }
+
+    const adminNote = new AdminCompanyInformationNote();
+    adminNote.note = createAdminNoteDto.note;
+    adminNote.companyInformation = companyInformation;
+
+    return this.adminNoteRepository.save(adminNote);
+  }
+
+  async updateAdminNote(
+    adminNoteId: number,
+    updateAdminNoteDto: CreateUpdateAdminNoteDto,
+  ): Promise<AdminCompanyInformationNote> {
+    const adminNote = await this.adminNoteRepository.findOne({ where: { id: adminNoteId } });
+
+    if (!adminNote) {
+      this.logger.error(`[updateAdminNote] Admin note with ID ${adminNoteId} not found`);
+      throw new NotFoundException(`Admin note with ID ${adminNoteId} not found`);
+    }
+
+    adminNote.note = updateAdminNoteDto.note;
+    return this.adminNoteRepository.save(adminNote);
   }
 }

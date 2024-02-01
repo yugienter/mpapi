@@ -34,7 +34,8 @@ export class CreateUploadedFilesTable1699609412415 implements MigrationInterface
           },
           {
             name: 'path',
-            type: 'varchar',
+            // type: 'varchar', // change varchar to text normal by update SQL in database ( 31/01/2024 )
+            type: 'text',
             isNullable: false,
           },
           {
