@@ -2,7 +2,12 @@ import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nest
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CompanyInformationDto, CreateUpdateAdminNoteDto, FinancialDataDto } from '@/app/controllers/dto/company.dto';
+import {
+  CompanyInformationDto,
+  CreateUpdateAdminNoteDto,
+  CreateUpdateCompanyByAdminDto,
+  FinancialDataDto,
+} from '@/app/controllers/dto/company.dto';
 import {
   AdminNoteResponse,
   CompanyDetailResponse,
@@ -138,7 +143,10 @@ export class CompaniesService {
     return { ...companyInfo, files };
   }
 
-  async createCompanyInfo(companyInfoDto: CompanyInformationDto, userId: string): Promise<CompanyDetailResponse> {
+  async createCompanyInfo(
+    companyInfoDto: CompanyInformationDto | CreateUpdateCompanyByAdminDto,
+    userId: string,
+  ): Promise<CompanyDetailResponse> {
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
       if (!user) {
@@ -176,8 +184,8 @@ export class CompaniesService {
 
       return result;
     } catch (error) {
-      this.logger.error(`[createCompany] failed for userId ${userId}`, error.stack);
-      throw new Error(`[createCompany] error : ${error.message}`);
+      this.logger.error(`[createCompanyInfo] failed for userId ${userId}`, error.stack);
+      throw new Error(`[createCompanyInfo] error : ${error.message}`);
     }
   }
 
@@ -245,8 +253,8 @@ export class CompaniesService {
 
       return result;
     } catch (error) {
-      this.logger.error(`[createCompany] failed for userId ${userId}`, error.stack);
-      throw new Error(`[createCompany] error : ${error.message}`);
+      this.logger.error(`[updateCompanyInfo] failed for userId ${userId}`, error.stack);
+      throw new Error(`[updateCompanyInfo] error : ${error.message}`);
     }
   }
 
@@ -295,6 +303,8 @@ export class CompaniesService {
       throw new Error(`[getCompanyInfo] error : ${error}`);
     }
   }
+
+  /** ADMIN */
 
   async getCompanyInfoForAdmin(companyId: number): Promise<ICompanyInfoWithUserResponse> {
     try {

@@ -18,6 +18,7 @@ export enum StatusOfInformation {
   DRAFT_FROM_ADMIN = 'DRAFT_FROM_ADMIN',
   REQUEST = 'REQUEST',
   SUBMITTED = 'SUBMITTED',
+  CREATE_FROM_ADMIN = 'CREATE_FROM_ADMIN',
   PROCESSING = 'PROCESSING',
   PROCESSED = 'PROCESSED',
 }
@@ -48,6 +49,12 @@ export class Company {
   @DeleteDateColumn()
   deleted_at: Date;
 
+  @Column({ type: 'varchar', nullable: true })
+  contact_person_name: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  contact_person_email: string;
+
   ///////////////////////////////////
   //////////// RELATIONS ////////////
   ///////////////////////////////////
@@ -58,4 +65,8 @@ export class Company {
   @ManyToOne(() => User, (user) => user.companies)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'created_by_admin' })
+  admin: User;
 }

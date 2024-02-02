@@ -4,6 +4,7 @@ import {
   ArrayMinSize,
   ArrayNotEmpty,
   IsArray,
+  IsEmail,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -121,6 +122,7 @@ function ValidateCombinedFinancialData(validationOptions?: ValidationOptions) {
 }
 
 export class FinancialDataDto {
+  @IsNotEmpty()
   @IsInt()
   year: number;
 
@@ -314,4 +316,145 @@ export class CompanyInformationDto {
 export class CreateUpdateAdminNoteDto {
   @IsNotEmpty()
   note: string;
+}
+
+export class CreateUpdateCompanyByAdminDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Company Name is not empty' })
+  @MaxLength(255)
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  position?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  contact_person_name?: string;
+
+  @IsOptional()
+  @IsEmail()
+  contact_person_email?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  phone_number?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  website?: string;
+
+  @IsOptional()
+  @IsString()
+  general_shareholder_structure?: string;
+
+  @IsOptional()
+  @IsString()
+  general_management_structure?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1900)
+  general_year_of_establishment: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  general_headquarter?: string;
+
+  @IsOptional()
+  @IsEnum(TypeOfBusinessEnum)
+  general_business_type: TypeOfBusinessEnum;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  general_business_location_country: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  general_business_location_area: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  general_number_of_employees: number;
+
+  @IsOptional()
+  @IsString()
+  business_overview?: string;
+
+  @IsOptional()
+  @IsString()
+  business_main_products_services?: string;
+
+  @IsOptional()
+  @IsString()
+  business_major_clients?: string;
+
+  @IsOptional()
+  @IsString()
+  business_major_suppliers?: string;
+
+  @IsOptional()
+  @IsString()
+  business_future_growth_projection?: string;
+
+  // Financial Data
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FinancialDataDto)
+  financial_data?: FinancialDataDto[];
+
+  @IsOptional()
+  @IsNumber()
+  financial_current_valuation: number;
+
+  // End Financial Data
+
+  // Transaction Data
+
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  transaction_sell_shares_percentage: number;
+
+  @IsNumber()
+  @Min(1)
+  transaction_sell_shares_amount: number;
+
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  transaction_issue_shares_percentage: number;
+
+  @IsNumber()
+  @Min(1)
+  transaction_issue_shares_amount: number;
+
+  @IsString()
+  transaction_other_details?: string;
+
+  // End Transaction Data
+  @IsOptional()
+  @IsString()
+  reason_deal_reason?: string;
+  @IsOptional()
+  @IsString()
+  reason_deal_timeline?: string;
+
+  @IsEnum(StatusOfInformation)
+  @IsNotEmpty()
+  status: StatusOfInformation;
+
+  @IsArray()
+  @IsInt({ each: true })
+  files?: number[];
 }

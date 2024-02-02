@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Logger, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 
 import { ManualCreateUserRequest } from '@/app/controllers/dto/auth.dto';
-import { CreateUpdateAdminNoteDto } from '@/app/controllers/dto/company.dto';
+import { CreateUpdateAdminNoteDto, CreateUpdateCompanyByAdminDto } from '@/app/controllers/dto/company.dto';
 import {
   AddSummaryToMasterDto,
   CompanySummaryDto,
@@ -13,7 +13,11 @@ import {
   CreateSummaryTranslationDto,
   UpdateSummaryTranslationDto,
 } from '@/app/controllers/dto/company_summary_translation.dto';
-import { IAdminNoteResponse, ICompanyInfoWithUserResponse } from '@/app/controllers/viewmodels/company.response';
+import {
+  CompanyDetailResponse,
+  IAdminNoteResponse,
+  ICompanyInfoWithUserResponse,
+} from '@/app/controllers/viewmodels/company.response';
 import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmodels/company_summary.response';
 import { CompanySummaryTranslationResponse } from '@/app/controllers/viewmodels/company_summary_translation.response';
 import { Roles } from '@/app/decorators/roles.decorator';
@@ -87,31 +91,31 @@ export class AdminController implements Coded {
     return true;
   }
 
-  @Get('/companies/users')
+  @Get('companies/users')
   @Roles(RolesEnum.admin)
   async getCompanyUsers() {
     return this.usersService.getCompanyUsersWithCompanyDetails();
   }
 
-  @Get('/companies/:companyId/information')
+  @Get('companies/:companyId/information')
   @Roles(RolesEnum.admin)
   async getCompanyInformation(@Param('companyId') companyId: number): Promise<ICompanyInfoWithUserResponse> {
     return this.companiesService.getCompanyInfoForAdmin(companyId);
   }
 
-  @Get('/companies/:companyInformationId/summaries')
+  @Get('companies/:companyInformationId/summaries')
   @Roles(RolesEnum.admin)
   getSummary(@Param('companyInformationId') companyInformationId: number): Promise<CompanySummaryResponse | null> {
     return this.companySummariesService.getSummaryForAdmin(companyInformationId);
   }
 
-  @Get('/companies/summaries/:summaryId/posted')
+  @Get('companies/summaries/:summaryId/posted')
   @Roles(RolesEnum.admin)
   getSummaryPostedById(@Param('summaryId') summaryId: number): Promise<any> {
     return this.companySummariesService.getSummaryPostedByIdForAdmin(summaryId);
   }
 
-  @Post('/companies/:companyInformationId/summaries')
+  @Post('companies/:companyInformationId/summaries')
   @Roles(RolesEnum.admin)
   createSummary(
     @Param('companyInformationId') companyInformationId: number,
@@ -120,7 +124,7 @@ export class AdminController implements Coded {
     return this.companySummariesService.createSummary(companyInformationId, createSummaryDto);
   }
 
-  @Put('/companies/:companyInformationId/summaries/:summaryId')
+  @Put('companies/:companyInformationId/summaries/:summaryId')
   @Roles(RolesEnum.admin)
   updateSummary(
     @Param('companyInformationId') companyInformationId: number,
@@ -130,7 +134,7 @@ export class AdminController implements Coded {
     return this.companySummariesService.updateSummary(companyInformationId, summaryId, updateSummaryDto);
   }
 
-  @Put('/companies/summaries/:summaryId/posted')
+  @Put('companies/summaries/:summaryId/posted')
   @Roles(RolesEnum.admin)
   updateSummaryMaster(
     @Param('summaryId') summaryId: number,
@@ -139,7 +143,7 @@ export class AdminController implements Coded {
     return this.companySummariesService.updateSummaryMaster(summaryId, updateSummaryDto);
   }
 
-  @Put('/companies/:companySummaryId/summaries/add-to-master')
+  @Put('companies/:companySummaryId/summaries/add-to-master')
   @Roles(RolesEnum.admin)
   addSummaryToMaster(
     @Param('companySummaryId') companySummaryId: number,
@@ -148,7 +152,7 @@ export class AdminController implements Coded {
     return this.companySummariesService.addSummaryToMaster(companySummaryId, addToMasterDto);
   }
 
-  @Post('/companies/:companySummaryId/summaries/translations')
+  @Post('companies/:companySummaryId/summaries/translations')
   @Roles(RolesEnum.admin)
   createSummaryTranslation(
     @Param('companySummaryId') companySummaryId: number,
@@ -160,7 +164,7 @@ export class AdminController implements Coded {
     );
   }
 
-  @Put('/companies/:companySummaryId/summaries/translations/:translationId')
+  @Put('companies/:companySummaryId/summaries/translations/:translationId')
   @Roles(RolesEnum.admin)
   updateSummaryTranslation(
     @Param('companySummaryId') companySummaryId: number,
@@ -174,7 +178,7 @@ export class AdminController implements Coded {
     );
   }
 
-  @Get('/companies/:companySummaryId/summaries/translations')
+  @Get('companies/:companySummaryId/summaries/translations')
   @Roles(RolesEnum.admin)
   getSummaryTranslations(
     @Param('companySummaryId') companySummaryId: number,
@@ -182,19 +186,19 @@ export class AdminController implements Coded {
     return this.companySummaryTranslationsService.getSummaryTranslations(companySummaryId);
   }
 
-  @Get('/companies/summaries/latest-posted')
+  @Get('companies/summaries/latest-posted')
   @Roles(RolesEnum.admin)
   getLatestPostedSummaries() {
     return this.companySummariesService.getLatestPostedSummaries();
   }
 
-  @Get('/summaries/unique-values')
+  @Get('summaries/unique-values')
   @Roles(RolesEnum.admin)
   async getUniqueSummaryValues(): Promise<SummaryOptions> {
     return this.companySummariesService.getUniqueSummaryValues();
   }
 
-  @Get('/companies/summaries/search')
+  @Get('companies/summaries/search')
   @Roles(RolesEnum.admin)
   searchSummaries(@Query() query): Promise<CompanySummaryResponse[]> {
     function toArray(value: string | string[]): string[] {
@@ -214,13 +218,13 @@ export class AdminController implements Coded {
     return this.companySummariesService.searchSummaries(searchSummaryDto);
   }
 
-  @Get('/companies/information/:companyInformationId/admin-notes')
+  @Get('companies/information/:companyInformationId/admin-notes')
   @Roles(RolesEnum.admin)
   async getAdminNote(@Param('companyInformationId') companyInformationId: number): Promise<IAdminNoteResponse> {
     return this.companiesService.getAdminNoteByCompanyInformationId(companyInformationId);
   }
 
-  @Post('/companies/information/:companyInformationId/admin-notes')
+  @Post('companies/information/:companyInformationId/admin-notes')
   @Roles(RolesEnum.admin)
   async createAdminNote(
     @Param('companyInformationId') companyInformationId: number,
@@ -229,12 +233,22 @@ export class AdminController implements Coded {
     return this.companiesService.createAdminNote(companyInformationId, createAdminNoteDto);
   }
 
-  @Put('/companies/admin-notes/:adminNoteId')
+  @Put('companies/admin-notes/:adminNoteId')
   @Roles(RolesEnum.admin)
   async updateAdminNote(
     @Param('adminNoteId', ParseIntPipe) adminNoteId: number,
     @Body() updateAdminNoteDto: CreateUpdateAdminNoteDto,
   ): Promise<IAdminNoteResponse> {
     return this.companiesService.updateAdminNote(adminNoteId, updateAdminNoteDto);
+  }
+
+  @Post('companies')
+  @Roles(RolesEnum.admin)
+  async createCompany(
+    @Req() request,
+    @Body() createCompanyDto: CreateUpdateCompanyByAdminDto,
+  ): Promise<CompanyDetailResponse> {
+    const adminId = request.raw.user.uid;
+    return this.companiesService.createCompanyInfo(createCompanyDto, adminId);
   }
 }
