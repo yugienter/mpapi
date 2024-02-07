@@ -42,8 +42,8 @@ export class CompanySummaryResponse {
     this.version = summary.version;
     this.created_at = summary.created_at;
     this.updated_at = summary.updated_at;
-    this.information_created_by_admin = summary.companyInformation.company.admin ? true : false;
-    this.companyId = summary.companyInformation.company.id;
+    this.information_created_by_admin = summary?.companyInformation?.company?.admin ? true : false;
+    this.companyId = summary?.companyInformation?.company?.id;
   }
 }
 
