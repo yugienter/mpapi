@@ -276,14 +276,14 @@ export class CompanySummariesService {
   ): Promise<CompanySummaryResponse> {
     this.logger.debug(`[updateSummary]`);
     try {
-      if (updateSummaryDto.status === SummaryStatus.SUBMITTED || updateSummaryDto.status === SummaryStatus.POSTED) {
-        this.logger.error(
-          `Admin can not SUBMITTED summary or POSTED summary with data - status: ${updateSummaryDto.status}`,
-        );
-        throw new ForbiddenException(
-          `Admin can not SUBMITTED summary or POSTED summary with data - status: ${updateSummaryDto.status}`,
-        );
-      }
+      // if (updateSummaryDto.status === SummaryStatus.SUBMITTED || updateSummaryDto.status === SummaryStatus.POSTED) {
+      //   this.logger.error(
+      //     `Admin can not SUBMITTED summary or POSTED summary with data - status: ${updateSummaryDto.status}`,
+      //   );
+      //   throw new ForbiddenException(
+      //     `Admin can not SUBMITTED summary or POSTED summary with data - status: ${updateSummaryDto.status}`,
+      //   );
+      // }
 
       const summary = await this.companySummaryRepository.findOne({
         where: { id: summaryId, companyInformation: { id: companyInformationId } },
