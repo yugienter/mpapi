@@ -276,6 +276,7 @@ export class CompanySummariesService {
   ): Promise<CompanySummaryResponse> {
     this.logger.debug(`[updateSummary]`);
     try {
+      /**TODO Summary */
       // if (updateSummaryDto.status === SummaryStatus.SUBMITTED || updateSummaryDto.status === SummaryStatus.POSTED) {
       //   this.logger.error(
       //     `Admin can not SUBMITTED summary or POSTED summary with data - status: ${updateSummaryDto.status}`,
