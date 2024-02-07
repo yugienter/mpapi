@@ -329,8 +329,6 @@ export class CompaniesService {
         throw new NotFoundException(`Company with ID ${companyId} not found`);
       }
 
-      console.log(company);
-
       const companyInfo = await this.getCompanyInformation(companyId);
 
       const latestSummary = await this.companySummaryRepository
