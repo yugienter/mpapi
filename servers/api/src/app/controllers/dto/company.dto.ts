@@ -421,24 +421,29 @@ export class CreateUpdateCompanyByAdminDto {
 
   // Transaction Data
 
+  @IsOptional()
   @IsInt()
   @Min(1)
   @Max(100)
   transaction_sell_shares_percentage: number;
 
+  @IsOptional()
   @IsNumber()
   @Min(1)
   transaction_sell_shares_amount: number;
 
+  @IsOptional()
   @IsInt()
   @Min(1)
   @Max(100)
   transaction_issue_shares_percentage: number;
 
+  @IsOptional()
   @IsNumber()
   @Min(1)
   transaction_issue_shares_amount: number;
 
+  @IsOptional()
   @IsString()
   transaction_other_details?: string;
 

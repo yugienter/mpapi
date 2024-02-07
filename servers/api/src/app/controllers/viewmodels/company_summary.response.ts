@@ -3,6 +3,7 @@ import { CompanySummary, SummaryStatus } from '@/app/models/company_summaries';
 
 export class CompanySummaryResponse {
   id: number;
+  companyId: number;
   country: string;
   area: string;
   title: string;
@@ -20,6 +21,7 @@ export class CompanySummaryResponse {
   version: number;
   created_at: Date;
   updated_at: Date;
+  information_created_by_admin: boolean;
 
   constructor(summary: CompanySummary, relatedPostedSummary: number = null) {
     this.id = summary.id;
@@ -40,6 +42,8 @@ export class CompanySummaryResponse {
     this.version = summary.version;
     this.created_at = summary.created_at;
     this.updated_at = summary.updated_at;
+    this.information_created_by_admin = summary.companyInformation.company.admin ? true : false;
+    this.companyId = summary.companyInformation.company.id;
   }
 }
 

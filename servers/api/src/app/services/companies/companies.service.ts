@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 
 import {
   CompanyInformationDto,
@@ -191,7 +191,7 @@ export class CompaniesService {
 
   async updateCompanyInfo(
     companyId: number,
-    companyInfoDto: CompanyInformationDto,
+    companyInfoDto: CompanyInformationDto | CreateUpdateCompanyByAdminDto,
     userId: string,
   ): Promise<CompanyDetailResponse> {
     try {
@@ -217,7 +217,7 @@ export class CompaniesService {
       if (
         [
           StatusOfInformation.PROCESSING, // Process then user can not action
-          StatusOfInformation.PROCESSING, // Processed then user can not action
+          StatusOfInformation.PROCESSED, // Processed then user can not action
           StatusOfInformation.DRAFT_FROM_ADMIN, // from admin, so user can not edit in this case
         ].includes(companyInfo.status)
       ) {
@@ -306,12 +306,30 @@ export class CompaniesService {
 
   /** ADMIN */
 
+  async getCompaniesCreateByAdmin(): Promise<Company[]> {
+    try {
+      return await this.companiesRepository.find({
+        select: ['id', 'name', 'created_at', 'updated_at'],
+        where: { admin: Not(IsNull()) },
+        order: { created_at: 'ASC' },
+      });
+    } catch (error) {
+      this.logger.error(`[getCompaniesCreateByAdmin] failed for get company list `, error.stack);
+      throw new Error(`[getCompaniesCreateByAdmin] error : ${error}`);
+    }
+  }
+
   async getCompanyInfoForAdmin(companyId: number): Promise<ICompanyInfoWithUserResponse> {
     try {
-      const company = await this.companiesRepository.findOne({ where: { id: companyId }, relations: ['user'] });
+      const company = await this.companiesRepository.findOne({
+        where: { id: companyId },
+        relations: ['user', 'admin'],
+      });
       if (!company) {
         throw new NotFoundException(`Company with ID ${companyId} not found`);
       }
+
+      console.log(company);
 
       const companyInfo = await this.getCompanyInformation(companyId);
 
@@ -331,12 +349,132 @@ export class CompaniesService {
         companyInformationId: companyInfo.id,
       });
 
-      const user = new UserInfo(company.user);
+      const user = company.user ? new UserInfo(company.user) : null;
 
       return { user, company: companyResult, summaryPostedId };
     } catch (error) {
       this.logger.error(`[getCompanyInfoForAdmin] failed for companyId ${companyId}`, error.stack);
       throw new Error(`[getCompanyInfoForAdmin] error : ${error.message}`);
+    }
+  }
+
+  async createCompanyInfoForAdmin(
+    companyInfoDto: CompanyInformationDto | CreateUpdateCompanyByAdminDto,
+    adminId: string,
+  ): Promise<CompanyDetailResponse> {
+    try {
+      const admin = await this.userRepository.findOne({ where: { id: adminId } });
+      if (!admin) {
+        throw new Error('User not found');
+      }
+
+      const company = new Company();
+      Object.assign(company, companyInfoDto);
+      company.admin = admin;
+      const savedCompany = await this.companiesRepository.save(company);
+
+      const companyInfo = new CompanyInformation();
+      Object.assign(companyInfo, companyInfoDto);
+      companyInfo.company = savedCompany;
+
+      await this.companyInformationRepository.save(companyInfo);
+
+      let updateFile;
+      if (companyInfoDto.files) {
+        updateFile = await this.handleFileAttachments(companyInfo.id, companyInfoDto.files, adminId);
+      }
+
+      if (companyInfoDto.financial_data && companyInfoDto.financial_data.length > 0) {
+        await this.handleFinancialData(companyInfo, companyInfoDto.financial_data, 'add');
+      }
+
+      const result = new CompanyDetailResponse({
+        ...savedCompany,
+        ...companyInfo,
+        companyId: savedCompany.id,
+        companyInformationId: companyInfo.id,
+        files: updateFile,
+        financial_data: companyInfoDto.financial_data,
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.error(`[createCompanyInfoForAdmin] failed for adminId ${adminId}`, error.stack);
+      throw new Error(`[createCompanyInfoForAdmin] error : ${error.message}`);
+    }
+  }
+
+  async updateCompanyInfoForAdmin(
+    companyId: number,
+    companyInfoDto: CompanyInformationDto | CreateUpdateCompanyByAdminDto,
+    adminId: string,
+  ): Promise<CompanyDetailResponse> {
+    try {
+      const admin = await this.userRepository.findOne({ where: { id: adminId } });
+      if (!admin) {
+        throw new Error('Admin not found');
+      }
+      const company = await this.companiesRepository.findOne({
+        where: { id: companyId, admin: Not(IsNull()), user: IsNull() },
+      });
+      // In case edit company for admin created
+      /* TODO : Need to check if admin is not the creator of company then handle another case */
+      if (!company) {
+        this.logger.error(`[updateCompanyInfoForAdmin] Company of user ${adminId} not found with ID: ${companyId}`);
+        throw new NotFoundException(
+          `[updateCompanyInfoForAdmin] Company of user ${adminId} not found with ID: ${companyId}`,
+        );
+      }
+
+      const companyInfo = await this.companyInformationRepository.findOne({ where: { company: { id: companyId } } });
+
+      if (!companyInfo) {
+        this.logger.error(`[updateCompanyInfoForAdmin] CompanyInfo of user ${adminId} not found with ID: ${companyId}`);
+        throw new NotFoundException(
+          `[updateCompanyInfoForAdmin] CompanyInfo of user ${adminId} not found with ID: ${companyId}`,
+        );
+      }
+
+      if (
+        [
+          StatusOfInformation.PROCESSING, // Process then user can not action
+          StatusOfInformation.PROCESSED, // Processed then user can not action
+        ].includes(companyInfo.status)
+      ) {
+        this.logger.error('[updateCompanyInfoForAdmin] : Invalid status');
+        throw Error('Invalid status of Information');
+      }
+
+      Object.assign(company, companyInfoDto);
+      const savedCompany = await this.companiesRepository.save(company);
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { files, financial_data, ...companyInfoData } = companyInfoDto;
+      Object.assign(companyInfo, companyInfoData);
+      await this.companyInformationRepository.save(companyInfo);
+
+      let updateFile;
+      if (companyInfoDto.files) {
+        updateFile = await this.handleFileAttachments(companyInfo.id, companyInfoDto.files, adminId);
+      }
+
+      if (companyInfoDto.financial_data && companyInfoDto.financial_data.length > 0) {
+        await this.handleFinancialData(companyInfo, companyInfoDto.financial_data);
+      }
+
+      const result = new CompanyDetailResponse({
+        ...savedCompany,
+        ...companyInfo,
+        companyId: savedCompany.id,
+        companyInformationId: companyInfo.id,
+        files: updateFile,
+        financial_data: companyInfoDto.financial_data,
+      });
+
+      return result;
+    } catch (error) {
+      this.logger.error(`[updateCompanyInfoForAdmin] failed for userId ${adminId}`, error.stack);
+      throw new Error(`[updateCompanyInfoForAdmin] error : ${error.message}`);
     }
   }
 

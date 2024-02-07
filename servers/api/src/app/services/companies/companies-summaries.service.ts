@@ -27,7 +27,6 @@ import { ConfigProvider } from '@/app/providers/config.provider';
 import { DataAccessProvider } from '@/app/providers/data-access.provider';
 import { EmailProvider } from '@/app/providers/email.provider';
 import { Service } from '@/app/utils/decorators';
-import { AdminCompanyInformationNote } from '@/app/models/admin_company_information_notes';
 
 @Service()
 @Injectable()
@@ -334,7 +333,12 @@ export class CompanySummariesService {
 
       const summary = await this.companySummaryRepository.findOne({
         where: { id: summaryId },
-        relations: ['companyInformation', 'companyInformation.company', 'companyInformation.company.user'],
+        relations: [
+          'companyInformation',
+          'companyInformation.company',
+          'companyInformation.company.user',
+          'companyInformation.company.admin',
+        ],
       });
 
       if (!summary) {
@@ -454,7 +458,7 @@ export class CompanySummariesService {
     try {
       const summary = await this.companySummaryRepository.findOne({
         where: { id: summaryId, status: SummaryStatus.POSTED },
-        relations: ['companyInformation'],
+        relations: ['companyInformation', 'companyInformation.company', 'companyInformation.company.admin'],
       });
       if (!summary) {
         this.logger.error(`Summary Posted with ID ${summaryId} not found`);

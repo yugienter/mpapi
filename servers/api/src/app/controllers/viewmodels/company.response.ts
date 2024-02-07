@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import { AdminCompanyInformationNote } from '@/app/models/admin_company_information_notes';
+import { User } from '@/app/models/user';
 
 import { UserInfo } from './user.response';
 
@@ -8,6 +9,8 @@ export interface ICompanyDetailResponse {
   companyId: number;
   companyInformationId: number;
   name: string;
+  contact_person_name: string;
+  contact_person_email: string;
   position: string;
   phone_number: string;
   website: string;
@@ -37,6 +40,7 @@ export interface ICompanyDetailResponse {
   financial_data: IFinancialData[];
   created_at: Date; // Assuming you want to keep the Date type
   updated_at: Date;
+  admin: User;
 }
 
 export interface IFinancialData {
@@ -57,6 +61,8 @@ export class CompanyDetailResponse {
   companyId: number;
   companyInformationId: number;
   name: string;
+  contact_person_name: string;
+  contact_person_email: string;
   position: string;
   phone_number: string;
   website: string;
@@ -86,11 +92,14 @@ export class CompanyDetailResponse {
   financial_data: IFinancialData[];
   created_at: Date; // Assuming you want to keep the Date type
   updated_at: Date;
+  created_by_admin: boolean;
 
   constructor(input: ICompanyDetailResponse) {
     this.companyId = input.companyId;
     this.companyInformationId = input.companyInformationId;
     this.name = input.name;
+    this.contact_person_name = input.contact_person_name;
+    this.contact_person_email = input.contact_person_email;
     this.position = input.position;
     this.phone_number = input.phone_number;
     this.website = input.website;
@@ -131,11 +140,12 @@ export class CompanyDetailResponse {
     }));
     this.created_at = input.created_at;
     this.updated_at = input.updated_at;
+    this.created_by_admin = input.admin ? true : false;
   }
 }
 
 export interface ICompanyInfoWithUserResponse {
-  user: UserInfo;
+  user: UserInfo | null;
   company: CompanyDetailResponse;
   summaryPostedId: number | null;
 }

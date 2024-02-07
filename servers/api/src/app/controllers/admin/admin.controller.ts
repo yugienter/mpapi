@@ -29,6 +29,7 @@ import { CompanySummaryTranslationsService } from '@/app/services/companies/comp
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
+import { Company } from '@/app/models/company';
 
 @MpplatformApiDefault()
 @Authorized()
@@ -242,6 +243,12 @@ export class AdminController implements Coded {
     return this.companiesService.updateAdminNote(adminNoteId, updateAdminNoteDto);
   }
 
+  @Get('companies/list')
+  @Roles(RolesEnum.admin)
+  async getCompanies(): Promise<Company[]> {
+    return await this.companiesService.getCompaniesCreateByAdmin();
+  }
+
   @Post('companies')
   @Roles(RolesEnum.admin)
   async createCompany(
@@ -249,6 +256,17 @@ export class AdminController implements Coded {
     @Body() createCompanyDto: CreateUpdateCompanyByAdminDto,
   ): Promise<CompanyDetailResponse> {
     const adminId = request.raw.user.uid;
-    return this.companiesService.createCompanyInfo(createCompanyDto, adminId);
+    return this.companiesService.createCompanyInfoForAdmin(createCompanyDto, adminId);
+  }
+
+  @Put('companies/:companyId')
+  @Roles(RolesEnum.admin)
+  async updateCompany(
+    @Param('companyId') companyId: number,
+    @Body() updateCompanyDto: CreateUpdateCompanyByAdminDto,
+    @Req() request,
+  ): Promise<CompanyDetailResponse> {
+    const adminId = request.raw.user.uid;
+    return this.companiesService.updateCompanyInfoForAdmin(companyId, updateCompanyDto, adminId);
   }
 }
