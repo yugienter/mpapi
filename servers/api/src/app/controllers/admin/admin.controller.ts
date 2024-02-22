@@ -22,6 +22,7 @@ import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmo
 import { CompanySummaryTranslationResponse } from '@/app/controllers/viewmodels/company_summary_translation.response';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
+import { Company } from '@/app/models/company';
 import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
@@ -29,7 +30,6 @@ import { CompanySummaryTranslationsService } from '@/app/services/companies/comp
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
-import { Company } from '@/app/models/company';
 
 @MpplatformApiDefault()
 @Authorized()
@@ -112,7 +112,7 @@ export class AdminController implements Coded {
 
   @Get('companies/summaries/:summaryId/posted')
   @Roles(RolesEnum.admin)
-  getSummaryPostedById(@Param('summaryId') summaryId: number): Promise<any> {
+  getSummaryPostedById(@Param('summaryId') summaryId: number): Promise<CompanySummaryResponse> {
     return this.companySummariesService.getSummaryPostedByIdForAdmin(summaryId);
   }
 
@@ -190,13 +190,13 @@ export class AdminController implements Coded {
   @Get('companies/summaries/latest-posted')
   @Roles(RolesEnum.admin)
   getLatestPostedSummaries() {
-    return this.companySummariesService.getLatestPostedSummaries();
+    return this.companySummariesService.getLatestPostedSummaries({ isAdmin: true });
   }
 
   @Get('summaries/unique-values')
   @Roles(RolesEnum.admin)
   async getUniqueSummaryValues(): Promise<SummaryOptions> {
-    return this.companySummariesService.getUniqueSummaryValues();
+    return this.companySummariesService.getUniqueSummaryValues({ isAdmin: true });
   }
 
   @Get('companies/summaries/search')
@@ -216,7 +216,7 @@ export class AdminController implements Coded {
       keyword: query.keyword,
     });
 
-    return this.companySummariesService.searchSummaries(searchSummaryDto);
+    return this.companySummariesService.searchSummaries(searchSummaryDto, { isAdmin: true });
   }
 
   @Get('companies/information/:companyInformationId/admin-notes')

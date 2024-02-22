@@ -1,11 +1,8 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, ValidateIf } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
 import { registerDecorator, ValidationArguments, ValidationOptions } from 'class-validator';
 
 import { TypeOfBusinessEnum } from '@/app/models/company_information';
 import { AnnualRevenueEnum, NumberOfEmployeesEnum, SummaryStatus, YearsEnum } from '@/app/models/company_summaries';
-import { LanguageEnum } from '@/app/models/enum';
-
-import { SearchSummaryDto } from './company_summary_search.dto';
 
 export function IsAllowedStatus(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
@@ -121,10 +118,4 @@ export class UpdateSummaryMasterDto {
 export class AddSummaryToMasterDto {
   @IsBoolean()
   is_public: boolean;
-}
-
-export class CompanySummaryListingDto extends SearchSummaryDto {
-  @IsString()
-  @IsOptional()
-  language?: LanguageEnum;
 }

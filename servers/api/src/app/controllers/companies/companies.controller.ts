@@ -118,7 +118,6 @@ export class CompaniesController implements Coded {
   }
 
   @Get('/get-summary-enums')
-  @Roles(RolesEnum.company, RolesEnum.admin)
   getAllEnums() {
     return {
       years: YearsEnum,

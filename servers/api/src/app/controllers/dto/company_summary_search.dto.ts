@@ -2,6 +2,7 @@ import { IsArray, IsOptional, IsString, Validate } from 'class-validator';
 
 import { TypeOfBusinessEnum } from '@/app/models/company_information';
 import { AnnualRevenueEnum, NumberOfEmployeesEnum, YearsEnum } from '@/app/models/company_summaries';
+import { LanguageEnum } from '@/app/models/enum';
 
 import { IsEnumKey } from './company_summary.dto';
 
@@ -39,6 +40,17 @@ export class SearchSummaryDto {
   keyword: string;
 
   constructor(partial: Partial<SearchSummaryDto>) {
+    Object.assign(this, partial);
+  }
+}
+
+export class CompanySummaryListingDto extends SearchSummaryDto {
+  @IsString()
+  @IsOptional()
+  language?: LanguageEnum;
+
+  constructor(partial: Partial<CompanySummaryListingDto>) {
+    super(partial);
     Object.assign(this, partial);
   }
 }

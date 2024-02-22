@@ -42,6 +42,8 @@ export class AuthMiddleware implements NestMiddleware, Coded {
     this._use(req, res, next);
   }
 
+  publicRoutes = ['/api/companies/get-summary-enums'];
+
   async _use(req, res, next: (error?: Error) => void) {
     this.logger.debug(`M:[${req.method}] P:${req.originalUrl}`);
     const config = this.configProvider.config;
@@ -49,6 +51,9 @@ export class AuthMiddleware implements NestMiddleware, Coded {
       _.get(req.cookies, config.cookieAccessTokenName) ?? req.headers?.authorization?.replace(/^Bearer\s+/, '');
     const refreshToken: string = _.get(req.cookies, config.cookieRefreshTokenName);
     // このMiddlewareにおいて、tokenが与えられていなかった場合は不可。
+    if (this.publicRoutes.includes(req.originalUrl)) {
+      return next();
+    }
     if (!accessToken) {
       return next(new CodedUnauthorizedException(this.code, this.errorCodes.NO_TOKEN('U-001')));
     }

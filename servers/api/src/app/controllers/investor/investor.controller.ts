@@ -1,11 +1,11 @@
-import { Controller, Get, Logger, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Logger, Param, Query, UseGuards } from '@nestjs/common';
 
+import { CompanySummaryListingDto } from '@/app/controllers/dto/company_summary_search.dto';
+import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmodels/company_summary.response';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
 import { Coded } from '@/app/utils/coded';
 import { MpplatformApiDefault } from '@/app/utils/decorators';
-
-import { CompanySummaryListingDto } from '../dto/company_summary.dto';
 
 @MpplatformApiDefault()
 @Controller('investor')
@@ -18,8 +18,8 @@ export class InvestorController implements Coded {
     return 'CIN';
   }
 
-  @Get('summaries')
-  async getSummaries(@Query() query: CompanySummaryListingDto) {
+  @Get('summaries/search')
+  async getSummaries(@Query() query) {
     function toArray(value: string | string[]): string[] {
       return Array.isArray(value) ? value : [value].filter(Boolean);
     }
@@ -32,8 +32,19 @@ export class InvestorController implements Coded {
       number_of_employees: toArray(query.number_of_employees),
       annual_revenue: toArray(query.annual_revenue),
       keyword: query.keyword,
+      language: query.language,
     });
 
     return this.companySummariesService.searchSummaries(searchSummaryDto);
+  }
+
+  @Get('summaries/:summaryId/posted')
+  getSummaryPostedById(@Param('summaryId') summaryId: number): Promise<CompanySummaryResponse> {
+    return this.companySummariesService.getSummaryPostedByIdForInvestor(summaryId);
+  }
+
+  @Get('summaries/unique-values')
+  async getUniqueSummaryValues(): Promise<SummaryOptions> {
+    return this.companySummariesService.getUniqueSummaryValues();
   }
 }

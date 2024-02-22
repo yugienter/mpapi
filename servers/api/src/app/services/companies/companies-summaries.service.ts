@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { MoreThan, Not, Repository } from 'typeorm';
 
 import {
   AddSummaryToMasterDto,
@@ -425,14 +425,19 @@ export class CompanySummariesService {
 
     summary.is_public = is_public;
 
+    await this.companySummaryRepository.update(
+      { companyInformation: { id: summary.companyInformation.id } },
+      { is_public: is_public },
+    );
+
     await this.companySummaryRepository.save(summary);
 
     return new CompanySummaryResponse(summary);
   }
 
-  async getLatestPostedSummaries(): Promise<CompanySummary[]> {
+  async getLatestPostedSummaries({ isAdmin = false }: { isAdmin?: boolean } = {}): Promise<CompanySummary[]> {
     try {
-      return this.companySummaryRepository
+      const query = this.companySummaryRepository
         .createQueryBuilder('summary')
         .where('summary.status = :status', { status: SummaryStatus.POSTED })
         .innerJoin(
@@ -446,15 +451,19 @@ export class CompanySummariesService {
           'latestSummary',
           'summary.company_information_id = latestSummary.company_information_id AND summary.version = latestSummary.max_version',
         )
-        .orderBy('summary.card_order', 'DESC')
-        .getMany();
+        .orderBy('summary.card_order', 'DESC');
+
+      if (!isAdmin) {
+        query.andWhere('summary.is_public = :isPublic', { isPublic: true });
+      }
+      return query.getMany();
     } catch (error) {
       this.logger.error(`Failed to get latest posted summaries: ${error.message}`);
       throw new InternalServerErrorException('Failed to retrieve summaries');
     }
   }
 
-  async getSummaryPostedByIdForAdmin(summaryId: number) {
+  async getSummaryPostedByIdForAdmin(summaryId: number): Promise<CompanySummaryResponse> {
     this.logger.debug('[getSummaryPostedByIdForAdmin]');
     try {
       const summary = await this.companySummaryRepository.findOne({
@@ -472,7 +481,7 @@ export class CompanySummariesService {
     }
   }
 
-  async getUniqueSummaryValues(): Promise<SummaryOptions> {
+  async getUniqueSummaryValues({ isAdmin = false }: { isAdmin?: boolean } = {}): Promise<SummaryOptions> {
     const latestVersionSubquery = this.companySummaryRepository
       .createQueryBuilder('subSummary')
       .select(['companyInformation.id AS companyInformationId', 'MAX(subSummary.version) AS maxVersion'])
@@ -489,6 +498,11 @@ export class CompanySummariesService {
       )
       .setParameters(latestVersionSubquery.getParameters());
 
+    if (!isAdmin) {
+      query.where('summary.status = :status', { status: SummaryStatus.POSTED });
+      query.andWhere('summary.is_public = :isPublic', { isPublic: true });
+    }
+
     const countries = await query.select('DISTINCT summary.country', 'country').getRawMany();
     const areas = await query.select('DISTINCT summary.area', 'area').getRawMany();
     const typesOfBusiness = await query.select('DISTINCT summary.type_of_business', 'typeOfBusiness').getRawMany();
@@ -500,7 +514,10 @@ export class CompanySummariesService {
     };
   }
 
-  async searchSummaries(searchSummaryDto: SearchSummaryDto): Promise<CompanySummaryResponse[]> {
+  async searchSummaries(
+    searchSummaryDto: SearchSummaryDto,
+    { isAdmin = false }: { isAdmin?: boolean } = {},
+  ): Promise<CompanySummaryResponse[]> {
     const { type_of_business, years, country, area, number_of_employees, annual_revenue, keyword } = searchSummaryDto;
 
     const latestVersionSubquery = this.companySummaryRepository
@@ -517,8 +534,13 @@ export class CompanySummariesService {
         'summary.company_information_id = latestSummary.companyInformationId AND summary.version = latestSummary.maxVersion',
       )
       .setParameters(latestVersionSubquery.getParameters())
-      .where('summary.status = :status', { status: SummaryStatus.POSTED })
-      .orderBy('summary.card_order', 'DESC');
+      .where('summary.status = :status', { status: SummaryStatus.POSTED });
+
+    if (!isAdmin) {
+      query.andWhere('summary.is_public = :isPublic', { isPublic: true });
+    }
+
+    query.orderBy('summary.card_order', 'DESC');
 
     const searchConditions = [];
     const parameters = {};
@@ -572,74 +594,42 @@ export class CompanySummariesService {
   }
 
   /** Investor */
-  async searchSummariesForInvestor(searchSummaryDto: SearchSummaryDto): Promise<CompanySummaryResponse[]> {
-    const { type_of_business, years, country, area, number_of_employees, annual_revenue, keyword } = searchSummaryDto;
-
-    const latestVersionSubquery = this.companySummaryRepository
-      .createQueryBuilder('subSummary')
-      .select(['subSummary.company_information_id AS companyInformationId', 'MAX(subSummary.version) AS maxVersion'])
-      .where('subSummary.status = :status', { status: SummaryStatus.POSTED })
-      .groupBy('subSummary.company_information_id');
-
-    const query = this.companySummaryRepository
-      .createQueryBuilder('summary')
-      .innerJoin(
-        '(' + latestVersionSubquery.getQuery() + ')',
-        'latestSummary',
-        'summary.company_information_id = latestSummary.companyInformationId AND summary.version = latestSummary.maxVersion',
-      )
-      .setParameters(latestVersionSubquery.getParameters())
-      .where('summary.status = :status', { status: SummaryStatus.POSTED })
-      .orderBy('summary.card_order', 'DESC');
-
-    const searchConditions = [];
-    const parameters = {};
-
-    if (type_of_business && type_of_business.length) {
-      searchConditions.push('summary.type_of_business IN (:...typeOfBusiness)');
-      parameters['typeOfBusiness'] = type_of_business;
-    }
-
-    if (years && years.length) {
-      searchConditions.push('summary.years IN (:...years)');
-      parameters['years'] = years;
-    }
-
-    if (country && country.length) {
-      searchConditions.push('summary.country IN (:...country)');
-      parameters['country'] = country;
-    }
-
-    if (area && area.length) {
-      searchConditions.push('summary.area IN (:...area)');
-      parameters['area'] = area;
-    }
-
-    if (number_of_employees && number_of_employees.length) {
-      searchConditions.push('summary.number_of_employees IN (:...numberOfEmployees)');
-      parameters['numberOfEmployees'] = number_of_employees;
-    }
-
-    if (annual_revenue && annual_revenue.length) {
-      searchConditions.push('summary.annual_revenue IN (:...annualRevenue)');
-      parameters['annualRevenue'] = annual_revenue;
-    }
-
-    if (keyword) {
-      searchConditions.push('(summary.title LIKE :keyword OR summary.content LIKE :keyword)');
-      parameters['keyword'] = `%${keyword}%`;
-    }
-
-    if (searchConditions.length > 0) {
-      query.andWhere(searchConditions.join(' AND '), parameters);
-    }
-
+  async getSummaryPostedByIdForInvestor(summaryId: number): Promise<CompanySummaryResponse> {
+    this.logger.debug('[getSummaryPostedByIdForInvestor]');
     try {
-      const summaries = await query.getMany();
-      return summaries.map((summary) => new CompanySummaryResponse(summary));
+      // Get the summary with the given ID
+      const summary = await this.companySummaryRepository.findOne({
+        where: { id: summaryId, status: SummaryStatus.POSTED, is_public: true },
+        relations: ['companyInformation'],
+      });
+
+      // If no such summary exists, throw an error
+      if (!summary) {
+        this.logger.error(`Summary Posted with ID ${summaryId} not found`);
+        throw new NotFoundException(`Summary Posted not found`);
+      }
+
+      // Check if there is a higher version that is POSTED and is_public for the same companyInformationId
+      const higherVersion = await this.companySummaryRepository.findOne({
+        where: {
+          companyInformation: { id: summary.companyInformation.id },
+          version: MoreThan(summary.version),
+          status: SummaryStatus.POSTED,
+          is_public: true,
+        },
+      });
+
+      // If a higher version exists, throw an error
+      if (higherVersion) {
+        this.logger.error(`A higher version of summary with ID ${summaryId} exists`);
+        throw new NotFoundException(`A higher version of summary exists`);
+      }
+
+      // If the summary exists and meets all conditions, return it
+      return new CompanySummaryResponse(summary);
     } catch (error) {
-      this.logger.error(`[searchSummaries] Failed to search summaries: ${error.message}`);
-      throw new InternalServerErrorException('Failed to search summaries');
+      this.logger.error(`Failed to get posted summaries: ${error.message}`);
+      throw new InternalServerErrorException('Failed to retrieve summaries');
     }
   }
 }
