@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { CompanyInformation, TypeOfBusinessEnum } from '@/app/models/company_information';
+import { CompanyInformation } from '@/app/models/company_information';
 
 export enum SummaryStatus {
   DRAFT = 'DRAFT',
@@ -66,7 +66,7 @@ export class CompanySummary {
   content: string;
 
   @Column()
-  type_of_business: TypeOfBusinessEnum;
+  type_of_business: string;
 
   @Column()
   years: string;

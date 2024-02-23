@@ -48,7 +48,7 @@ export class CompanyInformation {
   general_headquarter: string;
 
   @Column({ length: 50 })
-  general_business_type: TypeOfBusinessEnum;
+  general_business_type: string;
 
   @Column({ length: 50 })
   general_business_location_country: string;

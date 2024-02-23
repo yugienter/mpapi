@@ -10,6 +10,7 @@ import { CompanySummaryResponse } from '@/app/controllers/viewmodels/company_sum
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { Company, StatusOfInformation } from '@/app/models/company';
+import { TypeOfBusinessEnum } from '@/app/models/company_information';
 import { AnnualRevenueEnum, NumberOfEmployeesEnum, YearsEnum } from '@/app/models/company_summaries';
 import { RolesEnum } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
@@ -123,6 +124,7 @@ export class CompaniesController implements Coded {
       years: YearsEnum,
       numberOfEmployees: NumberOfEmployeesEnum,
       annualRevenue: AnnualRevenueEnum,
+      typeOfBusiness: TypeOfBusinessEnum,
     };
   }
 }

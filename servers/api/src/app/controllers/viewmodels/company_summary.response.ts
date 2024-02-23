@@ -1,4 +1,3 @@
-import { TypeOfBusinessEnum } from '@/app/models/company_information';
 import { CompanySummary, SummaryStatus } from '@/app/models/company_summaries';
 
 export class CompanySummaryResponse {
@@ -8,7 +7,7 @@ export class CompanySummaryResponse {
   area: string;
   title: string;
   content: string;
-  type_of_business: TypeOfBusinessEnum;
+  type_of_business: string;
   years: string;
   number_of_employees: string;
   annual_revenue: string;

@@ -357,7 +357,7 @@ export class CompaniesService {
   }
 
   async createCompanyInfoForAdmin(
-    companyInfoDto: CompanyInformationDto | CreateUpdateCompanyByAdminDto,
+    companyInfoDto: CreateUpdateCompanyByAdminDto,
     adminId: string,
   ): Promise<CompanyDetailResponse> {
     try {
@@ -404,7 +404,7 @@ export class CompaniesService {
 
   async updateCompanyInfoForAdmin(
     companyId: number,
-    companyInfoDto: CompanyInformationDto | CreateUpdateCompanyByAdminDto,
+    companyInfoDto: CreateUpdateCompanyByAdminDto,
     adminId: string,
   ): Promise<CompanyDetailResponse> {
     try {
