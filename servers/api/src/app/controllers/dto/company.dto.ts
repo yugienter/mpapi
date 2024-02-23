@@ -26,6 +26,8 @@ import {
 import { StatusOfInformation } from '@/app/models/company';
 import { TypeOfBusinessEnum } from '@/app/models/company_information';
 
+import { IsEnumKey } from './company_summary.dto';
+
 @ValidatorConstraint({ async: true })
 class IsOneOfThreeGroupsConstraint implements ValidatorConstraintInterface {
   validate(value: CompanyInformationDto, args: ValidationArguments) {
@@ -193,7 +195,7 @@ export class CompanyInformationDto {
 
   @ValidateIf((o) => o.status === StatusOfInformation.SUBMITTED)
   @IsNotEmpty()
-  @IsEnum(TypeOfBusinessEnum)
+  @IsEnumKey(TypeOfBusinessEnum)
   general_business_type: TypeOfBusinessEnum;
 
   @ValidateIf((o) => o.status === StatusOfInformation.SUBMITTED)
@@ -367,7 +369,7 @@ export class CreateUpdateCompanyByAdminDto {
   general_headquarter?: string;
 
   @IsOptional()
-  @IsEnum(TypeOfBusinessEnum)
+  @IsEnumKey(TypeOfBusinessEnum)
   general_business_type: TypeOfBusinessEnum;
 
   @IsOptional()

@@ -22,6 +22,7 @@ import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmo
 import { CompanySummaryTranslationResponse } from '@/app/controllers/viewmodels/company_summary_translation.response';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
+import { Company } from '@/app/models/company';
 import { ModifiedUser, RolesEnum, User } from '@/app/models/user';
 import { CompaniesService } from '@/app/services/companies/companies.service';
 import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
@@ -29,7 +30,6 @@ import { CompanySummaryTranslationsService } from '@/app/services/companies/comp
 import { UsersService } from '@/app/services/users/users.service';
 import { Coded } from '@/app/utils/coded';
 import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
-import { Company } from '@/app/models/company';
 
 @MpplatformApiDefault()
 @Authorized()

@@ -43,35 +43,45 @@ export function IsEnumKey(enumObj: object, validationOptions?: ValidationOptions
 }
 
 export class CompanySummaryDto {
-  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
+  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED || !!o.country)
+  @IsNotEmpty()
   @IsString()
   country: string;
 
-  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
+  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED || !!o.area)
+  @IsNotEmpty()
   @IsString()
   area: string;
 
-  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
+  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED || !!o.title)
+  @IsNotEmpty()
   @IsString()
   title: string;
 
-  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
+  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED || !!o.content)
+  @IsNotEmpty()
   @IsString()
   content: string;
 
-  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
-  @IsEnum(TypeOfBusinessEnum)
-  type_of_business: TypeOfBusinessEnum;
+  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED || !!o.type_of_business)
+  @IsNotEmpty()
+  @IsEnumKey(TypeOfBusinessEnum)
+  type_of_business: string;
 
-  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
+  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED || !!o.years)
+  @IsNotEmpty()
   @IsEnumKey(YearsEnum)
   years: string;
 
-  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
+  @ValidateIf(
+    (o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED || !!o.number_of_employees,
+  )
+  @IsNotEmpty()
   @IsEnumKey(NumberOfEmployeesEnum)
   number_of_employees: string;
 
-  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED)
+  @ValidateIf((o) => o.status === SummaryStatus.REQUEST || o.status === SummaryStatus.SUBMITTED || !!o.annual_revenue)
+  @IsNotEmpty()
   @IsEnumKey(AnnualRevenueEnum)
   annual_revenue: string;
 
@@ -98,8 +108,8 @@ export class UpdateSummaryMasterDto {
   content: string;
 
   @IsNotEmpty()
-  @IsEnum(TypeOfBusinessEnum)
-  type_of_business: TypeOfBusinessEnum;
+  @IsEnumKey(TypeOfBusinessEnum)
+  type_of_business: string;
 
   @IsNotEmpty()
   @IsEnumKey(YearsEnum)
