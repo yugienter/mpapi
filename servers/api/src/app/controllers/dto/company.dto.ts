@@ -196,7 +196,7 @@ export class CompanyInformationDto {
   @ValidateIf((o) => o.status === StatusOfInformation.SUBMITTED)
   @IsNotEmpty()
   @IsEnumKey(TypeOfBusinessEnum)
-  general_business_type: TypeOfBusinessEnum;
+  general_business_type: string;
 
   @ValidateIf((o) => o.status === StatusOfInformation.SUBMITTED)
   @IsNotEmpty()
@@ -370,7 +370,7 @@ export class CreateUpdateCompanyByAdminDto {
 
   @IsOptional()
   @IsEnumKey(TypeOfBusinessEnum)
-  general_business_type: TypeOfBusinessEnum;
+  general_business_type: string;
 
   @IsOptional()
   @IsString()
