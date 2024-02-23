@@ -127,4 +127,17 @@ export class EmailProvider implements Coded {
 
     await this.sendMailWithSES(subject, sendTo, templateName, params);
   }
+
+  async sendAdminNotificationForNewInquiry(subject: string, sendTo: string, params: EmailContext) {
+    const adminUrlObj = new URL(this.configProvider.config.exchangeBaseUrlAdmin);
+    adminUrlObj.pathname = `company/summary/master/${params.summary_id}`;
+    const investorUrlObj = new URL(this.configProvider.config.exchangeBaseUrlInvestor);
+    investorUrlObj.pathname = `summary/${params.summary_id}`;
+
+    await this.sendMailWithSES(subject, sendTo, 'new_inquiry_notification', {
+      ...params,
+      admin_link: adminUrlObj.toString(),
+      investor_link: investorUrlObj.toString(),
+    });
+  }
 }

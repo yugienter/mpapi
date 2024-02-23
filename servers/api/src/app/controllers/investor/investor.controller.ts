@@ -1,6 +1,7 @@
-import { Controller, Get, Logger, Param, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post, Query, UseGuards } from '@nestjs/common';
 
 import { CompanySummaryListingDto } from '@/app/controllers/dto/company_summary_search.dto';
+import { AdminNotificationDto } from '@/app/controllers/dto/investor_request.dto';
 import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmodels/company_summary.response';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
@@ -46,5 +47,10 @@ export class InvestorController implements Coded {
   @Get('summaries/unique-values')
   async getUniqueSummaryValues(): Promise<SummaryOptions> {
     return this.companySummariesService.getUniqueSummaryValues();
+  }
+
+  @Post('notify-admin-of-new-inquiry')
+  async notifyAdminOfNewInquiry(@Body() adminNotificationDto: AdminNotificationDto): Promise<boolean> {
+    return this.companySummariesService.notifyAdminOfNewInquiry(adminNotificationDto);
   }
 }

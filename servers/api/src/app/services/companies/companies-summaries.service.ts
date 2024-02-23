@@ -14,6 +14,7 @@ import {
   UpdateSummaryMasterDto,
 } from '@/app/controllers/dto/company_summary.dto';
 import { SearchSummaryDto } from '@/app/controllers/dto/company_summary_search.dto';
+import { AdminNotificationDto } from '@/app/controllers/dto/investor_request.dto';
 import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmodels/company_summary.response';
 import { CompanyInformation } from '@/app/models/company_information';
 import {
@@ -630,6 +631,21 @@ export class CompanySummariesService {
     } catch (error) {
       this.logger.error(`Failed to get posted summaries: ${error.message}`);
       throw new InternalServerErrorException('Failed to retrieve summaries');
+    }
+  }
+
+  async notifyAdminOfNewInquiry(adminNotificationDto: AdminNotificationDto): Promise<boolean> {
+    const adminEmail = this.configProvider.config.adminEmail;
+    try {
+      this.logger.log(`Send new inquiry submit to admin: ${adminEmail}`);
+      await this.emailProvider.sendAdminNotificationForNewInquiry('New inquiry from investor', adminEmail, {
+        ...adminNotificationDto,
+      });
+      return true;
+    } catch (error) {
+      this.logger.error(error);
+      this.logger.log(`[notifyAdmin] Fail to send email for ${adminEmail}`);
+      return false;
     }
   }
 }

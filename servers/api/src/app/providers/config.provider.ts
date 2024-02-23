@@ -15,6 +15,10 @@ export declare class Config {
   readonly appBaseUrl: string;
   /** Environment variable: EXCHANGE_BASE_URL */
   readonly exchangeBaseUrl: string;
+  /** Environment variable: EXCHANGE_BASE_URL_ADMIN */
+  readonly exchangeBaseUrlAdmin: string;
+  /** Environment variable: EXCHANGE_BASE_URL_INVESTOR */
+  readonly exchangeBaseUrlInvestor: string;
 
   /** Environment variable: LOG_LEVEL */
   readonly logLevel: LogLevel;
@@ -120,6 +124,8 @@ export class ConfigProvider {
       serverPort: this.getOrShowError<string>('SERVER_PORT'),
       appBaseUrl: this.getOrShowError<string>('APP_BASE_URL'),
       exchangeBaseUrl: this.getOrShowError<string>('EXCHANGE_BASE_URL'),
+      exchangeBaseUrlAdmin: this.getOrShowError<string>('EXCHANGE_BASE_URL_ADMIN'),
+      exchangeBaseUrlInvestor: this.getOrShowError<string>('EXCHANGE_BASE_URL_INVESTOR'),
 
       logLevel: this.getOrShowError<LogLevel>('LOG_LEVEL', 'log'),
       logFile: this.getOrShowError<string>('LOG_FILE', null),

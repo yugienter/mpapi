@@ -1,0 +1,58 @@
+doctype html
+html
+  head
+    title We have new inquiry from investor
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    style.
+      @media only screen and (max-width: 600px) {
+        table {
+          width: 100% !important;
+        }
+      }
+  body(style="font-family: Arial, sans-serif; margin: 0; padding: 0;")
+    table(width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#f4f4f4")
+      tr
+        td(align="center" valign="top")
+          table(width="600" border="0" cellpadding="10" cellspacing="0" bgcolor="#ffffff" style="padding: 30px")
+            tr
+              td(align="center")
+                h1(style="font-size: 24px; margin-bottom: 20px;") We have new inquiry from investor
+            tr
+              td(align="left")
+                p We have received a new inquiry from #{name} of #{company_name}. The details are as follows:
+                p 
+                  strong Department: 
+                  | #{department}
+                p 
+                  strong Position: 
+                  | #{position}
+                p 
+                  strong Email: 
+                  | #{email}
+                p 
+                  strong Tel: 
+                  | #{tel}
+                p 
+                  strong Inquiry Details: 
+                  br
+                  | #{inquiry_details}
+                  br
+                p 
+                  strong Summary ID: 
+                  | #{summary_id}
+                p 
+                  strong Admin Page: 
+                  a(href=admin_link) View on Admin Page
+                  
+                p 
+                  strong Investor Page: 
+                  a(href=investor_link) View on Investor Page
+            tr
+              td(align="left" style="font-size: 12px; font-style: italic;")
+                span * 
+                | This is an automated message. Please do not reply directly to this email.
+            tr
+              td(align="left")
+                p If you have any issues or questions, please 
+                  a(href="mailto:info@mp-asia.com" style="text-decoration: underline;") contact our support team
+                p Thank you!
