@@ -4,6 +4,7 @@ import { CompanySummaryListingDto } from '@/app/controllers/dto/company_summary_
 import { AdminNotificationDto } from '@/app/controllers/dto/investor_request.dto';
 import { CompanySummaryResponse, SummaryOptions } from '@/app/controllers/viewmodels/company_summary.response';
 import { RolesGuard } from '@/app/guards/roles.guard';
+import { LanguageEnum } from '@/app/models/enum';
 import { CompanySummariesService } from '@/app/services/companies/companies-summaries.service';
 import { Coded } from '@/app/utils/coded';
 import { MpplatformApiDefault } from '@/app/utils/decorators';
@@ -19,8 +20,8 @@ export class InvestorController implements Coded {
     return 'CIN';
   }
 
-  @Get('summaries/search')
-  async getSummaries(@Query() query) {
+  @Get('summaries/search/:language')
+  async getSummaries(@Query() query, @Param('language') language?: LanguageEnum) {
     function toArray(value: string | string[]): string[] {
       return Array.isArray(value) ? value : [value].filter(Boolean);
     }
@@ -36,7 +37,7 @@ export class InvestorController implements Coded {
       language: query.language,
     });
 
-    return this.companySummariesService.searchSummaries(searchSummaryDto);
+    return this.companySummariesService.searchSummariesForInvestor(searchSummaryDto, language);
   }
 
   @Get('summaries/:summaryId/posted')

@@ -42,7 +42,7 @@ export class AuthMiddleware implements NestMiddleware, Coded {
     this._use(req, res, next);
   }
 
-  publicRoutes = ['/api/companies/get-summary-enums'];
+  publicRoutes = ['/api/companies/get-summary-enums', '/api/companies/get-countries-json'];
 
   async _use(req, res, next: (error?: Error) => void) {
     this.logger.debug(`M:[${req.method}] P:${req.originalUrl}`);

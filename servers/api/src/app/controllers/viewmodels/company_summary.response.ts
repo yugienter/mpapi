@@ -1,4 +1,5 @@
 import { CompanySummary, SummaryStatus } from '@/app/models/company_summaries';
+import { CompanySummaryTranslation } from '@/app/models/company_summaries_translations';
 
 export class CompanySummaryResponse {
   id: number;
@@ -21,13 +22,19 @@ export class CompanySummaryResponse {
   created_at: Date;
   updated_at: Date;
   information_created_by_admin: boolean;
+  translation?: CompanySummaryTranslation;
 
-  constructor(summary: CompanySummary, relatedPostedSummary: number = null) {
+  constructor(summary: CompanySummary, relatedPostedSummary: number = null, translation?: CompanySummaryTranslation) {
     this.id = summary.id;
     this.country = summary.country;
     this.area = summary.area;
-    this.title = summary.title;
-    this.content = summary.content;
+    if (translation) {
+      this.title = translation.title_translated;
+      this.content = translation.content_translated;
+    } else {
+      this.title = summary.title;
+      this.content = summary.content;
+    }
     this.type_of_business = summary.type_of_business;
     this.years = summary.years;
     this.number_of_employees = summary.number_of_employees;

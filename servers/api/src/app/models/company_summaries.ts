@@ -4,11 +4,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { CompanyInformation } from '@/app/models/company_information';
+import { CompanySummaryTranslation } from '@/app/models/company_summaries_translations';
 
 export enum SummaryStatus {
   DRAFT = 'DRAFT',
@@ -107,4 +109,7 @@ export class CompanySummary {
   @ManyToOne(() => CompanyInformation)
   @JoinColumn({ name: 'company_information_id' })
   companyInformation: CompanyInformation;
+
+  @OneToMany(() => CompanySummaryTranslation, (translation) => translation.companySummary)
+  translations: CompanySummaryTranslation[];
 }
