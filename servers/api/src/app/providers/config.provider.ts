@@ -37,6 +37,8 @@ export declare class Config {
 
   /** Environment variable: EMAIL_USER */
   readonly emailUser: string;
+  /** Environment variable: FROM_TEXT_EMAIL_USER */
+  readonly fromTextEmailUser: string;
   /** Environment variable: BCC_EMAIL_USER */
   readonly bccEmailUser: string;
   /** Environment variable: AWS_EMAIL_USER */
@@ -136,6 +138,7 @@ export class ConfigProvider {
       adminEmail: this.getOrShowError<string>('ADMIN_EMAIL', null),
 
       emailUser: this.getOrShowError<string>('EMAIL_USER', null),
+      fromTextEmailUser: this.getOrShowError<string>('FROM_TEXT_EMAIL_USER', null),
       bccEmailUser: this.getOrShowError<string>('BCC_EMAIL_USER', null),
       awsEmailUser: this.getOrShowError<string>('AWS_EMAIL_USER', null),
       emailPassword: this.getOrShowError<string>('EMAIL_PASSWORD', null),

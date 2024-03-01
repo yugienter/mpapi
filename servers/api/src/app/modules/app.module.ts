@@ -64,7 +64,8 @@ import { ConfigProvider } from '@/app/providers/config.provider';
             },
           },
           defaults: {
-            from: `"M&P Asia platform" <${conf.emailUser}>`,
+            // from: `"M&P Asia platform" <${conf.emailUser}>`,
+            from: conf.fromTextEmailUser,
           },
           preview: conf.emailDebugPreview,
           template: {
