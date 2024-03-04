@@ -134,7 +134,7 @@ export class EmailProvider implements Coded {
     const investorUrlObj = new URL(this.configProvider.config.exchangeBaseUrlInvestor);
     investorUrlObj.pathname = `summary/${params.summary_id}`;
 
-    await this.sendMailWithSES(subject, sendTo, 'new_inquiry_notification', {
+    await this.sendMailWithSES(subject, sendTo, 'new-inquiry-notification', {
       ...params,
       admin_link: adminUrlObj.toString(),
       investor_link: investorUrlObj.toString(),

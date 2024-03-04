@@ -2,7 +2,12 @@ import { IsEmail, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class AdminNotificationDto {
   @IsNumber()
+  @IsNotEmpty()
   summary_id: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  card_order: number;
 
   @IsString()
   @IsNotEmpty()
