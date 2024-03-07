@@ -41,8 +41,11 @@ export class InvestorController implements Coded {
   }
 
   @Get('summaries/:summaryId/posted')
-  getSummaryPostedById(@Param('summaryId') summaryId: number): Promise<CompanySummaryResponse> {
-    return this.companySummariesService.getSummaryPostedByIdForInvestor(summaryId);
+  getSummaryPostedById(
+    @Param('summaryId') summaryId: number,
+    @Query('language') language?: LanguageEnum,
+  ): Promise<CompanySummaryResponse> {
+    return this.companySummariesService.getSummaryPostedByIdForInvestor(summaryId, language);
   }
 
   @Get('summaries/unique-values')

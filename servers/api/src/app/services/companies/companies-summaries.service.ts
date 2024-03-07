@@ -661,8 +661,18 @@ export class CompanySummariesService {
     }
 
     if (keyword) {
-      searchConditions.push('(summary.title LIKE :keyword OR summary.content LIKE :keyword)');
       parameters['keyword'] = `%${keyword}%`;
+      if (language === LanguageEnum.EN) {
+        searchConditions.push('(summary.title LIKE :keyword OR summary.content LIKE :keyword)');
+      } else {
+        searchConditions.push(
+          '(' +
+            '(translation.title_translated LIKE :keyword OR translation.content_translated LIKE :keyword)' +
+            ' AND translation.language = :language' +
+            ')',
+        );
+      }
+      parameters['language'] = language;
     }
 
     if (searchConditions.length > 0) {
@@ -681,13 +691,13 @@ export class CompanySummariesService {
     }
   }
 
-  async getSummaryPostedByIdForInvestor(summaryId: number): Promise<CompanySummaryResponse> {
+  async getSummaryPostedByIdForInvestor(summaryId: number, language?: LanguageEnum): Promise<CompanySummaryResponse> {
     this.logger.debug('[getSummaryPostedByIdForInvestor]');
     try {
       // Get the summary with the given ID
       const summary = await this.companySummaryRepository.findOne({
         where: { id: summaryId, status: SummaryStatus.POSTED, is_public: true },
-        relations: ['companyInformation'],
+        relations: language ? ['companyInformation', 'translations'] : ['companyInformation'],
       });
 
       // If no such summary exists, throw an error
@@ -712,8 +722,10 @@ export class CompanySummariesService {
         throw new NotFoundException(`A higher version of summary exists`);
       }
 
+      const translation = language ? summary.translations.find((t) => t.language === language) : null;
+
       // If the summary exists and meets all conditions, return it
-      return new CompanySummaryResponse(summary);
+      return new CompanySummaryResponse(summary, null, translation);
     } catch (error) {
       this.logger.error(`Failed to get posted summaries: ${error.message}`);
       throw new InternalServerErrorException('Failed to retrieve summaries');
