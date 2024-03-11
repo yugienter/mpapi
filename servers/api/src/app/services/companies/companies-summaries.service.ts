@@ -437,7 +437,31 @@ export class CompanySummariesService {
     return new CompanySummaryResponse(summary);
   }
 
+  // change public status of summary in master ( with status  POSTED)
+  async changePublicStatus(summaryId: number, is_public: boolean): Promise<boolean> {
+    this.logger.debug('[updatePublicStatus]');
+    console.log('is_public', is_public);
+    try {
+      const summary = await this.companySummaryRepository.findOne({ where: { id: summaryId } });
+      if (!summary) {
+        this.logger.error(`Summary with ID ${summaryId} not found`);
+        throw new NotFoundException(`Summary with ID ${summaryId} not found`);
+      }
+      if (summary.status !== SummaryStatus.POSTED) {
+        this.logger.error('Admin can not edit summary with status not POSTED');
+        throw new ForbiddenException('Admin can not edit summary with status not POSTED');
+      }
+      summary.is_public = is_public;
+      const result = await this.companySummaryRepository.save(summary);
+      return !!result;
+    } catch (error) {
+      this.logger.error(`Failed to update public status of summary: ${error.message}`);
+      throw new InternalServerErrorException('Failed to update public status of summary');
+    }
+  }
+
   async getLatestPostedSummaries({ isAdmin = false }: { isAdmin?: boolean } = {}): Promise<CompanySummary[]> {
+    this.logger.debug('[getLatestPostedSummaries]');
     try {
       const query = this.companySummaryRepository
         .createQueryBuilder('summary')

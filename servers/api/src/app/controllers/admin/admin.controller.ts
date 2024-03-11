@@ -153,6 +153,14 @@ export class AdminController implements Coded {
     return this.companySummariesService.addSummaryToMaster(companySummaryId, addToMasterDto);
   }
 
+  @Put('summaries/:summaryId/public-status')
+  async changePublicStatus(
+    @Param('summaryId') summaryId: number,
+    @Body('is_public') is_public: boolean,
+  ): Promise<boolean> {
+    return this.companySummariesService.changePublicStatus(summaryId, is_public);
+  }
+
   @Post('companies/:companySummaryId/summaries/translations')
   @Roles(RolesEnum.admin)
   createSummaryTranslation(
