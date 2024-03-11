@@ -22,7 +22,7 @@ export class CompanySummaryResponse {
   created_at: Date;
   updated_at: Date;
   information_created_by_admin: boolean;
-  translation?: CompanySummaryTranslation;
+  translations?: CompanySummaryTranslation[];
 
   constructor(summary: CompanySummary, relatedPostedSummary: number = null, translation?: CompanySummaryTranslation) {
     this.id = summary.id;
@@ -50,6 +50,10 @@ export class CompanySummaryResponse {
     this.updated_at = summary.updated_at;
     this.information_created_by_admin = summary?.companyInformation?.company?.admin ? true : false;
     this.companyId = summary?.companyInformation?.company?.id;
+    // for admin users, we want to show all translations
+    if (summary?.translations?.length > 0 && summary?.translations?.length > 0) {
+      this.translations = summary?.translations;
+    }
   }
 }
 

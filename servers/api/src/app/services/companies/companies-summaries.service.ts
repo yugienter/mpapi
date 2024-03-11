@@ -24,11 +24,11 @@ import {
   SummaryStatus,
   YearsEnum,
 } from '@/app/models/company_summaries';
+import { LanguageEnum } from '@/app/models/enum';
 import { ConfigProvider } from '@/app/providers/config.provider';
 import { DataAccessProvider } from '@/app/providers/data-access.provider';
 import { EmailProvider } from '@/app/providers/email.provider';
 import { Service } from '@/app/utils/decorators';
-import { LanguageEnum } from '@/app/models/enum';
 
 @Service()
 @Injectable()
@@ -460,35 +460,6 @@ export class CompanySummariesService {
     }
   }
 
-  async getLatestPostedSummaries({ isAdmin = false }: { isAdmin?: boolean } = {}): Promise<CompanySummary[]> {
-    this.logger.debug('[getLatestPostedSummaries]');
-    try {
-      const query = this.companySummaryRepository
-        .createQueryBuilder('summary')
-        .where('summary.status = :status', { status: SummaryStatus.POSTED })
-        .innerJoin(
-          (subQuery) => {
-            return subQuery
-              .select(['subSummary.company_information_id', 'MAX(subSummary.version) as max_version'])
-              .from(CompanySummary, 'subSummary')
-              .where('subSummary.status = :status', { status: SummaryStatus.POSTED })
-              .groupBy('subSummary.company_information_id');
-          },
-          'latestSummary',
-          'summary.company_information_id = latestSummary.company_information_id AND summary.version = latestSummary.max_version',
-        )
-        .orderBy('summary.card_order', 'DESC');
-
-      if (!isAdmin) {
-        query.andWhere('summary.is_public = :isPublic', { isPublic: true });
-      }
-      return query.getMany();
-    } catch (error) {
-      this.logger.error(`Failed to get latest posted summaries: ${error.message}`);
-      throw new InternalServerErrorException('Failed to retrieve summaries');
-    }
-  }
-
   async getSummaryPostedByIdForAdmin(summaryId: number): Promise<CompanySummaryResponse> {
     this.logger.debug('[getSummaryPostedByIdForAdmin]');
     try {
@@ -540,10 +511,7 @@ export class CompanySummariesService {
     };
   }
 
-  async searchSummaries(
-    searchSummaryDto: SearchSummaryDto,
-    { isAdmin = false }: { isAdmin?: boolean } = {},
-  ): Promise<CompanySummaryResponse[]> {
+  async searchSummaries(searchSummaryDto: SearchSummaryDto): Promise<CompanySummaryResponse[]> {
     const { type_of_business, years, country, area, number_of_employees, annual_revenue, keyword } = searchSummaryDto;
 
     const latestVersionSubquery = this.companySummaryRepository
@@ -560,11 +528,8 @@ export class CompanySummariesService {
         'summary.company_information_id = latestSummary.companyInformationId AND summary.version = latestSummary.maxVersion',
       )
       .setParameters(latestVersionSubquery.getParameters())
-      .where('summary.status = :status', { status: SummaryStatus.POSTED });
-
-    if (!isAdmin) {
-      query.andWhere('summary.is_public = :isPublic', { isPublic: true });
-    }
+      .where('summary.status = :status', { status: SummaryStatus.POSTED })
+      .leftJoinAndSelect('summary.translations', 'translation');
 
     query.orderBy('summary.card_order', 'DESC');
 

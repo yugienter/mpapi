@@ -195,12 +195,6 @@ export class AdminController implements Coded {
     return this.companySummaryTranslationsService.getSummaryTranslations(companySummaryId);
   }
 
-  @Get('companies/summaries/latest-posted')
-  @Roles(RolesEnum.admin)
-  getLatestPostedSummaries() {
-    return this.companySummariesService.getLatestPostedSummaries({ isAdmin: true });
-  }
-
   @Get('summaries/unique-values')
   @Roles(RolesEnum.admin)
   async getUniqueSummaryValues(): Promise<SummaryOptions> {
@@ -224,7 +218,7 @@ export class AdminController implements Coded {
       keyword: query.keyword,
     });
 
-    return this.companySummariesService.searchSummaries(searchSummaryDto, { isAdmin: true });
+    return this.companySummariesService.searchSummaries(searchSummaryDto);
   }
 
   @Get('companies/information/:companyInformationId/admin-notes')
