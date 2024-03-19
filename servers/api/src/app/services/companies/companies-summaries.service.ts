@@ -567,7 +567,10 @@ export class CompanySummariesService {
     }
 
     if (keyword) {
-      searchConditions.push('(summary.title LIKE :keyword OR summary.content LIKE :keyword)');
+      searchConditions.push(
+        '(summary.title LIKE :keyword OR summary.content LIKE :keyword ' +
+          'OR translation.title_translated LIKE :keyword OR translation.content_translated LIKE :keyword)',
+      );
       parameters['keyword'] = `%${keyword}%`;
     }
 
