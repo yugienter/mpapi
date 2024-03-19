@@ -21,7 +21,7 @@ export class InvestorController implements Coded {
   }
 
   @Get('summaries/search/:language')
-  async getSummaries(@Query() query, @Param('language') language?: LanguageEnum) {
+  async searchSummaries(@Query() query, @Param('language') language?: LanguageEnum) {
     function toArray(value: string | string[]): string[] {
       return Array.isArray(value) ? value : [value].filter(Boolean);
     }
@@ -37,7 +37,7 @@ export class InvestorController implements Coded {
       language: query.language,
     });
 
-    return this.companySummariesService.searchSummariesForInvestor(searchSummaryDto, language);
+    return this.companySummariesService.searchSummariesFromInvestor(searchSummaryDto, language);
   }
 
   @Get('summaries/:summaryId/posted')

@@ -511,7 +511,7 @@ export class CompanySummariesService {
     };
   }
 
-  async searchSummaries(searchSummaryDto: SearchSummaryDto): Promise<CompanySummaryResponse[]> {
+  async searchSummariesFromAdmin(searchSummaryDto: SearchSummaryDto): Promise<CompanySummaryResponse[]> {
     const { type_of_business, years, country, area, number_of_employees, annual_revenue, keyword } = searchSummaryDto;
 
     const latestVersionSubquery = this.companySummaryRepository
@@ -589,7 +589,7 @@ export class CompanySummariesService {
 
   /** Investor */
 
-  async searchSummariesForInvestor(
+  async searchSummariesFromInvestor(
     searchSummaryDto: SearchSummaryDto,
     language?: LanguageEnum,
   ): Promise<CompanySummaryResponse[]> {

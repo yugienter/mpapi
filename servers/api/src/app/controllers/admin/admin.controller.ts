@@ -218,7 +218,7 @@ export class AdminController implements Coded {
       keyword: query.keyword,
     });
 
-    return this.companySummariesService.searchSummaries(searchSummaryDto);
+    return this.companySummariesService.searchSummariesFromAdmin(searchSummaryDto);
   }
 
   @Get('companies/information/:companyInformationId/admin-notes')
