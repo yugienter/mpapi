@@ -1,3 +1,13 @@
 yarn.lock.docker
 
 package.config.json
+
+node_modules/
+
+# Ignore all log files
+*.log
+
+# Ignore environment configuration files
+.env
+.env.local
+.env.staging.local
