@@ -21,7 +21,8 @@ export class CompanySummaryTranslationsService {
     private summaryTranslationRepository: Repository<CompanySummaryTranslation>,
     @InjectRepository(CompanySummary)
     private companySummaryRepository: Repository<CompanySummary>,
-  ) {}
+  ) // eslint-disable-next-line no-empty-function
+  {}
 
   async createSummaryTranslation(
     companySummaryId: number,

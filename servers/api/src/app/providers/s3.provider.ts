@@ -1,4 +1,4 @@
-import { Multipart, MultipartFile } from '@fastify/multipart';
+import { MultipartFile } from '@fastify/multipart';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import * as fs from 'fs';

@@ -11,6 +11,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { ArticleImage } from '@/app/models/article_images';
+import { Article } from '@/app/models/articles';
 import { Company } from '@/app/models/company';
 import { EmailVerificationToken } from '@/app/models/email_verification_tokens';
 import { FileAttachments } from '@/app/models/file_attachments';
@@ -76,6 +78,12 @@ export class User {
 
   @OneToMany(() => FileAttachments, (file) => file.user)
   files: FileAttachments[];
+
+  @OneToMany(() => Article, (article) => article.author)
+  articles: Article[];
+
+  @OneToMany(() => ArticleImage, (image) => image.created_by)
+  articleImages: ArticleImage[];
 }
 
 export class ModifiedUser {

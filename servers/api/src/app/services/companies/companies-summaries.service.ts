@@ -479,7 +479,7 @@ export class CompanySummariesService {
   }
 
   async getUniqueSummaryValues({ isAdmin = false }: { isAdmin?: boolean } = {}): Promise<SummaryOptions> {
-    const latestVersionSubquery = this.companySummaryRepository
+    const latestVersionSubQuery = this.companySummaryRepository
       .createQueryBuilder('subSummary')
       .select(['companyInformation.id AS companyInformationId', 'MAX(subSummary.version) AS maxVersion'])
       .innerJoin('subSummary.companyInformation', 'companyInformation')
@@ -489,11 +489,11 @@ export class CompanySummariesService {
     const query = this.companySummaryRepository
       .createQueryBuilder('summary')
       .innerJoin(
-        '(' + latestVersionSubquery.getQuery() + ')',
+        '(' + latestVersionSubQuery.getQuery() + ')',
         'latestSummary',
         'summary.companyInformation.id = latestSummary.companyInformationId AND summary.version = latestSummary.maxVersion',
       )
-      .setParameters(latestVersionSubquery.getParameters());
+      .setParameters(latestVersionSubQuery.getParameters());
 
     if (!isAdmin) {
       query.where('summary.status = :status', { status: SummaryStatus.POSTED });
@@ -514,7 +514,7 @@ export class CompanySummariesService {
   async searchSummariesFromAdmin(searchSummaryDto: SearchSummaryDto): Promise<CompanySummaryResponse[]> {
     const { type_of_business, years, country, area, number_of_employees, annual_revenue, keyword } = searchSummaryDto;
 
-    const latestVersionSubquery = this.companySummaryRepository
+    const latestVersionSubQuery = this.companySummaryRepository
       .createQueryBuilder('subSummary')
       .select(['subSummary.company_information_id AS companyInformationId', 'MAX(subSummary.version) AS maxVersion'])
       .where('subSummary.status = :status', { status: SummaryStatus.POSTED })
@@ -523,11 +523,11 @@ export class CompanySummariesService {
     const query = this.companySummaryRepository
       .createQueryBuilder('summary')
       .innerJoin(
-        '(' + latestVersionSubquery.getQuery() + ')',
+        '(' + latestVersionSubQuery.getQuery() + ')',
         'latestSummary',
         'summary.company_information_id = latestSummary.companyInformationId AND summary.version = latestSummary.maxVersion',
       )
-      .setParameters(latestVersionSubquery.getParameters())
+      .setParameters(latestVersionSubQuery.getParameters())
       .where('summary.status = :status', { status: SummaryStatus.POSTED })
       .leftJoinAndSelect('summary.translations', 'translation');
 
@@ -595,7 +595,7 @@ export class CompanySummariesService {
   ): Promise<CompanySummaryResponse[]> {
     const { type_of_business, years, country, area, number_of_employees, annual_revenue, keyword } = searchSummaryDto;
 
-    const latestVersionSubquery = this.companySummaryRepository
+    const latestVersionSubQuery = this.companySummaryRepository
       .createQueryBuilder('subSummary')
       .select(['subSummary.company_information_id AS companyInformationId', 'MAX(subSummary.version) AS maxVersion'])
       .where('subSummary.status = :status', { status: SummaryStatus.POSTED })
@@ -604,11 +604,11 @@ export class CompanySummariesService {
     const query = this.companySummaryRepository
       .createQueryBuilder('summary')
       .innerJoin(
-        '(' + latestVersionSubquery.getQuery() + ')',
+        '(' + latestVersionSubQuery.getQuery() + ')',
         'latestSummary',
         'summary.company_information_id = latestSummary.companyInformationId AND summary.version = latestSummary.maxVersion',
       )
-      .setParameters(latestVersionSubquery.getParameters())
+      .setParameters(latestVersionSubQuery.getParameters())
       .where('summary.status = :status', { status: SummaryStatus.POSTED })
       .andWhere('summary.is_public = :isPublic', { isPublic: true })
       .orderBy('summary.card_order', 'DESC');

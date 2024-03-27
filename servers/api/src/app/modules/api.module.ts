@@ -7,6 +7,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AdminController } from '@/app/controllers/admin/admin.controller';
+import { ArticleController } from '@/app/controllers/admin/article.controller';
 import { AuthController } from '@/app/controllers/auth.controller';
 import { CompaniesController } from '@/app/controllers/companies/companies.controller';
 import { FilesController } from '@/app/controllers/files/files.controller';
@@ -42,6 +43,7 @@ const allControllers = [
   CompaniesController,
   FilesController,
   AdminController,
+  ArticleController,
   MastersController,
   InvestorController,
 ];
