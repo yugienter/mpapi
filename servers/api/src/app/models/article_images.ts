@@ -11,6 +11,11 @@ import {
 import { Article } from '@/app/models/articles';
 import { User } from '@/app/models/user';
 
+export enum ImageStatus {
+  UNUSED = 'UNUSED',
+  USED = 'USED',
+}
+
 @Entity('article_images')
 export class ArticleImage {
   @PrimaryGeneratedColumn()
@@ -40,11 +45,18 @@ export class ArticleImage {
   @Column({ nullable: true })
   deleted_at: Date | null;
 
+  @Column({
+    type: 'enum',
+    enum: ImageStatus,
+    default: ImageStatus.UNUSED,
+  })
+  status: ImageStatus;
+
   @ManyToOne(() => User, (user) => user.articleImages)
   @JoinColumn({ name: 'created_by' })
-  created_by: User;
+  user: User;
 
-  @ManyToOne(() => Article, (article) => article.articleImages)
+  @ManyToOne(() => Article, (article) => article.articleImage)
   @JoinColumn({ name: 'article_id' })
   article?: Article;
 }

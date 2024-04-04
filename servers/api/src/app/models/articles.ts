@@ -44,8 +44,8 @@ export class Article {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'author_id' })
-  author: User;
+  user: User;
 
   @OneToMany(() => ArticleImage, (article) => article.article)
-  articleImages: ArticleImage[];
+  articleImage: ArticleImage[];
 }

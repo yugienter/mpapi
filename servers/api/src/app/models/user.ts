@@ -79,10 +79,10 @@ export class User {
   @OneToMany(() => FileAttachments, (file) => file.user)
   files: FileAttachments[];
 
-  @OneToMany(() => Article, (article) => article.author)
+  @OneToMany(() => Article, (article) => article.user)
   articles: Article[];
 
-  @OneToMany(() => ArticleImage, (image) => image.created_by)
+  @OneToMany(() => ArticleImage, (image) => image.user)
   articleImages: ArticleImage[];
 }
 

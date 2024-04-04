@@ -100,6 +100,13 @@ export class CreateArticlesAndArticleImagesTable1711442707117 implements Migrati
           {
             name: 'article_id',
             type: 'int',
+            isNullable: true,
+          },
+          {
+            name: 'status',
+            type: 'enum',
+            enum: ['UNUSED', 'USED'],
+            default: `'UNUSED'`,
           },
           {
             name: 'created_by',

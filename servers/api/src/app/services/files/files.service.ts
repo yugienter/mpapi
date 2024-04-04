@@ -29,8 +29,12 @@ export class FileService {
       user: User;
     },
   ): Promise<T> {
-    const uploadedFile = repository.create(fileData as DeepPartial<T>);
-    return repository.save(uploadedFile);
+    try {
+      const uploadedFile = repository.create(fileData as DeepPartial<T>);
+      return repository.save(uploadedFile);
+    } catch (error) {
+      throw new Error('Error when saving file to database');
+    }
   }
 
   async createAttachmentFileOfCompany(fileData: {

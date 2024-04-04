@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Logger, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 
+import { CreateArticleDto, UpdateArticleDto } from '@/app/controllers/dto/article.dto';
 import { Roles } from '@/app/decorators/roles.decorator';
 import { RolesGuard } from '@/app/guards/roles.guard';
 import { Article } from '@/app/models/articles';
@@ -7,6 +8,8 @@ import { RolesEnum } from '@/app/models/user';
 import { ArticleService } from '@/app/services/articles/articles.services';
 import { Coded } from '@/app/utils/coded';
 import { Authorized, MpplatformApiDefault } from '@/app/utils/decorators';
+
+import { ArticleResponse } from '../viewmodels/article.response';
 
 @MpplatformApiDefault()
 @Authorized()
@@ -29,20 +32,26 @@ export class ArticleController implements Coded {
 
   @Get(':id')
   @Roles(RolesEnum.admin)
-  async getArticleById(@Param('id') id: number): Promise<Article> {
+  async getArticleById(@Param('id') id: number): Promise<ArticleResponse> {
     return this.articleService.getArticleById(id);
   }
 
   @Post()
   @Roles(RolesEnum.admin)
-  async createArticle(@Body() article: Article): Promise<Article> {
-    return this.articleService.createArticle(article);
+  async createArticle(@Body() article: CreateArticleDto, @Req() request): Promise<ArticleResponse> {
+    const authorId = request.raw.user.uid;
+    return this.articleService.createArticle(article, authorId);
   }
 
   @Put(':id')
   @Roles(RolesEnum.admin)
-  async updateArticle(@Param('id') id: number, @Body() article: Article): Promise<Article> {
-    return this.articleService.updateArticle(id, article);
+  async updateArticle(
+    @Param('id') id: number,
+    @Body() article: UpdateArticleDto,
+    @Req() request,
+  ): Promise<ArticleResponse> {
+    const authorId = request.raw.user.uid;
+    return this.articleService.updateArticle(id, article, authorId);
   }
 
   @Delete(':id')

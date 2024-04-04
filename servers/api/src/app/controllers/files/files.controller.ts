@@ -26,12 +26,7 @@ abstract class BaseFileStorageStrategy implements FileStorageStrategy {
 
   async storeFile(file: any, user: ModifiedUser) {
     const contentType = file.mimetype;
-    const s3Key = await this.s3Provider.uploadFile(
-      file,
-      contentType,
-      user.role,
-      this.folder === 'company' ? 'infoDetail' : this.folder,
-    );
+    const s3Key = await this.s3Provider.uploadFile(file, contentType, user.role, this.folder);
 
     const fileData = {
       name: file.filename,
@@ -41,7 +36,7 @@ abstract class BaseFileStorageStrategy implements FileStorageStrategy {
       user: user as User,
     };
 
-    if (this.folder === 'company') {
+    if (this.folder === 'infoDetail') {
       return this.filesService.createAttachmentFileOfCompany(fileData);
     }
 
@@ -53,7 +48,7 @@ abstract class BaseFileStorageStrategy implements FileStorageStrategy {
 
 class ArticleFileStorageStrategy extends BaseFileStorageStrategy {
   constructor(filesService: FileService, s3Provider: S3Provider) {
-    super(filesService, s3Provider, 'articles');
+    super(filesService, s3Provider, 'article');
   }
 
   async storeFile(file: any, user: ModifiedUser) {
