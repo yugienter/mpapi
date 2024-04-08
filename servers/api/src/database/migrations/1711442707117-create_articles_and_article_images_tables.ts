@@ -22,6 +22,16 @@ export class CreateArticlesAndArticleImagesTable1711442707117 implements Migrati
             type: 'text',
           },
           {
+            name: 'excerpt',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'displayDate',
+            type: 'timestamp',
+            isNullable: true,
+          },
+          {
             name: 'content',
             type: 'text',
           },

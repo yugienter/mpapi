@@ -1,11 +1,11 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { FindManyOptions, In, Repository } from 'typeorm';
 
 import { CreateArticleDto, UpdateArticleDto } from '@/app/controllers/dto/article.dto';
 import { ArticleResponse } from '@/app/controllers/viewmodels/article.response';
 import { ArticleImage, ImageStatus } from '@/app/models/article_images';
-import { Article } from '@/app/models/articles';
+import { Article, ArticleStatus } from '@/app/models/articles';
 import { User } from '@/app/models/user';
 import { Service } from '@/app/utils/decorators';
 
@@ -136,5 +136,41 @@ export class ArticleService {
 
   async deleteArticle(id: number): Promise<void> {
     await this.articleRepository.delete(id);
+  }
+
+  // COMPANY SIDE
+  async getManyArticlesForCompanySide(limit?: number): Promise<Article[]> {
+    this.logger.debug('[getAllArticlesForCompanySide]');
+    try {
+      const queryOptions: FindManyOptions<Article> = {
+        where: { status: ArticleStatus.PUBLISHED },
+        order: { displayDate: 'DESC' },
+      };
+
+      if (limit) {
+        queryOptions.take = limit;
+      }
+
+      return this.articleRepository.find(queryOptions);
+    } catch (error) {
+      this.logger.error(`Failed to get All Articles for Company: ${error.message}`);
+      throw new NotFoundException(`Failed to get All Articles for Company: ${error.message}`);
+    }
+  }
+
+  async getArticleByIdForCompanySide(id: number): Promise<ArticleResponse> {
+    this.logger.debug(`[getArticleByIdForCompanySide]: ${id}`);
+    try {
+      const article = await this.articleRepository.findOne({ where: { id, status: ArticleStatus.PUBLISHED } });
+
+      if (!article) {
+        throw new NotFoundException(`Article with ID ${id} and status is ${ArticleStatus.PUBLISHED} not found`);
+      }
+
+      return new ArticleResponse(article);
+    } catch (error) {
+      this.logger.error(`Failed to get Article by ID ${id}: ${error.message}`);
+      throw new NotFoundException(`Failed to get Article by ID ${id}: ${error.message}`);
+    }
   }
 }

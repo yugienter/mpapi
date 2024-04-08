@@ -27,6 +27,12 @@ export class Article {
   title: string;
 
   @Column({ type: 'text' })
+  excerpt: string;
+
+  @Column({ type: 'date' })
+  displayDate: Date;
+
+  @Column({ type: 'text' })
   content: string;
 
   @Column({

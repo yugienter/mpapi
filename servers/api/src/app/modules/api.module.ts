@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminController } from '@/app/controllers/admin/admin.controller';
 import { ArticleController } from '@/app/controllers/admin/article.controller';
 import { AuthController } from '@/app/controllers/auth.controller';
+import { ArticleCompaniesController } from '@/app/controllers/companies/article_companies.controller';
 import { CompaniesController } from '@/app/controllers/companies/companies.controller';
 import { FilesController } from '@/app/controllers/files/files.controller';
 import { HealthController } from '@/app/controllers/health.controller';
@@ -44,6 +45,7 @@ const allControllers = [
   FilesController,
   AdminController,
   ArticleController,
+  ArticleCompaniesController,
   MastersController,
   InvestorController,
 ];
